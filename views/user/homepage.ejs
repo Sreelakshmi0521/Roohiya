@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roopiya - Adorn Your Soul with Timeless Beauty</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo img {
+            max-width: 60px;
+            height: auto;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 400;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #d4af37;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .search-bar {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            width: 200px;
+        }
+
+        .cart-icon, .user-icon, .wishlist-icon {
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Hero Section (Banner) */
+        .hero {
+            position: relative;
+            height: 95vh;
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('hero-bg.jpg'); /* Replace with actual image */
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            padding: 20px;
+        }
+
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .cta-btn {
+            background: #d4af37;
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .cta-btn:hover {
+            background: #b8942f;
+        }
+
+        /* Categories Section */
+        .categories {
+            padding: 4rem 0;
+        }
+
+        .section-title {
+            text-align: center;
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #333;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .category-card {
+            text-align: center;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .category-image {
+            width: 100%;
+            height: 250px;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            object-fit: cover;
+        }
+
+        .category-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* New Arrivals Section */
+        .new-arrivals {
+            padding: 4rem 0;
+            background: #f9f9f9;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 2rem;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+
+        .product-info {
+            padding: 1rem;
+        }
+
+        .product-name {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-price {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #d4af37;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero {
+                height: 70vh; /* Adjusted for mobile */
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <div class="logo"><img src="/images/icon.png" alt="Roopiya Logo"></div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</li>
+                <li><a href="#shop">Shop</a></li>
+                <li><a href="#new">New Arrivals</a></li>
+                <li><a href="#about">About</a></li>
+            </ul>
+            <div class="header-actions">
+                <input type="text" class="search-bar" placeholder="Search...">
+                <div class="user-icon">👤</div>
+                <div class="wishlist-icon">❤️</div>
+                <div class="cart-icon">🛒</div>
+            </div>
+        </nav>
+    </header>
+
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1>Adorn Your Soul</h1>
+            <p>with timeless beauty</p>
+            <button class="cta-btn">Shop Now</button>
+        </div>
+    </section>
+
+    <section class="categories" id="shop">
+        <div class="container">
+            <h2 class="section-title">Browse Categories</h2>
+            <div class="categories-grid">
+                <div class="category-card">
+                    <img src="/images/officewear.jpg" alt="Office Wear" class="category-image"> <!-- Replace with actual image -->
+                    <h3 class="category-title">Office Wear</h3>
+                </div>
+                <div class="category-card">
+                    <img src="/images/casual wear.jpg" alt="Casual Wear" class="category-image"> <!-- Replace with actual image -->
+                    <h3 class="category-title">Casual Wear</h3>
+                </div>
+                <div class="category-card">
+                    <img src="/images/festivewear.jpg" alt="Festive Wear" class="category-image"> <!-- Replace with actual image -->
+                    <h3 class="category-title">Festive Wear</h3>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="new-arrivals" id="new">
+        <div class="container">
+            <h2 class="section-title">New Arrivals</h2>
+            <div class="products-grid">
+                <div class="product-card">
+                    <img src="/images/flower gold.jpg" alt="Golden Hoops" class="product-image"> <!-- Replace with actual image -->
+                    <div class="product-info">
+                        <h4 class="product-name">Golden Blossom Studs</h4>
+                        <p class="product-price">₹170</p>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <img src="/images/royal silver.jpg" alt="Roopiya Silver Studs" class="product-image"> <!-- Replace with actual image -->
+                    <div class="product-info">
+                        <h4 class="product-name">Royal Silver Jhumkas</h4>
+                        <p class="product-price">₹650</p>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <img src="/images/golden teardrop.jpg" alt="Golden Teardrops" class="product-image"> <!-- Replace with actual image -->
+                    <div class="product-info">
+                        <h4 class="product-name">Golden Teardrops Studs</h4>
+                        <p class="product-price">₹350</p>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <img src="/images/love gold.jpg" alt="Copper Hoops" class="product-image"> <!-- Replace with actual image -->
+                    <div class="product-info">
+                        <h4 class="product-name">Golden Heart Studs</h4>
+                        <p class="product-price">₹160</p>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <img src="/images/Triple Hoop.jpg" alt="Gold Heart Earrings" class="product-image"> <!-- Replace with actual image -->
+                    <div class="product-info">
+                        <h4 class="product-name">Triple Hoop Silver-Plated</h4>
+                        <p class="product-price">₹400</p>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <img src="/images/silver twirl.jpg" alt="Silver Drops" class="product-image"> <!-- Replace with actual image -->
+                    <div class="product-info">
+                        <h4 class="product-name">Silver Twirl Drops</h4>
+                        <p class="product-price">₹150</p>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <img src="/images/moonlit.jpg" alt="Pastel Chandbalis" class="product-image"> <!-- Replace with actual image -->
+                    <div class="product-info">
+                        <h4 class="product-name">Moonlit Jhumka</h4>
+                        <p class="product-price">650</p>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <img src="/images/festivewear.jpg" alt="Pearl Earrings" class="product-image"> <!-- Replace with actual image -->
+                    <div class="product-info">
+                        <h4 class="product-name">Royal Dome Chandbali</h4>
+                        <p class="product-price">₹750</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer style="background: #333; color: white; text-align: center; padding: 2rem 0;">
+        <div class="container">
+            <p>&copy; 2025 Roopiya. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Simple smooth scrolling for nav links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Cart functionality placeholder
+        document.querySelector('.cart-icon').addEventListener('click', () => {
+            alert('Cart - Coming soon!');
+        });
+
+        // Wishlist functionality placeholder
+        document.querySelector('.wishlist-icon').addEventListener('click', () => {
+            alert('Wishlist - Coming soon!');
+        });
+    </script>
+</body>
+</html>
