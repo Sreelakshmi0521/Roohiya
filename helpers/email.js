@@ -2,7 +2,7 @@
 const nodemailer=require("nodemailer")
 const env=require("dotenv").config({quiet:true})
 
-async function sendVerificationEmail(email,otp) {
+async function sendVerificationEmail(email,otp,context="signup") {
     try {
         const transporter=nodemailer.createTransport({
             service:"gmail",
@@ -12,13 +12,23 @@ async function sendVerificationEmail(email,otp) {
             }
            
         })
+        let subject,text,html;
+        if(context==="forgot"){
+            subject="Reset Your Password";
+            text = `Your OTP for password reset is ${otp}`;
+            html = `<b>Your OTP for password reset: ${otp}</b>`;
+        }else{
+             subject="Verify your account";
+            text=`Your OTP is ${otp}`;
+            html=`<b> Your OTP: ${otp}</b>`;
+        }
         const emailInfo=await transporter.sendMail({
 
             from:process.env.NODEMAILER_EMAIL,
             to:email,
-            subject:"Verify your account",
-            text:`Your OTP is ${otp}`,
-            html:`<b> Your OTP: ${otp}</b>`
+            subject:subject,
+            text:text,
+            html:html,
         })
         return emailInfo.accepted.length>0
         

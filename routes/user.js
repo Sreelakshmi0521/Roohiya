@@ -24,6 +24,16 @@ router.get("/auth/google/callback",passport.authenticate("google", { failureRedi
 router.get("/login",isLogin,nocache,authController.loadLogin)
 router.post("/login",authController.loginUser)
 
+//forgot password
+router.get("/forgotPassword",authController.loadForpassEmail)
+router.post("/forgotPassword",authController.sendRecoverOtp)
+router.get("/recoveryOtp",authController.loadRecoveryOtp)
+router.post("/recoveryOtp",authController.recoveryOtp)
+router.post("/resendRecoveryOtp",authController.resendRecoveryOtp)
+router.get("/newForpassword",authController.loadNewpassword)
+router.post("/newForpassword",authController.newForpassword)
+
+
 router.get("/homepage",requireLogin,nocache,authController.loadHomepage)
 
 

@@ -163,7 +163,7 @@ const resendOtp=async(req,res)=>{
     try {
         const {email,password}=req.body
 
-            const errors=validationLogin({email,password});
+         const errors=validationLogin({email,password});
         if(errors.length>0){
             return res.render("user/login",{
                 message:errors[0],
@@ -233,6 +233,157 @@ const googleLogin = (req, res) => {
     }
 }
 
+//forgot password
+
+const loadForpassEmail=(req,res)=>{
+    res.render("user/forgotPassword",{
+        message:null,
+        messageType:null
+    })
+}
+
+//email verify for otp
+const sendRecoverOtp=async(req,res)=>{
+    try{
+    const {email}=req.body
+
+    if(!email){
+        return res.json({success:false,message:"email is required"})
+    }
+
+    const user =await User.findOne({email})
+    if(!user){
+        return res.json({success:false,message:"email not registered"})
+    }
+
+    if (req.session.recoveryEmail && req.session.recoverOtp && Date.now() < req.session.recoverOtpExpiry) {
+            return res.json({ success: false, message: " OTP already send. Please wait until it expires." });
+        }
+    
+   
+        const otp=generateOtp()
+    req.session.recoverOtp=otp
+    req.session.recoverOtpExpiry= Date.now() + 1 * 60 * 1000
+    req.session.recoveryEmail = email
+    console.log(otp)
+
+     const sentEmail=await sendVerificationEmail(email,otp,"forgot")
+    if (!sentEmail){
+         return res.json({ success: false, message: "Failed to send OTP" })
+    }
+
+    res.json({ success: true, message: "OTP sent to your email" })
+   
+}catch (error) {
+        console.error(error);
+        res.json({ success: false, message: "Something went wrong. Try again" });
+    }
+
+
+}
+
+const loadRecoveryOtp=(req,res)=>{
+     res.render("user/recoveryOtp",{
+        message:null,
+        messageType:null
+     })
+}
+const recoveryOtp=async(req,res)=>{
+    try {
+        let {otp}=req.body
+
+        if(!otp||!/^\d{6}$/.test(otp)){
+            return res.json({success:false,message:"OTP must be 6 digits."})
+        }
+        if(!req.session.recoverOtp||!req.session.recoveryEmail){
+            return res.json({success:false,message:"No OTP Found. Try again"})
+        }
+        if(Date.now() > req.session.recoverOtpExpiry){
+            req.session.recoverOtp=null
+            req.session.recoverOtpExpiry=null
+            req.session.recoveryEmail=null
+           return res.json({success:false,message: "OTP expired. Please resend."})
+        }
+        if(otp!==req.session.recoverOtp){
+            return res.json({success:false,message:"Incorrect OTP,Try again"})
+        }
+        req.session.verifiedRecoveryEmail=req.session.recoveryEmail
+
+        req.session.recoverOtp=null
+        req.session.recoverOtpExpiry=null
+        return res.json({success:true,message: "OTP verified successfully!"})
+   
+    } catch (error) {
+        console.log(error)
+        return res.json({success:false,message: "Something went wrong while verifying OTP."})
+    }
+}
+
+//resend recovery otp
+const resendRecoveryOtp=async(req,res)=>{
+  try {
+    if(!req.session.recoveryEmail){
+        return res.json({success:false,message:"No recovery email found.Try again"})
+    }
+    const otp=generateOtp()
+    req.session.recoverOtp=otp
+    req.session.recoverOtpExpiry=Date.now()+1 * 60 * 1000
+    console.log("resend recovery otp:",otp )
+
+    const sentEmail=await sendVerificationEmail(req.session.recoveryEmail,otp,"forgot")
+
+    if(!sentEmail){
+        return res.json({success:false,message:"Failed to resend OTP,try again"})
+    }
+  
+    // console.log("resend recov otp:",otp)
+
+  return res.json({success:true,message: "A new OTP has been sent to your email."})
+
+  } catch (error) {
+    console.error(error)
+    return res.json({success:false,message: "Something went wrong while resending OTP."})
+  }
+}
+const loadNewpassword=(req,res)=>{
+    if(!req.session.verifiedRecoveryEmail){
+        return res.redirect("/user/forgotPassword")
+    }
+    res.render("user/newForpassword",{
+        message:null,
+        messageType:null
+    })
+}
+const newForpassword=async(req,res)=>{
+    try {
+        const {newPassword,confirmPassword}=req.body
+
+        if(!newPassword||!confirmPassword){
+            return res.json({success:false,message:"All fields are required"})
+        }
+        if(newPassword!==confirmPassword){
+            return res.json({success:false,message:"Incorrect password"})
+        }
+        
+        const hashedPassword= await bcrypt.hash(newPassword,10)
+
+        const updatepass= await User.findOneAndUpdate(
+            {email:req.session.verifiedRecoveryEmail},
+            {$set:{password:hashedPassword}}
+        )
+        console.log(updatepass)
+
+        req.session.verifiedRecoveryEmail=null
+        
+        return res.json({success:true,message:"Password reset successfully!"})
+        
+         
+    } catch (error) {
+        console.error(error);
+       return res.json({ success: false, message: "Something went wrong." })
+        
+    }
+}
 
 const loadHomepage=(req,res)=>{
     res.render("user/homepage",{ 
@@ -249,5 +400,12 @@ module.exports={
     resendOtp,
     loadLogin,
     loginUser,
-    googleLogin
+    googleLogin,
+   loadForpassEmail,
+    sendRecoverOtp,
+    loadRecoveryOtp,
+     recoveryOtp,
+    resendRecoveryOtp,
+    loadNewpassword,
+    newForpassword
 }

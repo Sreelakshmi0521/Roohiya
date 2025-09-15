@@ -128,7 +128,8 @@
                      enableResend()
                 }
             } catch (error) {
-                 Swal.fire({ icon: "error",
+                 Swal.fire({ 
+                    icon: "error",
                   title: "Server Error", 
                   text: "Could not resend OTP. Try again later."
                  });
