@@ -4,6 +4,7 @@ const bcrypt=require("bcrypt")
 
 const loadLogin=(req,res)=>{
     res.render("admin/login",{
+        layout: false, 
         message:null,
         messageType:null,
         FormData:{
@@ -23,6 +24,7 @@ const adminLogin=async(req,res)=>{
         return res.render("admin/login",{
             message:"Invalid email or Password",
             messageType:"warning",
+            layout: false,
             FormData:{email},
 
         })
@@ -34,6 +36,7 @@ const adminLogin=async(req,res)=>{
         return res.render("admin/login",{
             message:"invalid  password",
             messageType:"warning",
+             layout: false,
             FormData:{email}
         })
     }
@@ -49,6 +52,7 @@ const adminLogin=async(req,res)=>{
         res.render("admin/login",{
             message:"something went wrong ",
             messageType:"warning",
+             layout: false,
             FormData:{}
         })
         
@@ -70,6 +74,8 @@ const loadDashboard=async(req,res)=>{
             admin,
             message: null,
             messageType: null,
+          
+    
         });
     } catch (error) {
         console.error(error)

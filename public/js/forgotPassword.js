@@ -85,6 +85,10 @@
                     title:"Sending..",
                     text:"Please Wait",
                     allowOutsideClick:false,
+                    position:"center",
+                    customClass: {
+                    popup: 'swal-custom'
+                     },
                     didOpen:()=>{
                         Swal.showLoading()
                     }
@@ -183,7 +187,7 @@
    }
 
    if(resendLink){
-   resendLink.addEventListener("click",async(e)=>{
+   resendLink.addEventListener("click",throttle(async(e)=>{
 
     e.preventDefault()
     if(!canResend)return 
@@ -199,22 +203,24 @@
                     })
                     startTimer()
         }else{
-             Swal.fire({
+                 Swal.fire({
                         icon:"error",
                         title:"error",
                         text:res.data.message
                     })
                     enableResend()
-        }
+       
+                }
 
     } catch (error) {
          Swal.fire({ icon: "error",
                   title: "Server Error", 
                   text: "Could not resend OTP. Try again later."
-                 });
-                  enableResend()
-    }
-   })
+                 })
+                 enableResend()
+  
+                }
+   },3000))
     
 
 

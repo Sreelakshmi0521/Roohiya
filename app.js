@@ -8,6 +8,7 @@ const nocache=require("nocache")
 const userRoutes=require("./routes/user")
 const adminRoutes=require("./routes/admin")
 const passport=require("./config/passport")
+const expressLayouts=require("express-ejs-layouts")
 
 
 
@@ -18,6 +19,9 @@ app.use(express.urlencoded({extended:true}))
 app.set("view engine","ejs")
 app.set("views",path.join(__dirname,"views"))
 app.use(express.static(path.join(__dirname,"public")))
+app.use(expressLayouts)
+app.set('layout', 'layouts/mainLayout');
+
 
 
 app.use(session({
