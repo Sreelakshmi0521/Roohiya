@@ -1,0 +1,26 @@
+<div class="content-wrapper">
+    <h1>Add New Category</h1>
+
+    <!-- Success/Warning Messages -->
+    <% if (message) { %>
+        <div class="alert <%= messageType === 'success' ? 'alert-success' : 'alert-warning' %>">
+            <p class="mb-0"><%= message %></p>
+        </div>
+    <% } %>
+
+    <!-- Add Category Form -->
+    <form action="/admin/categories/add" method="POST" class="category-form">
+        <div class="form-group">
+            <label for="name">Category Name</label>
+            <input type="text" id="name" name="name" placeholder="Enter category name" >
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description (optional)</label>
+            <textarea id="description" name="description" placeholder="Enter description"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-add">Add Category</button>
+        <a href="/admin/categories" class="btn btn-clear">Cancel</a>
+    </form>
+</div>

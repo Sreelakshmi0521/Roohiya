@@ -1,0 +1,74 @@
+<div class="content-wrapper">
+    <h1>Categories</h1>
+
+    <!-- Search & Filter Form -->
+    <form action="/admin/categories" method="GET" class="search-filter-form">
+        <div class="search-filter-bar">
+            <div class="search-container">
+                <input type="text" name="search" value="<%= search %>" placeholder="Search here..." class="search-input">
+                <button type="submit" class="btn btn-search">🔍</button>
+            </div>
+            <a href="/admin/categories" class="btn btn-clear">Clear</a>
+        </div>
+    </form>
+
+    <!-- Category Table -->
+    <table class="category-table table">
+        <thead>
+            <tr>
+                <th>Sl.No</th>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        <% if(categories.length === 0) { %>
+            <tr>
+                <td colspan="4" class="no-results">No categories found</td>
+            </tr>
+        <% } else { %>
+            <% for(let i = 0; i < categories.length; i++) { 
+                let category = categories[i]; %>
+                <tr>
+                    <td><%= i + 1 %></td>
+                    <td><%= category.name %></td>
+                    <td><%= category.isListed ? "Listed" : "Unlisted" %></td>
+                    <td>
+                        <a href="/admin/categories/edit/<%= category._id %>" class="btn btn-edit">Edit</a>
+
+                        <% if(category.isListed) { %>
+                            <a href="/admin/categories/unlist/<%= category._id %>" class="btn btn-unlist">Unlist</a>
+                        <% } else { %>
+                            <a href="/admin/categories/list/<%= category._id %>" class="btn btn-list">List</a>
+                        <% } %>
+                         <form action="/admin/categories/delete/<%= category._id %>" method="POST" style="display:inline;">
+                             <button type="submit" class="btn btn-delete">Delete</button>
+                           </form>
+                    </td>
+                </tr>
+            <% } %>
+        <% } %>
+        </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <div class="pagination">
+        <% if(currentPage > 1) { %>
+            <a href="?page=<%= currentPage - 1 %>&search=<%= search %>" class="btn prev-btn">Previous</a>
+        <% } %>
+        
+        <% for(let i = 1; i <= totalPages; i++) { %>
+            <a href="?page=<%= i %>&search=<%= search %>" class="btn page-btn <%= currentPage === i ? 'active' : '' %>"><%= i %></a>
+        <% } %>
+
+        <% if(currentPage < totalPages) { %>
+            <a href="?page=<%= currentPage + 1 %>&search=<%= search %>" class="btn next-btn">Next</a>
+        <% } %>
+    </div>
+
+    <!-- Bottom Buttons -->
+    <div class="category-actions">
+        <a href="/admin/categories/add" class="btn btn-add">Add a new category</a>
+    </div>
+</div>

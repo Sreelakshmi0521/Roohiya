@@ -14,7 +14,7 @@ const loadCustomer=async(req,res)=>{
         if(req.query.page){
             page=parseInt(req.query.page)
         }
-        const limit=3
+        let  limit=3
 
         let userData={ isDeleted:false}
 
