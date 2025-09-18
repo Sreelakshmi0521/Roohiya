@@ -43,6 +43,14 @@ const userSchema=new mongoose.Schema({
 },{timestamps:true})
 
 
+userSchema.virtual("status").get(function(){
+    return this.isBlocked ? "Blocked" : "Active"
+})
+
+userSchema.set("toJSON",{virtuals:true})
+userSchema.set("toObject",{virtuals:true})
+
+
 
 const User=mongoose.model("User",userSchema)
 module.exports=User;
