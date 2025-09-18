@@ -1,6 +1,7 @@
 .content-wrapper {
-    max-width: 1200px; /* Optional: constrain width for better readability */
+    max-width: 1200px;
     margin: 0 auto;
+    padding: 20px;
 }
 
 .search-filter-bar {
@@ -28,11 +29,21 @@
     font-size: 14px;
 }
 
-.search-icon {
+.btn-search {
     padding: 8px 12px;
+    border: none;
     background-color: #3498db;
     color: white;
     border-radius: 0 4px 4px 0;
+    cursor: pointer;
+}
+
+.btn-clear {
+    padding: 8px 12px;
+    border: none;
+    background-color: #7f8c8d;
+    color: white;
+    border-radius: 4px;
     cursor: pointer;
 }
 
@@ -78,26 +89,27 @@
 .customer-table .btn {
     display: inline-block;
     padding: 6px 12px;
-    text-decoration: none;
     border-radius: 4px;
     font-size: 12px;
     margin-right: 5px;
-    color: white !important;
+    color: white;
     text-align: center;
+    cursor: pointer;
     transition: opacity 0.3s ease;
+    border: none;
 }
 
-.customer-table .btn-edit {
-    background-color: #27ae60 !important;
+.customer-table .btn-block {
+    background-color: #e74c3c; /* Red for block */
 }
 
-.customer-table .btn-delete {
-    background-color: #e74c3c !important;
+.customer-table .btn-unblock {
+    background-color: #27ae60; /* Green for unblock */
 }
 
-.customer-table .btn-edit:hover,
-.customer-table .btn-delete:hover {
-    opacity: 0.9;
+.customer-table .btn-block:hover,
+.customer-table .btn-unblock:hover {
+    opacity: 0.8;
 }
 
 .pagination {
@@ -115,7 +127,7 @@
     color: #2c3e50;
     border-radius: 4px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    text-decoration: none;
 }
 
 .pagination .btn:hover {
@@ -137,4 +149,10 @@
 .pagination .prev-btn:hover,
 .pagination .next-btn:hover {
     background-color: #2980b9;
+}
+.no-results {
+    text-align: center;
+    font-weight: bold;
+    padding: 20px 0;
+    color: #555;
 }

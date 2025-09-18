@@ -8,30 +8,29 @@ const loadCustomer=async(req,res)=>{
             search=req.query.search;
         }
 
-        let filter=""
-        if(req.query.filter){
-            filter=req.query.filter
-        }
+
 
         let page=1
         if(req.query.page){
             page=parseInt(req.query.page)
         }
         const limit=3
-      
-        let userData={
-            isDeleted:false,
-            $or:[
+
+        let userData={ isDeleted:false}
+
+    
+        if(search){
+          userData.$or=[
                 {name:{$regex:search,$options:"i"}},
                 {email:{$regex:search,$options:"i"}},
             ]
         }
       
-        if(filter){
-            userData.isBlocked= filter==="blocked" ? true:false
-        }
-        const totalCustomers=await User.countDocuments(userData)
-        const customers=await User.find(userData)
+    // console.log("data", userData)
+
+
+        const totalCustomers=await User.countDocuments( userData)
+        const customers=await User.find( userData)
              .sort({createdAt:-1})
              .skip((page-1)*limit)
              .limit(limit)
@@ -42,7 +41,7 @@ const loadCustomer=async(req,res)=>{
             currentPage:page,
             totalPages:Math.ceil(totalCustomers/limit),
              search,
-             filter
+              pageJs: "block.unblock.js"
          })
 
     } catch (error) {
@@ -51,8 +50,30 @@ const loadCustomer=async(req,res)=>{
     }
 }
 
+const blockUser=async(req,res)=>{
+    try {
+        const userId=req.params.id
+        await User.findByIdAndUpdate(userId,{isBlocked:true})
+        return res.json({success:true,message:"User blocked successfully"})
+    } catch (error) {
+        console.error(error)
+        return res.json({success:false,message:"failed to block"})
+    }
+}
 
+const unblockUser=async(req,res)=>{
+    try {
+        const userId=req.params.id
+        await User.findByIdAndUpdate(userId,{isBlocked:false})
+        return res.json({success:true,message:"User unblocked "})
+    } catch (error) {
+        console.error(error)
+        return res.json({success:false,message:"failed to unblock"})
+    }
+}
 
 module.exports={
-    loadCustomer
+    loadCustomer,
+    blockUser,
+    unblockUser
 }

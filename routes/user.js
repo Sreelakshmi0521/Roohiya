@@ -4,8 +4,11 @@ const authController=require("../controllers/user/authController")
 const passport = require("passport")
 const nocache=require("../middlewares/nocache")
 const {isLogin,requireLogin,requireTempuser}=require("../middlewares/userAuth")
+const setLayout=require("../middlewares/setLayout")
 
 
+
+router.use(setLayout("user"))
 //signup
 router.get("/signup",isLogin,nocache,authController.loadSignup)
 router.post("/signup",authController.signupUser)

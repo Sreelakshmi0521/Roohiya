@@ -189,6 +189,15 @@ const resendOtp=async(req,res)=>{
                 formData: { email } 
             })
         }
+        if(user.isBlocked){
+            return res.render("user/login",{
+                message:"Your account has been blocked ",
+                messageType:"warning",
+                formData:{email}
+            })
+        }
+
+
         const passMatch= await bcrypt.compare(password,user.password)
         if(!passMatch){
             return res.render("user/login",{
@@ -197,6 +206,7 @@ const resendOtp=async(req,res)=>{
                 formData:{email}
             })
         }
+
 
         req.session.user={
             id:user._id,

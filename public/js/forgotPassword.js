@@ -187,7 +187,7 @@
    }
 
    if(resendLink){
-   resendLink.addEventListener("click",throttle(async(e)=>{
+   resendLink.addEventListener("click",async(e)=>{
 
     e.preventDefault()
     if(!canResend)return 
@@ -220,7 +220,7 @@
                  enableResend()
   
                 }
-   },3000))
+   })
     
 
 

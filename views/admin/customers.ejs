@@ -1,16 +1,15 @@
 <div class="content-wrapper">
     <h1>Customers</h1>
-    <div class="search-filter-bar">
-        <div class="search-container">
-            <input type="text" class="search-input" placeholder="Search here...">
-            <span class="search-icon">🔍</span>
+    <!-- Search & Filter Form -->
+    <form action="/admin/customers" method="GET" class="search-filter-form">
+        <div class="search-filter-bar">
+            <div class="search-container">
+                <input type="text" name="search" value="<%= search %>" placeholder="Search here..." class="search-input">
+                <button type="submit" class="btn btn-search">🔍</button>
+            </div>
+            <a href="/admin/customers" class="btn btn-clear">Clear</a>
         </div>
-        <select class="filter-select">
-            <option value="">Filters</option>
-            <option value="active">Active</option>
-            <option value="blocked">Blocked</option>
-        </select>
-    </div>
+    </form>
     <table class="customer-table table">
         <thead>
             <tr>
@@ -23,28 +22,44 @@
             </tr>
         </thead>
         <tbody>
-            <% customers.forEach(customer => { %>
-                <tr>
-                    <td><%= customer._id %></td> <!-- Changed from customer.customerId to customer._id -->
-                    <td><%= customer.name %></td>
-                    <td><%= customer.email %></td>
-                    <td><%= customer.phone %></td>
-                    <td><%= customer.status %></td>
-                    <td>
-                        <a href="/admin/edit/<%= customer._id %>" class="btn btn-edit">edit</a> <!-- Updated to use _id -->
-                        <a href="/admin/delete/<%= customer._id %>" class="btn btn-delete">delete</a> <!-- Updated to use _id -->
-                    </td>
-                </tr>
-            <% }); %>
-        </tbody>
+    <% if(customers.length === 0) { %>
+        <tr>
+            <td colspan="6" class="no-results">No customers found</td>
+        </tr>
+    <% } else { %>
+        <% for(let i = 0; i < customers.length; i++) { 
+            let customer = customers[i]; %>
+            <tr>
+                <td><%= customer._id %></td> 
+                <td><%= customer.name %></td>
+                <td><%= customer.email %></td>
+                <td><%= customer.phone %></td>
+                <td><%= customer.status %></td>
+                <td>
+                    <button class="btn <%= customer.isBlocked ? 'btn-unblock' : 'btn-block' %> block-unblock-btn"
+                            data-user-id="<%= customer._id %>"
+                            data-status="<%= customer.isBlocked %>">
+                        <%= customer.isBlocked ? "Unblock" : "Block" %>
+                    </button>
+                </td>
+            </tr>
+        <% } %>
+    <% } %>
+</tbody>
+
     </table>
     <div class="pagination">
-        <button class="btn prev-btn">Previous</button>
-        <span class="page-numbers">
-            <% for(let i = 1; i <= totalPages; i++) { %>
-                <button class="btn page-btn <%= currentPage === i ? 'active' : '' %>" data-page="<%= i %>"><%= i %></button>
-            <% } %>
-        </span>
-        <button class="btn next-btn">Next</button>
+        <% if(currentPage > 1) { %>
+            <a href="?page=<%= currentPage - 1 %>&search=<%= search %>" class="btn prev-btn">Previous</a>
+        <% } %>
+        
+        <% for(let i = 1; i <= totalPages; i++) { %>
+             <a href="?page=<%= i %>&search=<%= search %>" class="btn page-btn <%= currentPage === i ? 'active' : '' %>"><%= i %></a>
+        <% } %>
+
+        <% if(currentPage < totalPages) { %>
+            <a href="?page=<%= currentPage + 1 %>&search=<%= search %>" class="btn next-btn">Next</a>
+
+        <% } %>
     </div>
 </div>
