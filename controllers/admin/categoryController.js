@@ -1,5 +1,6 @@
 const Category=require("../../models/categoryModel")
 
+
 const loadCategory=async(req,res)=>{
     try {
       
@@ -33,7 +34,10 @@ const loadCategory=async(req,res)=>{
         totalCategories,
         currentPage:page,
         totalPages,
-        search
+        search,
+         pageJs:"categoryAction.js",
+        message:null,
+        messageType:null
     })
 
     } catch (error) {
@@ -55,7 +59,7 @@ const addCategory=async(req,res)=>{
 
         if(!name||name.trim()===""){
             return res.render("admin/addCategory",{
-                message:"Category name id required",
+                message:"Category name is required",
                 messageType:"warning"
             })
         }
@@ -77,7 +81,7 @@ const addCategory=async(req,res)=>{
 
     } catch (error) {
         console.error(error)
-        return res.render("admin/categories",{
+        return res.render("admin/addCategory",{
             message:"something went wrong",
             messageType:"warning"
         })
@@ -86,11 +90,90 @@ const addCategory=async(req,res)=>{
       
 
 }
+ 
+const loadEditCategory=async(req,res)=>{
+try {
+    
+    const category= await Category.findById(req.params.id)
+    if(!category||category.isDeleted){
+        return res.render("admin/categories",{
+            categories:[],
+            totalCategories:0,
+            currentPage:1,
+            totalPages:0,
+            message:"category not found",
+            messageType:"warning"
+        })
+    }
 
+    res.render("admin/editCategory",{
+        category,
+        message:null,
+        messageType:null
+    })
+
+} catch (error) {
+    console.error(error)
+    res.redirect("/admin/categories")
+}
+}
+ const editCategory=async(req,res)=>{
+    try {
+        const {name,description,isListed}=req.body
+
+    const category= await Category.findById(req.params.id)
+     if(!category||category.isDeleted){
+        return res.render("admin/categories",{
+            message:"category not found",
+            messageType:"warning"
+        })
+     }
+
+     const existingCate=await Category.findOne({
+        name:name,
+        _id:{$ne:req.params.id},
+        isDeleted:false
+     })
+      
+     if(existingCate){
+        return res.render("admin/editCategory",{
+            message:"category already existing",
+            messageType:"warning"
+        })
+     }
+     category.name=name
+     category.description=description
+     category.isListed=isListed==="true"
+      
+     await category.save()
+     console.log(category)
+
+     res.redirect("/admin/categories")
+
+
+    } catch (error) {
+        console.error(error)
+        return res.redirect("/admin/categories")
+    }
+ }
+
+const softDelete=async(req,res)=>{
+   try {
+       await Category.findByIdAndUpdate(req.params.id,{isDeleted:true})
+       res.json({success:true,message:"category deleted successfully"})
+   } catch (error) {
+    console.error(error)
+    res.json({success:false,message:"something wrong"})
+   }
+}
 
 
 module.exports={
     loadCategory,
     loadAddCategory,
-     addCategory
+     addCategory,
+     loadEditCategory,
+      editCategory,
+      softDelete,
+     
 }

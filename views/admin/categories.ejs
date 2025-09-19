@@ -1,6 +1,12 @@
 <div class="content-wrapper">
     <h1>Categories</h1>
-
+<!-- 
+    message alert -->
+       <% if (message) { %>
+        <div class="alert <%= messageType === 'success' ? 'alert-success' : 'alert-warning' %>">
+            <p class="mb-0"><%= message %></p>
+        </div>
+    <% } %>
     <!-- Search & Filter Form -->
     <form action="/admin/categories" method="GET" class="search-filter-form">
         <div class="search-filter-bar">
@@ -37,14 +43,7 @@
                     <td>
                         <a href="/admin/categories/edit/<%= category._id %>" class="btn btn-edit">Edit</a>
 
-                        <% if(category.isListed) { %>
-                            <a href="/admin/categories/unlist/<%= category._id %>" class="btn btn-unlist">Unlist</a>
-                        <% } else { %>
-                            <a href="/admin/categories/list/<%= category._id %>" class="btn btn-list">List</a>
-                        <% } %>
-                         <form action="/admin/categories/delete/<%= category._id %>" method="POST" style="display:inline;">
-                             <button type="submit" class="btn btn-delete">Delete</button>
-                           </form>
+                     <button type="button" class="btn btn-delete" data-category-id="<%= category._id %>">Delete</button>
                     </td>
                 </tr>
             <% } %>

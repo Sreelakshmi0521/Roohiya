@@ -22,8 +22,12 @@ router.post("/customers/unblock/:id",checkSession,customerController.unblockUser
 //category management 
 router.get("/categories",nocache,checkSession,setPagetitle("categories","categories.css"),categoryController.loadCategory)
 router.get("/categories/add",nocache,checkSession,setPagetitle("categories","addeditCategory.css"),categoryController.loadAddCategory)
-router.post("/categories/add",nocache,checkSession,categoryController.addCategory)
+router.post("/categories/add",nocache,checkSession,setPagetitle("categories","addeditCategory.css"),categoryController.addCategory)
 
+router.get("/categories/edit/:id",nocache,checkSession,setPagetitle("categories","addeditCategory.css"),categoryController.loadEditCategory)
+router.post("/categories/edit/:id",nocache,checkSession,setPagetitle("categories","addeditCategory.css"),categoryController.editCategory)
+
+router.post("/categories/delete/:id",nocache,checkSession,categoryController.softDelete)
 
 router.get("/dashboard",nocache,checkSession,setPagetitle("Admin Dashboard","dashboard.css"),authController.loadDashboard)
 
