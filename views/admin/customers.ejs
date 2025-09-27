@@ -1,65 +1,67 @@
 <div class="content-wrapper">
     <h1>Customers</h1>
+
     <!-- Search & Filter Form -->
-    <form action="/admin/customers" method="GET" class="search-filter-form">
-        <div class="search-filter-bar">
-            <div class="search-container">
-                <input type="text" name="search" value="<%= search %>" placeholder="Search here..." class="search-input">
-                <button type="submit" class="btn btn-search">🔍</button>
-            </div>
+     <form action="/admin/customers" method="GET" class="search-filter-form">
+        <div class="search-actions">
+            <input type="text" name="search" value="<%= search %>" placeholder="Search..." class="search-input">
+            <button type="submit" class="btn btn-search">🔍</button>
             <a href="/admin/customers" class="btn btn-clear">Clear</a>
         </div>
     </form>
-    <table class="customer-table table">
-        <thead>
-            <tr>
-                <th>Customer ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-    <% if(customers.length === 0) { %>
-        <tr>
-            <td colspan="6" class="no-results">No customers found</td>
-        </tr>
-    <% } else { %>
-        <% for(let i = 0; i < customers.length; i++) { 
-            let customer = customers[i]; %>
-            <tr>
-                <td><%= customer._id %></td> 
-                <td><%= customer.name %></td>
-                <td><%= customer.email %></td>
-                <td><%= customer.phone %></td>
-                <td><%= customer.status %></td>
-                <td>
-                    <button class="btn <%= customer.isBlocked ? 'btn-unblock' : 'btn-block' %> block-unblock-btn"
-                            data-user-id="<%= customer._id %>"
-                            data-status="<%= customer.isBlocked %>">
-                        <%= customer.isBlocked ? "Unblock" : "Block" %>
-                    </button>
-                </td>
-            </tr>
-        <% } %>
-    <% } %>
-</tbody>
+    <!-- Table Wrapper for horizontal scroll on mobile -->
+    <div class="table-wrapper">
+        <table class="customer-table table">
+            <thead>
+                <tr>
+                    <th>Customer ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if(customers.length === 0) { %>
+                    <tr>
+                        <td colspan="6" class="no-results">No customers found</td>
+                    </tr>
+                <% } else { %>
+                    <% for(let i = 0; i < customers.length; i++) { 
+                        let customer = customers[i]; %>
+                        <tr>
+                            <td><%= customer._id %></td>
+                            <td><%= customer.name %></td>
+                            <td><%= customer.email %></td>
+                            <td><%= customer.phone %></td>
+                            <td><%= customer.status %></td>
+                            <td>
+                                <button class="btn <%= customer.isBlocked ? 'btn-unblock' : 'btn-block' %> block-unblock-btn"
+                                        data-user-id="<%= customer._id %>"
+                                        data-status="<%= customer.isBlocked %>">
+                                    <%= customer.isBlocked ? "Unblock" : "Block" %>
+                                </button>
+                            </td>
+                        </tr>
+                    <% } %>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
 
-    </table>
+    <!-- Pagination -->
     <div class="pagination">
         <% if(currentPage > 1) { %>
             <a href="?page=<%= currentPage - 1 %>&search=<%= search %>" class="btn prev-btn">Previous</a>
         <% } %>
         
         <% for(let i = 1; i <= totalPages; i++) { %>
-             <a href="?page=<%= i %>&search=<%= search %>" class="btn page-btn <%= currentPage === i ? 'active' : '' %>"><%= i %></a>
+            <a href="?page=<%= i %>&search=<%= search %>" class="btn page-btn <%= currentPage === i ? 'active' : '' %>"><%= i %></a>
         <% } %>
 
         <% if(currentPage < totalPages) { %>
             <a href="?page=<%= currentPage + 1 %>&search=<%= search %>" class="btn next-btn">Next</a>
-
         <% } %>
     </div>
 </div>

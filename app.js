@@ -9,7 +9,7 @@ const userRoutes=require("./routes/user")
 const adminRoutes=require("./routes/admin")
 const passport=require("./config/passport")
 const expressLayouts=require("express-ejs-layouts")
-
+const methodOverride=require("method-override")
 
 
 
@@ -39,6 +39,8 @@ app.use(nocache());
 
 app.use(passport.initialize())
 app.use(passport.session())
+
+app.use(methodOverride("_method"))
 
 app.use("/user",userRoutes)
 app.use("/admin",adminRoutes)

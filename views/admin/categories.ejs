@@ -1,19 +1,11 @@
 <div class="content-wrapper">
     <h1>Categories</h1>
-<!-- 
-    message alert -->
-       <% if (message) { %>
-        <div class="alert <%= messageType === 'success' ? 'alert-success' : 'alert-warning' %>">
-            <p class="mb-0"><%= message %></p>
-        </div>
-    <% } %>
-    <!-- Search & Filter Form -->
+
+    <!-- Search (right aligned, short) -->
     <form action="/admin/categories" method="GET" class="search-filter-form">
-        <div class="search-filter-bar">
-            <div class="search-container">
-                <input type="text" name="search" value="<%= search %>" placeholder="Search here..." class="search-input">
-                <button type="submit" class="btn btn-search">🔍</button>
-            </div>
+        <div class="search-container-right">
+            <input type="text" name="search" value="<%= search %>" placeholder="Search..." class="search-input">
+            <button type="submit" class="btn btn-search">🔍</button>
             <a href="/admin/categories" class="btn btn-clear">Clear</a>
         </div>
     </form>
@@ -24,6 +16,7 @@
             <tr>
                 <th>Sl.No</th>
                 <th>Name</th>
+                <th>Description</th>
                 <th>Status</th>
                 <th>Action</th>
             </tr>
@@ -39,11 +32,20 @@
                 <tr>
                     <td><%= i + 1 %></td>
                     <td><%= category.name %></td>
+                    <td><%= category.description %></td>
                     <td><%= category.isListed ? "Listed" : "Unlisted" %></td>
                     <td>
+                        <!-- Edit -->
                         <a href="/admin/categories/edit/<%= category._id %>" class="btn btn-edit">Edit</a>
+                        
+                        <!-- List / Unlist toggle -->
+                        <a href="#" 
+                            class="btn toggle-btn <%= category.isListed ? 'btn-unlist' : 'btn-list' %>" 
+                            data-id="<%= category._id %>" 
+                            data-status="<%= category.isListed %>">
+                            <%= category.isListed ? 'Unlist' : 'List' %>
+                         </a>
 
-                     <button type="button" class="btn btn-delete" data-category-id="<%= category._id %>">Delete</button>
                     </td>
                 </tr>
             <% } %>
@@ -66,8 +68,8 @@
         <% } %>
     </div>
 
-    <!-- Bottom Buttons -->
+    <!-- Bottom Add Button -->
     <div class="category-actions">
-        <a href="/admin/categories/add" class="btn btn-add">Add a new category</a>
+        <a href="/admin/categories/add" class="btn btn-add">+ Add Category</a>
     </div>
 </div>

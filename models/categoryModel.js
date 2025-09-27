@@ -1,3 +1,4 @@
+const { required } = require("joi")
 const mongoose=require("mongoose")
 const CategorySchema= new mongoose.Schema({
 
@@ -5,22 +6,22 @@ const CategorySchema= new mongoose.Schema({
         type:String,
         required:true,
         unique:true,
-        trim:true
+        trim:true,
+       lowercase: true
     },
     
      description:{
-        type:String
+        type:String,
+        required:true,
+        maxlength:100,
+        trim:true,
      },
 
     isListed:{
         type:Boolean,
         default:true
-    },
-    isDeleted:{
-        type:Boolean,
-        default:false
-
     }
+
 },{timestamps:true})
 
 const Category= mongoose.model("Category",CategorySchema)

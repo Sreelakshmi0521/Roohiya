@@ -22,6 +22,11 @@
  <%- include("../partials/admin/sidebar")%>
 
 <%- include("../partials/admin/header") %>
+<%- include("../partials/admin/alert", { 
+    message: typeof message !== 'undefined' ? message : null, 
+    messageType: typeof messageType !== 'undefined' ? messageType : null 
+}) %>
+
 
       <main class="main-content" role="main">
     <%- body %>

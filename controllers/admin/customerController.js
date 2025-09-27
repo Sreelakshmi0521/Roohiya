@@ -65,7 +65,7 @@ const unblockUser=async(req,res)=>{
     try {
         const userId=req.params.id
         await User.findByIdAndUpdate(userId,{isBlocked:false})
-        return res.json({success:true,message:"User unblocked "})
+         return res.json({success:true,message:"User unblocked "})
     } catch (error) {
         console.error(error)
         return res.json({success:false,message:"failed to unblock"})

@@ -1,34 +1,33 @@
-/* Main Wrapper */
+Main Wrapper
 .content-wrapper {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
-  
 }
 
 /* Search & Filter */
 .search-filter-form {
-    margin-bottom: 20px;
-}
-
-.search-filter-bar {
     display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    align-items: center;
+    justify-content: flex-end; /* right aligned */
+    margin-bottom: 20px;
 }
 
 .search-container {
     display: flex;
-    flex: 1;
     gap: 5px;
+    align-items: center;
 }
 
 .search-input {
-    flex: 1;
-    padding: 8px 10px;
+    width: 180px;  /* shorter width */
+    padding: 6px 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
+    font-size: 14px;
+}
+
+.btn-search, .btn-clear {
+    padding: 6px 10px; /* match search input size */
     font-size: 14px;
 }
 
@@ -79,11 +78,6 @@
     color: #fff;
 }
 
-.btn-delete {
-    background-color: #6c0c0c;
-    color: #fff;
-}
-
 /* Table Styling */
 .category-table {
     width: 100%;
@@ -115,8 +109,7 @@
 }
 
 /* Action Buttons in Table */
-.category-table td a,
-.category-table td form {
+.category-table td a {
     margin-right: 5px;
 }
 
@@ -150,7 +143,7 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-    .search-filter-bar, .category-actions {
+    .search-filter-form, .category-actions {
         flex-direction: column;
         align-items: stretch;
     }
@@ -167,5 +160,9 @@
     .btn {
         font-size: 12px;
         padding: 6px 10px;
+    }
+
+    .btn-search, .btn-clear {
+        width: 100%;  /* full width on small screens */
     }
 }

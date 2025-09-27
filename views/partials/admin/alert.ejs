@@ -1,0 +1,13 @@
+<% if (message) { %>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    Swal.fire({
+      icon: '<%= messageType %>',
+      title: '<%= messageType === "warning" ? "Oops!" : "Success!" %>',
+      text: '<%= message %>',
+      showConfirmButton: false,
+      timer: 2000
+    });
+  });
+</script>
+<% } %>

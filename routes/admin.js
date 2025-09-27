@@ -25,10 +25,9 @@ router.get("/categories/add",nocache,checkSession,setPagetitle("categories","add
 router.post("/categories/add",nocache,checkSession,setPagetitle("categories","addeditCategory.css"),categoryController.addCategory)
 
 router.get("/categories/edit/:id",nocache,checkSession,setPagetitle("categories","addeditCategory.css"),categoryController.loadEditCategory)
-router.post("/categories/edit/:id",nocache,checkSession,setPagetitle("categories","addeditCategory.css"),categoryController.editCategory)
+router.put("/categories/edit/:id",nocache,checkSession,setPagetitle("categories","addeditCategory.css"),categoryController.editCategory)
 
-router.post("/categories/delete/:id",nocache,checkSession,categoryController.softDelete)
-
+router.post("/categories/toggle/:id",nocache,checkSession,setPagetitle("categories","categories.css"),categoryController.categoryStatus)
 router.get("/dashboard",nocache,checkSession,setPagetitle("Admin Dashboard","dashboard.css"),authController.loadDashboard)
 
 
