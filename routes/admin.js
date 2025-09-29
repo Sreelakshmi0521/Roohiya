@@ -7,7 +7,7 @@ const setPagetitle=require("../middlewares/setpagetitle")
 const customerController=require("../controllers/admin/customerController")
 const setLayout=require("../middlewares/setLayout")
 const categoryController=require("../controllers/admin/categoryController")
-
+const productController=require("../controllers/admin/productController")
 
 router.use(setLayout("admin"))
 
@@ -30,5 +30,6 @@ router.put("/categories/edit/:id",nocache,checkSession,setPagetitle("categories"
 router.post("/categories/toggle/:id",nocache,checkSession,setPagetitle("categories","categories.css"),categoryController.categoryStatus)
 router.get("/dashboard",nocache,checkSession,setPagetitle("Admin Dashboard","dashboard.css"),authController.loadDashboard)
 
-
+// product management
+router.get("/products",nocache,checkSession,setPagetitle("products","products.css"),productController.loadProduct)
 module.exports=router

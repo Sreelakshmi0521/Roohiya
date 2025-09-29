@@ -1,0 +1,80 @@
+<div class="content-wrapper">
+    <h1>Products management</h1>
+
+    <!-- Search and Clear Button -->
+    <div class="search-actions">
+      <form action="/admin/products" method="GET" class="search-form">
+        <input type="text" name="search" value="<%= search %>" placeholder="Search here" class="search-input">
+        <button type="submit" class="btn btn-search">🔍</button>
+        <div class="clear-container">
+          <a href="/admin/products" class="btn btn-clear">Clear</a>
+        </div>
+      </form>
+    </div>
+
+    <!-- Add Product Button -->
+    <div class="add-action">
+      <a href="/admin/products/add" class="btn btn-add">Add Product</a>
+    </div>
+
+    <!-- Product Table -->
+    <table class="products-table table">
+      <thead>
+        <tr>
+          <th>Sl.No</th>
+          <th>Product</th>
+          <th>Product ID</th>
+          <th>Price</th>
+          <th>Category</th>
+          <th>Stock</th>
+          <th>Added on</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (products.length === 0) { %>
+          <tr>
+            <td colspan="8" class="no-results">No products found</td>
+          </tr>
+        <% } else { %>
+          <% for(let i = 0; i < products.length; i++) { 
+            let product = products[i]; 
+            let index = (currentPage - 1) * perPage + i + 1; %>
+            <tr>
+              <td><%= index %></td>
+              <td><%= product.name %></td>
+              <td><%= product.id %></td>
+              <td><%= product.price %></td>
+              <td><%= product.category %></td>
+              <td><%= product.stock %></td>
+              <td><%= product.addedOn %></td>
+              <td>
+                <a href="/admin/products/edit/<%= product._id %>" class="btn btn-edit">Edit</a>
+                <a href="#" 
+                  class="btn toggle-btn <%= product.isListed ? 'btn-unlist' : 'btn-list' %>" 
+                  data-id="<%= product._id %>" 
+                  data-status="<%= product.isListed %>">
+                  <%= product.isListed ? 'Unlist' : 'List' %>
+                </a>
+              </td>
+            </tr>
+          <% } %>
+        <% } %>
+      </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <div class="pagination">
+      <% if(currentPage > 1) { %>
+        <a href="?page=<%= currentPage - 1 %>&search=<%= search %>" class="btn prev-btn">Previous</a>
+      <% } %>
+      
+      <% for(let i = 1; i <= totalPages; i++) { %>
+        <a href="?page=<%= i %>&search=<%= search %>" class="btn page-btn <%= currentPage === i ? 'active' : '' %>"><%= i %></a>
+      <% } %>
+
+      <% if(currentPage < totalPages) { %>
+        <a href="?page=<%= currentPage + 1 %>&search=<%= search %>" class="btn next-btn">Next</a>
+      <% } %>
+    </div>
+  </div>

@@ -180,6 +180,7 @@ try {
                 }
                 category.isListed=!category.isListed
                 await category.save()
+                console.log(category)
 
                 res.json({success:true,message:`Category ${category.isListed ? "listed" : "unlisted"} successfully`,isListed:category.isListed})
             
