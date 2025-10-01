@@ -24,7 +24,7 @@ const productVariantValidation=joi.object({
     "number.min": "Stock cannot be negative"
     }),
     images:joi.array()
-    .items(joi.string().uri().required())
+    .items(joi.string().required())
     .min(3)
     .required()
     .messages({

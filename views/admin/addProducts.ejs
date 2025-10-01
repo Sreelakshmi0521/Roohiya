@@ -1,0 +1,69 @@
+<div class="content-wrapper">
+  <h1>Add Product</h1>
+
+  <form action="/admin/products/add" method="POST" enctype="multipart/form-data" class="product-form">
+    
+    <!-- Product Name -->
+    <div class="form-group">
+      <label for="name">Earring Name</label>
+      <input type="text" id="name" name="name" placeholder="Enter earring name" value="<%= formData ? formData.name : '' %>">
+    </div>
+
+    <!-- Category -->
+    <div class="form-group">
+      <label for="category">Category</label>
+      <input type="text" id="category" name="category" placeholder="Enter category" value="<%= formData ? formData.category : '' %>">
+    </div>
+
+    <!-- Highlight -->
+    <div class="form-group">
+      <label for="highlights">Highlight</label>
+      <input type="text" id="highlights" name="highlights" placeholder="Enter highlight" value="<%= formData ? formData.highlights : '' %>">
+    </div>
+
+    <!-- Description -->
+    <div class="form-group">
+      <label for="description">Description</label>
+      <textarea id="description" name="description" placeholder="Enter description"><%= formData ? formData.description : '' %></textarea>
+    </div>
+
+    <!-- Photos (Multiple Upload) -->
+    <div class="form-group photos">
+      <label>Add Photos (minimum 3)</label>
+      <input type="file" name="images" accept="image/*" multiple>
+      <small class="photo-note">You can select multiple images at once</small>
+    </div>
+
+    <!-- Original Price -->
+    <div class="form-group">
+      <label for="price">Original Price</label>
+      <input type="number" id="price" name="price" placeholder="Enter original price" step="0.01" value="<%= formData ? formData.price : '' %>">
+    </div>
+
+    <!-- Discounted Price -->
+    <div class="form-group">
+      <label for="discountedPrice">Discount Price</label>
+      <input type="number" id="discountedPrice" name="discountedPrice" placeholder="Enter discount price" step="0.01" value="<%= formData ? formData.discountedPrice : '' %>">
+    </div>
+
+    <!-- Stock -->
+    <div class="form-group">
+      <label for="stock">Stock</label>
+      <input type="number" id="stock" name="stock" placeholder="Enter stock limit" value="<%= formData ? formData.stock : '' %>">
+    </div>
+
+    <!-- Color -->
+    <div class="form-group">
+      <label for="color">Colour</label>
+      <input type="text" id="color" name="color" placeholder="Enter colour" value="<%= formData ? formData.color : '' %>">
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <button type="button" class="btn btn-cancel">Cancel</button>
+      <button type="submit" class="btn btn-save">Save</button>
+      <button type="button" class="btn btn-add-variant">Add Another Variant</button>
+    </div>
+
+  </form>
+</div>

@@ -27,7 +27,7 @@ Main Wrapper
 }
 
 .btn-search, .btn-clear {
-    padding: 6px 10px; /* match search input size */
+    padding: 6px 10px; 
     font-size: 14px;
 }
 

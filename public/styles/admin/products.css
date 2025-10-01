@@ -73,7 +73,7 @@
 .btn-add:hover { background-color: #27ae60; }
 
 .table-wrapper {
-  overflow-x: auto; /* Horizontal scroll on small screens */
+  overflow-x: auto; 
 }
 
 .products-table {
@@ -88,7 +88,7 @@
 .products-table td {
   padding: 14px 12px;
   text-align: left;
-  border: 1px solid #eee; /* Proper lines for rows and columns */
+  border: 1px solid #eee; 
 }
 
 .products-table th {
