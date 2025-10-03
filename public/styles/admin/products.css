@@ -47,6 +47,8 @@
   color: #fff;
   font-size: 14px;
   transition: background-color 0.3s ease;
+  margin-right: 5px;
+  display: inline-block;
 }
 
 .btn-search {
@@ -63,6 +65,7 @@
 
 .btn-clear:hover {
   background-color: #f0f0f0;
+  color: #333;
 }
 
 .btn-add {
@@ -110,6 +113,24 @@
   background-color: #f1f3f5;
 }
 
+.status {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.status.listed {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status.unlisted {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
 .no-results {
   text-align: center;
   padding: 20px 0;
@@ -118,7 +139,6 @@
 
 .btn-edit {
   background-color: #3498db;
-  margin-right: 5px;
 }
 
 .btn-edit:hover {
@@ -143,6 +163,22 @@
 
 .btn-unlist:hover {
   background-color: #c0392b;
+}
+
+.btn-variant {
+  background-color: #6c757d;
+}
+
+.btn-variant:hover {
+  background-color: #5a6268;
+}
+
+.btn-delete {
+  background-color: #dc3545;
+}
+
+.btn-delete:hover {
+  background-color: #c82333;
 }
 
 .pagination {
@@ -221,5 +257,11 @@
   .btn-add {
     width: 100%;
     text-align: center;
+  }
+
+  .btn {
+    display: block;
+    margin-bottom: 5px;
+    margin-right: 0;
   }
 }

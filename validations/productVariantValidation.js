@@ -1,10 +1,10 @@
 const joi=require("joi")
 const productVariantValidation=joi.object({
-    productId:joi.string()
+    product:joi.string()
     .required()
     .messages({
-    "any.required": "Product ID is required",
-    "string.empty": "Product ID cannot be empty"
+    "any.required": "Product id is required",
+    "string.empty": "Product id cannot be empty"
     }),
     color:joi.string()
     .trim()

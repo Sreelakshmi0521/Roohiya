@@ -3,10 +3,10 @@ const mongoose=require("mongoose")
 
 
 const productVariantSchema=new mongoose.Schema({
-    productId:{
+    product:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"Product",
-        required:true
+        required: false
     },
     color:{
     type:String,
@@ -23,7 +23,7 @@ const productVariantSchema=new mongoose.Schema({
     images:{
         type:[String],
         validate:{
-            validator:(arr)=>arr.length>=3,
+            validator:(arr)=>arr.length===3,
             message:"3 images required"
         }
     },

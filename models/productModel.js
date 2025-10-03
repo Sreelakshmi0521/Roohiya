@@ -21,15 +21,23 @@ const ProductSchema=new mongoose.Schema({
      },
      highlights:{
         type:String,
-        maxlength:200,
+        maxlength:100,
         trim: true
      },
+    variants:[{ 
+        type: mongoose.Schema.Types.ObjectId,
+         ref: "ProductVariant" ,
+        
+       
+    }],
          isListed:{
         type:Boolean,
         default:true
     }
 
 },{timestamps:true})
+
+
 
 const Product=mongoose.model("Product",ProductSchema)
 

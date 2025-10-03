@@ -1,69 +1,96 @@
-<div class="content-wrapper">
-  <h1>Add Product</h1>
 
-  <form action="/admin/products/add" method="POST" enctype="multipart/form-data" class="product-form">
-    
-    <!-- Product Name -->
-    <div class="form-group">
-      <label for="name">Earring Name</label>
-      <input type="text" id="name" name="name" placeholder="Enter earring name" value="<%= formData ? formData.name : '' %>">
+<div class="add-product-form">
+    <form id="productForm">
+        <!-- Product Name -->
+        <div class="form-group">
+            <label for="productName">Product Name</label>
+            <input type="text" id="productName" placeholder="Enter Product Name">
+        </div>
+
+        <!-- Category Dropdown -->
+        <div class="form-group">
+            <label for="category">Category</label>
+            <select id="category" >
+                <option value="">Select Category</option>
+                <% if (typeof categories !== 'undefined') { %>
+                    <% categories.forEach(function(cat) { %>
+                        <% if (cat.isListed) { %>
+                            <option value="<%= cat._id %>"><%= cat.name %></option>
+                        <% } %>
+                    <% }); %>
+                <% } %>
+            </select>
+        </div>
+
+        <!-- Highlights -->
+        <div class="form-group">
+            <label>Highlights</label>
+            <div id="highlightsContainer">
+                <input type="text" class="highlight-input" placeholder="Enter Highlights"> 
+            </div>
+        </div>
+
+        <!-- Description -->
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" rows="4" placeholder="Write your description..."></textarea>
+        </div>
+
+        <!-- Add Variant Button -->
+        <div class="form-group">
+            <button type="button" id="addVariantBtn">Add Variant</button>
+        </div>
+
+        <!-- Variants List -->
+        <div id="variantsContainer">
+            <!-- Dynamically added variants will appear here -->
+        </div>
+
+        <div class="form-actions">
+            <button type="button" class="cancel-btn">Cancel</button>
+            <button type="submit" class="save-btn">Save</button>
+        </div>
+    </form>
+</div>
+
+<!-- Variant Modal (inline) -->
+<div class="modal" id="variantModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Add Variant</h3>
+            <span class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="variantForm">
+                <div class="form-group">
+                    <label for="color">Color</label>
+                    <input type="text" id="color">
+                </div>
+                <div class="form-group">
+                    <label for="price">Price</label>
+                    <input type="number" id="price" step="0.01" >
+                </div>
+                <div class="form-group">
+                    <label for="discountPrice">Discount Price</label>
+                    <input type="number" id="discountPrice" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label for="stockLimit">Stock Limit</label>
+                    <input type="number" id="stockLimit" >
+                </div>
+                <div class="form-group">
+                    <label>Images (Upload 3)</label>
+                    <div class="image-uploads">
+                        <input type="file" id="image1" accept="image/*" >
+                        <input type="file" id="image2" accept="image/*" >
+                        <input type="file" id="image3" accept="image/*" >
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="cancel-btn" id="closeModalBtn">Close</button>
+            <button type="button" class="save-btn" id="saveVariantBtn">Save Variant</button>
+        </div>
     </div>
-
-    <!-- Category -->
-    <div class="form-group">
-      <label for="category">Category</label>
-      <input type="text" id="category" name="category" placeholder="Enter category" value="<%= formData ? formData.category : '' %>">
-    </div>
-
-    <!-- Highlight -->
-    <div class="form-group">
-      <label for="highlights">Highlight</label>
-      <input type="text" id="highlights" name="highlights" placeholder="Enter highlight" value="<%= formData ? formData.highlights : '' %>">
-    </div>
-
-    <!-- Description -->
-    <div class="form-group">
-      <label for="description">Description</label>
-      <textarea id="description" name="description" placeholder="Enter description"><%= formData ? formData.description : '' %></textarea>
-    </div>
-
-    <!-- Photos (Multiple Upload) -->
-    <div class="form-group photos">
-      <label>Add Photos (minimum 3)</label>
-      <input type="file" name="images" accept="image/*" multiple>
-      <small class="photo-note">You can select multiple images at once</small>
-    </div>
-
-    <!-- Original Price -->
-    <div class="form-group">
-      <label for="price">Original Price</label>
-      <input type="number" id="price" name="price" placeholder="Enter original price" step="0.01" value="<%= formData ? formData.price : '' %>">
-    </div>
-
-    <!-- Discounted Price -->
-    <div class="form-group">
-      <label for="discountedPrice">Discount Price</label>
-      <input type="number" id="discountedPrice" name="discountedPrice" placeholder="Enter discount price" step="0.01" value="<%= formData ? formData.discountedPrice : '' %>">
-    </div>
-
-    <!-- Stock -->
-    <div class="form-group">
-      <label for="stock">Stock</label>
-      <input type="number" id="stock" name="stock" placeholder="Enter stock limit" value="<%= formData ? formData.stock : '' %>">
-    </div>
-
-    <!-- Color -->
-    <div class="form-group">
-      <label for="color">Colour</label>
-      <input type="text" id="color" name="color" placeholder="Enter colour" value="<%= formData ? formData.color : '' %>">
-    </div>
-
-    <!-- Form Actions -->
-    <div class="form-actions">
-      <button type="button" class="btn btn-cancel">Cancel</button>
-      <button type="submit" class="btn btn-save">Save</button>
-      <button type="button" class="btn btn-add-variant">Add Another Variant</button>
-    </div>
-
-  </form>
 </div>

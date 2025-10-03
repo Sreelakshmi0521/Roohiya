@@ -29,8 +29,16 @@ const productValidation=joi.object({
     .max(100)
     .allow("")
     .messages({
-      "string.max": "Highlights cannot exceed 200 characters"
+      "string.max": "Highlights cannot exceed 100 characters"
     }),
+variants: joi.array().items(joi.object({
+    color: joi.string().trim().required(),
+    stock: joi.number().min(0).required(),
+    price: joi.number().min(0).required(),
+    discountedPrice: joi.number().min(0).optional()
+})).min(1).required(),
+
+
       isListed: joi.boolean()
 
 })

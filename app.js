@@ -25,6 +25,7 @@ app.set('layout', 'layouts/mainLayout');
 
 
 
+
 app.use(session({
     secret: process.env.SESSION_SECRET,
    resave: false,

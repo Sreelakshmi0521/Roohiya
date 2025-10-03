@@ -229,6 +229,12 @@ const resendOtp=async(req,res)=>{
  }
 const googleLogin = (req, res) => {
     try {
+
+        if (req.user.isBlocked) {
+    req.logout?.();
+    return res.redirect("/user/login?blocked=true&email=" + encodeURIComponent(req.user.email));
+}
+
         if (req.user) {
             req.session.user ={
                 id:req.user._id,
@@ -238,6 +244,8 @@ const googleLogin = (req, res) => {
         } else {
             return res.redirect("/user/login");
         }
+
+        
     } catch (error) {
         return res.redirect("/user/login");
     }
