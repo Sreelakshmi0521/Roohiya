@@ -5,6 +5,10 @@ const  productVariantValidation=require("../../validations/productVariantValidat
 const Category=require("../../models/categoryModel")
 const cloudinary=require("../../config/cloudinary")
 const { cleanupTempFiles } = require("../../utils/cleanUpTemp")
+const{comprehensiveCleanup}=require("../../utils/cleanUpHelper")
+const IMAGES_PER_VARIANT = 3
+
+
 const loadProduct=async(req,res)=>{
     try {
            
@@ -40,7 +44,7 @@ const loadProduct=async(req,res)=>{
         currentPage:page,
         totalPages,
         search,
-        perpage:limit,
+        perPage:limit,
         message:req.query.message ||null,
         messageType:req.query.messageType||null
     })
@@ -69,38 +73,80 @@ const loadAddProduct=async(req,res)=>{
     }
 }
 
+
 const addProduct = async (req, res) => {
-    console.log("--- START: Add Product Controller ---");
-    
-    const allTempFilePaths = (req.files || []).map(file => file.path);
-    const allFiles = req.files; 
+    const allFiles = req.files || [];
+    const allTempFilePaths = allFiles.map(file => file.path);
     let uploadedImages = [];
     let savedVariantIds = [];
 
     try {
-        // Data Parsing
-        const rawVariantDetails = req.body.variantDetails; 
-        const productName = req.body.name;
-        const categoryId = req.body.category;
-        const description = req.body.description;
-        const highlightsString = JSON.parse(req.body.highlights || '[]').join(', '); 
-        
-        const parsedVariantDetails = (Array.isArray(rawVariantDetails) 
-            ? rawVariantDetails 
-            : (rawVariantDetails ? [rawVariantDetails] : [])
-        ).map(jsonStr => JSON.parse(jsonStr));
+        const { name, category, description } = req.body;
+        const highlightsArray = JSON.parse(req.body.highlights || "[]")
+        const rawVariantDetails = req.body.variantDetails
 
-        // Validation Check
-        if (!productName || !categoryId || !description || parsedVariantDetails.length === 0 || allFiles.length === 0) {
-            throw new Error("Missing critical product fields or no variants/files added.");
-        }
-        if (allFiles.length !== parsedVariantDetails.length * 3) {
-            throw new Error("Mismatched files and variants. Ensure every variant has exactly 3 images.");
-        }
-        
-        console.log("✅ Validation successful. Proceeding to Cloudinary upload...");
+        const parsedVariantDetails = (Array.isArray(rawVariantDetails)
+            ? rawVariantDetails
+            : rawVariantDetails ? [rawVariantDetails] : []
+        ).map(jsonStr => JSON.parse(jsonStr))
 
-        // Manual Cloudinary Upload
+        
+        if (!name || !category || !description || parsedVariantDetails.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Missing products fields "
+            });
+        }
+        if(allFiles.length===0){
+              return res.status(400).json({
+                success: false,
+                message: "missing images"
+            });
+
+        }
+
+        if (allFiles.length !== parsedVariantDetails.length * IMAGES_PER_VARIANT) {
+            return res.status(400).json({
+                success: false,
+                message: `Each variant must have exactly ${IMAGES_PER_VARIANT} images.`
+            });
+        }
+
+    
+        const productData = {
+            name,
+            category,
+            description,
+            highlights: highlightsArray,
+            variants: parsedVariantDetails.map(v => ({
+                color: v.color,
+                stock: Number(v.stockLimit),
+                price: Number(v.price),
+                discountedPrice: v.discountedPrice !== "" ? Number(v.discountedPrice) : undefined
+            }))
+        }
+
+        const { error: productError } = productValidation.validate(productData);
+        if (productError) {
+            return res.status(400).json({
+                // success: false,
+                message: productError.details[0].message,
+                messageType:"warning"
+            })
+        }
+
+
+        const existingProduct = await Product.findOne({name: name.trim(),category: category })
+    
+        if (existingProduct) {
+        return res.status(400).json({
+            success: false,
+            message: "A product with the same name already exists in this category.",
+            messageType:"warning"
+        })
+    }
+
+       
         for (const file of allFiles) {
             const result = await cloudinary.uploader.upload(file.path, {
                 folder: "products",
@@ -111,80 +157,72 @@ const addProduct = async (req, res) => {
                 public_id: result.public_id
             });
         }
-        let fileIndex = 0; 
-        const filesPerVariant = 3; 
+
+        let fileIndex = 0;
         for (const details of parsedVariantDetails) {
-            
-            const imagesForVariant = uploadedImages.slice(fileIndex, fileIndex + filesPerVariant); 
+            const imagesForVariant = uploadedImages.slice(fileIndex, fileIndex + IMAGES_PER_VARIANT);
             const imageUrls = imagesForVariant.map(img => img.url);
-            const priceNum = parseFloat(details.price);
-            const discountNum = details.discountPrice ? parseFloat(details.discountPrice) : null;            
-            if (discountNum !== null && discountNum > priceNum) {
-                throw new Error(`Discounted price (${discountNum}) cannot be greater than price (${priceNum}).`);
+
+           
+            const variantData = {
+                color: details.color,
+                stock: Number(details.stockLimit),
+                price: Number(details.price),
+                discountedPrice: details.discountedPrice ? Number(details.discountedPrice) : undefined,
+                images: imageUrls
+            };
+
+            const { error: variantError } = productVariantValidation.validate(variantData);
+            if (variantError) {
+                await comprehensiveCleanup(allTempFilePaths, uploadedImages, savedVariantIds, ProductVariant)
+                return res.status(400).json({
+                    success: false,
+                    message: variantError.details[0].message,
+                    messageType:"warning"
+    
+                });
             }
 
-            const newVariant = new ProductVariant({
-                color: details.color,
-                stock: details.stockLimit,
-                price: priceNum,
-                discountedPrice: discountNum,
-                images: imageUrls,
-            });
-            
+            const newVariant = new ProductVariant(variantData);
             const savedVariant = await newVariant.save();
-            savedVariantIds.push(savedVariant._id); 
-            
-            fileIndex += filesPerVariant; 
+            savedVariantIds.push(savedVariant._id);
+            fileIndex += IMAGES_PER_VARIANT;
         }
 
-        console.log(`📦 Created ${savedVariantIds.length} ProductVariant records.`);
-
-        // Create Main Product
+     
         const newProduct = new Product({
-            
-            name: productName,
-            category: categoryId,
-            description: description,
-            highlights: highlightsString,
-            variants: savedVariantIds 
+            name,
+            category,
+            description,
+            highlights: highlightsArray,
+            variants: savedVariantIds
         });
-        
-        const savedProduct = await newProduct.save();
 
-        // Final Update: Link Variants to Parent Product
+        const savedProduct = await newProduct.save();
         await ProductVariant.updateMany(
             { _id: { $in: savedVariantIds } },
             { $set: { product: savedProduct._id } }
         );
-        
-        // Cleanup and Response
-        await cleanupTempFiles(allTempFilePaths); 
-        
-        return res.send({ 
-            success: true, 
-            message: "Product and variants added successfully!", 
+
+        await cleanupTempFiles(allTempFilePaths);
+
+        return res.json({
+            success: true,
+            message: "Product added successfully!",
             productId: savedProduct._id
         });
 
     } catch (error) {
-        console.error( error.message);
-        
-        await cleanupTempFiles(allTempFilePaths); 
-        
-        if (savedVariantIds.length > 0) {
-            await ProductVariant.deleteMany({ _id: { $in: savedVariantIds } });
-        }
-        
-        return res.status(500).send({ 
-            success: false, 
-            message: `Failed to add product: ${error.message}` 
+        console.error("Error in addProduct:", error);
+           await comprehensiveCleanup(allTempFilePaths, uploadedImages, savedVariantIds, ProductVariant)
+
+        return res.status(500).json({
+            success: false,
+            message: "Something went wrong while adding the product. Please try again."
+
         });
     }
-};
-
-
-
-
+}
 
 
 

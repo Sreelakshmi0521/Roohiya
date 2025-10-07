@@ -1,12 +1,19 @@
-import fs from 'fs/promises';
+const fs = require('fs').promises;
 
-export async function cleanupTempFiles(paths) {
-  for (const filePath of paths) {
-    try {
-      await fs.unlink(filePath);
-      console.log(`🧹 Cleaned up temporary file: ${filePath}`);
-    } catch (err) {
-      console.error(`❌ Failed to delete temp file ${filePath}: ${err.message}`);
-    }
-  }
-}
+const cleanupTempFiles = async (filePaths) => {
+    if (!filePaths || filePaths.length === 0) return;
+    
+    const cleanupPromises = filePaths.map(async (filePath) => {
+        try {
+            await fs.unlink(filePath);
+        } catch (error) {
+            // Silent failure - ignore if file doesn't exist
+        }
+    });
+    
+    await Promise.allSettled(cleanupPromises);
+};
+
+module.exports = {
+    cleanupTempFiles
+};

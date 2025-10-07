@@ -1,38 +1,48 @@
-// Modal Elements
-const addVariantBtn = document.getElementById('addVariantBtn');
-const variantModal = document.getElementById('variantModal');
-const closeModalBtn = document.getElementById('closeModalBtn');
-const variantForm = document.getElementById('variantForm');
 
-const variants = []; // Store variants temporarily
+const addVariantBtn = document.getElementById('addVariantBtn')
+const variantModal = document.getElementById('variantModal')
+const closeModalBtn = document.getElementById('closeModalBtn')
+const variantForm = document.getElementById('variantForm')
+const closeSpan = document.querySelector('.close')
 
-// Open modal
+const variants = []
+
 addVariantBtn.addEventListener('click', () => {
     variantModal.style.display = 'block';
-});
+})
 
-// Close modal
 closeModalBtn.addEventListener('click', () => {
     variantModal.style.display = 'none';
+    resetVariantForm();
+})
+
+closeSpan.addEventListener('click', () => {
+    variantModal.style.display = 'none';
+    resetVariantForm();
 });
 
-// Close modal when clicking outside content
 window.addEventListener('click', (event) => {
     if (event.target === variantModal) {
         variantModal.style.display = 'none';
+        resetVariantForm();
     }
 });
 
-// Image preview logic
-['image1','image2','image3'].forEach(id => {
+function resetVariantForm() {
+    variantForm.reset();
+    document.querySelectorAll('.preview-img').forEach(img => img.remove());
+}
+
+
+['image1', 'image2', 'image3'].forEach(id => {
     const input = document.getElementById(id);
     input.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (!file) return;
 
-        // Remove existing preview if any
-        const existingPreview = input.nextElementSibling;
-        if (existingPreview && existingPreview.classList.contains('preview-img')) {
+        const parent = input.parentElement;
+        const existingPreview = parent.querySelector('.preview-img');
+        if (existingPreview) {
             existingPreview.remove();
         }
 
@@ -43,130 +53,281 @@ window.addEventListener('click', (event) => {
         img.style.height = '60px';
         img.style.marginLeft = '10px';
         img.style.objectFit = 'cover';
-        input.parentElement.appendChild(img);
+        img.style.borderRadius = '4px';
+        parent.appendChild(img);
     });
 });
 
-// Add variant
-document.getElementById('saveVariantBtn').addEventListener('click', () => {
-    const color = document.getElementById('color').value.trim();
-    const price = document.getElementById('price').value;
-    const discountPrice = document.getElementById('discountPrice').value;
-    const stockLimit = document.getElementById('stockLimit').value;
-    const image1 = document.getElementById('image1').files[0];
-    const image2 = document.getElementById('image2').files[0];
-    const image3 = document.getElementById('image3').files[0];
 
-    if (!color || !price || !stockLimit || !image1 || !image2 || !image3) {
-        alert('Please fill all fields and select all images.');
+document.getElementById('saveVariantBtn').addEventListener('click', () => {
+    const color = document.getElementById('color').value.trim()
+    const price = document.getElementById('price').value
+    const discountedPrice = document.getElementById('discountedPrice').value
+    const stockLimit = document.getElementById('stockLimit').value
+    const image1 = document.getElementById('image1').files[0]
+    const image2 = document.getElementById('image2').files[0]
+    const image3 = document.getElementById('image3').files[0]
+
+    if (!color || !price || !stockLimit) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Missing Fields',
+            text: 'Please fill all fields '
+        });
+        return;
+    }
+    if(!image1 || !image2 || !image3){
+        Swal.fire({
+            icon: 'error',
+            title: 'Missing Fields',
+            text: 'Please add images '
+        });
         return;
     }
 
-    const variant = { color, price, discountPrice, stockLimit, images: [image1, image2, image3] };
+    if (parseFloat(price) <= 0) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Invalid Price',
+            text: 'Price must be greater than 0.'
+        });
+        return;
+    }
+
+    if (discountedPrice && parseFloat(discountedPrice) > parseFloat(price)) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Invalid Discount',
+            text: 'Discount price cannot be greater than regular price.'
+        });
+        return;
+    }
+
+    const variant = {
+        color,
+        price: parseFloat(price),
+        discountedPrice: discountedPrice ? parseFloat(discountedPrice) : null,
+        stockLimit: parseInt(stockLimit),
+        images: [image1, image2, image3]
+    };
     variants.push(variant);
 
-    // Add to DOM
+   
     const container = document.getElementById('variantsContainer');
     const div = document.createElement('div');
     div.className = 'variant-card';
     div.innerHTML = `
-        <h4>${color}</h4>
-        <div>Price: $${price} | Discount: $${discountPrice || 'N/A'} | Stock: ${stockLimit}</div>
+        <div class="variant-header">
+            <h4>${color}</h4>
+            <button type="button" class="remove-variant-btn" onclick="removeVariant(this)">×</button>
+        </div>
+        <div class="variant-details">
+            <div>Price: $${variant.price}</div>
+            <div>Discount: $${variant.discountedPrice || 'N/A'}</div>
+            <div>Stock: ${variant.stockLimit}</div>
+        </div>
         <div class="variant-preview-images"></div>
-        <button type="button" onclick="removeVariant(this)">Remove</button>
     `;
-    
+
     const previewContainer = div.querySelector('.variant-preview-images');
     variant.images.forEach(file => {
         const img = document.createElement('img');
         img.src = URL.createObjectURL(file);
-        img.style.width = '60px';
-        img.style.height = '60px';
+        img.style.width = '50px';
+        img.style.height = '50px';
         img.style.marginRight = '5px';
         img.style.objectFit = 'cover';
+        img.style.borderRadius = '4px';
         previewContainer.appendChild(img);
     });
 
     container.appendChild(div);
 
-    // Reset & close modal
-    variantForm.reset();
+    resetVariantForm();
     variantModal.style.display = 'none';
+
+    Swal.fire({
+        icon: 'success',
+        title: 'Variant Added!',
+        text: 'Variant has been added successfully.',
+        timer: 1500,
+        showConfirmButton: false
+    });
 });
 
-// Remove variant
+
 function removeVariant(button) {
-    const index = Array.from(button.parentElement.parentElement.children).indexOf(button.parentElement);
+    const variantCard = button.closest('.variant-card');
+    const index = Array.from(variantCard.parentElement.children).indexOf(variantCard);
     variants.splice(index, 1);
-    button.parentElement.remove();
+    variantCard.remove();
 }
-document.getElementById('productForm').addEventListener('submit', async function(e) {
+
+// Highlight
+const highlightsContainer = document.getElementById('highlightsContainer');
+const addHighlightBtn = document.getElementById('addHighlightBtn');
+
+
+function createHighlightInput(value = '', isMain = false) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'highlight-wrapper';
+    wrapper.style.display = 'flex';
+    wrapper.style.alignItems = 'center';
+    wrapper.style.marginBottom = '5px';
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'highlight-input';
+    input.name = 'highlights';
+    input.placeholder = 'Add highlight';
+    input.value = value;
+    input.style.flex = '1';
+
+    if (!isMain) {
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.textContent = 'Remove';
+        removeBtn.className = 'remove-highlight-btn';
+        removeBtn.style.marginLeft = '5px';
+        removeBtn.addEventListener('click', () => wrapper.remove());
+        wrapper.appendChild(removeBtn);
+    }
+
+    wrapper.appendChild(input);
+    return wrapper;
+}
+
+
+document.querySelectorAll('#highlightsContainer .highlight-input').forEach((input, index) => {
+    const wrapper = createHighlightInput(input.value, index === 0);
+    input.replaceWith(wrapper);
+});
+
+
+addHighlightBtn.addEventListener('click', () => {
+    highlightsContainer.appendChild(createHighlightInput())
+});
+
+
+document.getElementById('productForm').addEventListener('submit', async function (e) {
     e.preventDefault();
 
-    // Get simple product fields
+  
+    const saveBtn = document.querySelector('.save-btn');
+    const originalText = saveBtn.textContent;
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Saving...';
+
+  
     const productName = document.getElementById('productName').value.trim();
     const category = document.getElementById('category').value;
     const description = document.getElementById('description').value.trim();
     const highlightInputs = document.querySelectorAll('.highlight-input');
     const highlights = Array.from(highlightInputs).map(input => input.value.trim()).filter(h => h);
 
-    if (!productName || !category || !description || variants.length === 0) {
-        alert('Please fill all required product fields and add at least one variant.');
+
+    if (!productName || !category || !description) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Missing Fields',
+            text: 'Please fill all required product fields.'
+        });
+        saveBtn.disabled = false;
+        saveBtn.textContent = originalText;
+        return;
+    }
+
+    if (variants.length === 0) {
+        Swal.fire({
+            icon: 'error',
+            title: 'No Variants',
+            text: 'Please add at least one product variant.'
+        });
+        saveBtn.disabled = false;
+        saveBtn.textContent = originalText;
         return;
     }
 
     const formData = new FormData();
-    // Append simple fields
+
+    // Append basic fields
     formData.append('name', productName);
     formData.append('category', category);
     formData.append('description', description);
     formData.append('highlights', JSON.stringify(highlights));
 
-    // Append flattened variants data
+    // Append variants data
     variants.forEach((variant) => {
-        // 1. Append text data as a JSON string
         const variantData = {
             color: variant.color,
             price: variant.price,
-            discountPrice: variant.discountPrice,
+            discountedPrice: variant.discountedPrice,
             stockLimit: variant.stockLimit,
         };
-        // Multer will place these JSON strings into req.body.variantDetails array
-        formData.append('variantDetails', JSON.stringify(variantData)); 
+        formData.append('variantDetails', JSON.stringify(variantData));
 
-        // 2. Append image files using a simple array name
+        // Append all images
         variant.images.forEach(img => {
-            // Multer will place ALL images into req.files array
-            formData.append('variantImages', img); 
+            formData.append('variantImages', img);
         });
     });
 
     try {
-        // --- Client-side Logging (For debugging client data) ---
-        console.log("--- Data being sent to server: ---");
-        for (let [key, value] of formData.entries()) {
-             if (value instanceof File) {
-                 console.log(`${key}:`, value.name, `(${value.size} bytes)`);
-             } else {
-                 console.log(`${key}:`, value);
-             }
-         }
-         console.log("----------------------------------");
-         
-        // Ensure you have a global axios object available
         const response = await axios.post('/admin/products/add', formData, {
-            // Note: Setting 'Content-Type': 'multipart/form-data' explicitly in headers is 
-            // generally NOT needed for FormData/Axios, but it doesn't hurt.
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            },
+            timeout: 30000
         });
 
         if (response.data.success) {
-            alert('Product added successfully!');
-            // window.location.reload();
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: response.data.message,
+                showConfirmButton: false,
+                timer: 2000
+            }).then(() => {
+                window.location.href = '/admin/products?message=Product added successfully&messageType=success';
+            });
         } else {
-            alert('Failed to add product.');
+             Swal.fire('Oops!', data.message, 'warning')
         }
-    } catch (err) {
-        console.error('API Error:', err);
-        alert('Error adding product. Check server console for details.');
+    } catch (error) {
+         console.error('Error:', error);
+
+        const msg = error?.response?.data?.message || 'Something went wrong. Please try again.';
+
+        Swal.fire({
+            icon: 'error',
+            title: 'Error!',
+            text: msg
+        });
+
+    } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = originalText;
+    }
+});
+
+
+document.querySelector('.cancel-btn').addEventListener('click', () => {
+    if (variants.length > 0) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'All unsaved changes will be lost.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, cancel!',
+            cancelButtonText: 'No, keep editing'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '/admin/products';
+            }
+        });
+    } else {
+        window.location.href = '/admin/products';
     }
 });

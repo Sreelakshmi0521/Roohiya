@@ -1,7 +1,7 @@
 const joi=require("joi")
 const productVariantValidation=joi.object({
     product:joi.string()
-    .required()
+    .optional()
     .messages({
     "any.required": "Product id is required",
     "string.empty": "Product id cannot be empty"
@@ -38,12 +38,14 @@ const productVariantValidation=joi.object({
      "any.required": "Price is required",
     "number.min": "Price cannot be negative"
     }),
-     discountedPrice:joi.number()
+    discountedPrice: joi.number()
     .min(0)
-    .max(joi.ref("price"))
+    .less(joi.ref("price"))
+    .optional()
+    .allow(null)
     .messages({
-      "number.max": "Discounted price cannot be more than the price"
-
+        "number.min": "Discounted price cannot be negative",
+        "number.less": "Discounted price must be less than the original price"
     }),
        isListed: joi.boolean()
 
