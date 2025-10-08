@@ -1,23 +1,24 @@
 const multer = require("multer");
 const path = require("path");
 const fs = require('fs');
+
+
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
+    destination: (req, file, callback) => {
         const uploadPath = path.join(process.cwd(), 'temp');
         fs.mkdir(uploadPath, { recursive: true }, (err) => {
             if (err) {
                 console.error("Error creating upload directory:", err);
-                return cb(err); 
+                return  callback(err); 
             }
-            cb(null, uploadPath); 
+             callback(null, uploadPath); 
         });
     },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + '-' + file.originalname);
+    filename: (req, file, callback) => {
+         callback(null, Date.now() + '-' + file.originalname);
     }
 });
 
-console.log("🟢 Multer + Disk storage initialized");
 
 const upload = multer({
     storage: storage,
@@ -25,11 +26,11 @@ const upload = multer({
         fileSize: 5 * 1024 * 1024, 
         files: 50 
     },
-    fileFilter: (req, file, cb) => {
+    fileFilter: (req, file,  callback) => {
         if (!file.originalname.match(/\.(jpg|jpeg|png)$/i)) {
-            return cb(new Error('Only image files (jpg, jpeg, png) are allowed!'), false);
+            return  callback(new Error('Only image files (jpg, jpeg, png) are allowed!'), false);
         }
-        cb(null, true);
+         callback(null, true);
     }
 });
 

@@ -118,15 +118,15 @@
 .products-table td {
   padding: 14px 12px;
   text-align: left;
-  border: 1px solid #ddd;
+  border: 1px solid #212529;
 }
 
 .products-table th {
-  background-color: #f8f9fa;
-  color: #495057;
+  background-color: #3e3e3e;
+  color: white;
   font-size: 14px;
   font-weight: 600;
-  border-bottom: 2px solid #ccc;
+  border-bottom: 2px solid #373b3e;
 }
 
 .products-table td {
@@ -191,28 +191,32 @@
 .btn-edit:hover {
   background-color: #138496;
 }
-
 .toggle-btn {
-  min-width: 65px;
-  justify-content: center;
+    padding: 8px 20px;
+    font-size: 12px;
+    border: 1px solid;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+.toggle-btn[data-status="true"] {
+    background-color: #dc3545;
+    color: white;
+    border-color: #dc3545;
 }
 
-.btn-list {
-  background-color: #28a745;
+.toggle-btn[data-status="false"] {
+    background-color: #28a745;
+    color: white;
+    border-color: #28a745;
 }
 
-.btn-list:hover {
-  background-color: #218838;
+.toggle-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    opacity: 0.9;
 }
-
-.btn-unlist {
-  background-color: #dc3545;
-}
-
-.btn-unlist:hover {
-  background-color: #c82333;
-}
-
 .btn-variant {
   background-color: #6c757d;
   min-width: 80px;

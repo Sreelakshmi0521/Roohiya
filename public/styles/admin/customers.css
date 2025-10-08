@@ -64,8 +64,9 @@ Wrapper
 }
 
 .customer-table th {
-    background-color: #f8f9fa;
+    background-color: #3e3e3e;
     font-weight: 600;
+     color: white;
 }
 
 .customer-table tr:hover {

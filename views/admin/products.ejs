@@ -44,32 +44,47 @@
               <tr>
                 <td><%= index %></td>
                 <td><%= product.name %></td>
-                <td><%= product.category %></td>
+                 <td>
+                    <% if (product.category && product.category.name) { %>
+                      <%= product.category.name %>
+                    <% } else { %>
+                      No Category
+                    <% } %>
+                  </td>
                 <td><span class="status <%= product.isListed ? 'listed' : 'unlisted' %>"><%= product.isListed ? 'Listed' : 'Unlisted' %></span></td>
-                <td><%= product.stock %></td>
+                  <td>
+                    <% if (product.totalStock !== undefined) { %>
+                      <%= product.totalStock %>
+                    <% } else { %>
+                      0
+                    <% } %>
+                  </td>
+
                 <td class="action-cell">
                   <div class="button-group">
-                    <a href="#" 
-                      class="btn toggle-btn <%= product.isListed ? 'btn-unlist' : 'btn-list' %>" 
-                      data-id="<%= product._id %>" 
-                      data-status="<%= product.isListed %>">
-                      <span class="btn-icon"><%= product.isListed ? '🔒' : '👁️' %></span>
-                      <%= product.isListed ? 'Unlist' : 'List' %>
-                    </a>
-                    <a href="/admin/products/variants/<%= product._id %>" class="btn btn-variant">
-                      <span class="btn-icon">📦</span> Variant
-                    </a>
+                   <a href="/admin/products/variants/<%= product._id %>" class="btn btn-variant">
+                      <span class="btn-icon"></span> Variant
+                  </a>
                   </div>
                 </td>
-                <td><%= product.addedOn %></td>
+                <td>
+                  <% if (product.createdAt) { %>
+                    <%= product.createdAt.toLocaleDateString() %>
+                  <% } else { %>
+                    N/A
+                  <% } %>
+                </td>
                 <td class="action-cell">
                   <div class="button-group">
                     <a href="/admin/products/edit/<%= product._id %>" class="btn btn-edit">
-                      <span class="btn-icon">✏️</span> Edit
+                      <span class="btn-icon"></span> Edit
                     </a>
-                    <a href="/admin/products/delete/<%= product._id %>" class="btn btn-delete" onclick="return confirm('Are you sure you want to delete this product?')">
-                      <span class="btn-icon">🗑️</span> Delete
-                    </a>
+                     <button class="toggle-btn" 
+                          data-id="<%= product._id %>" 
+                          data-status="<%= product.isListed %>">
+                      <%= product.isListed ? 'Unlist' : 'List' %>
+                  </button>
+
                   </div>
                 </td>
               </tr>

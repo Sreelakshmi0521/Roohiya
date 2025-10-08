@@ -7,7 +7,7 @@ const cleanupTempFiles = async (filePaths) => {
         try {
             await fs.unlink(filePath);
         } catch (error) {
-            // Silent failure - ignore if file doesn't exist
+            
         }
     });
     

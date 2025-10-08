@@ -1,0 +1,68 @@
+<!-- views/admin/productVariants.ejs -->
+<div class="content-wrapper">
+    <div class="page-header">
+        <h1>Manage Variants - <%= product.name %></h1>
+        <a href="/admin/products/edit/<%= product._id %>" class="btn btn-back">← Back to Product</a>
+        <a href="/admin/products/variants/<%= product._id %>/add" class="btn btn-add">+ Add Variant</a>
+    </div>
+
+    <% if (variants.length === 0) { %>
+        <div class="no-variants">
+            <p>No variants found for this product.</p>
+            <a href="/admin/products/variants/<%= product._id %>/add" class="btn btn-primary">Add First Variant</a>
+        </div>
+    <% } else { %>
+        <div class="table-wrapper">
+            <table class="variants-table table">
+                <thead>
+                    <tr>
+                        <th>Color</th>
+                        <th>Price</th>
+                        <th>Discounted Price</th>
+                        <th>Stock</th>
+                        <th>Images</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% variants.forEach((variant, index) => { %>
+                        <tr>
+                            <td><%= variant.color %></td>
+                            <td>$<%= variant.price %></td>
+                            <td>$<%= variant.discountedPrice || 'N/A' %></td>
+                            <td><%= variant.stock %></td>
+                            <td>
+                                <div class="variant-images">
+                                    <% variant.images.slice(0, 3).forEach(image => { %>
+                                        <img src="<%= image %>" alt="Variant Image" class="variant-thumbnail">
+                                    <% }) %>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="status <%= variant.isListed ? 'listed' : 'unlisted' %>">
+                                    <%= variant.isListed ? 'Listed' : 'Unlisted' %>
+                                </span>
+                            </td>
+                            <td class="action-cell">
+                                <div class="button-group">
+                                    <a href="/admin/products/variants/edit/<%= variant._id %>" 
+                                       class="btn btn-edit">
+                                        <span class="btn-icon"></span> Edit
+                                    </a>
+                                      <button class="toggle-btn" 
+                                                data-id="<%= variant._id %>" 
+                                                data-status="<%= variant.isListed %>">
+                                            <%= variant.isListed ? 'Unlist' : 'List' %>
+                                        </button>
+
+                                    
+                                </div>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+    <% } %>
+</div>

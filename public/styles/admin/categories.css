@@ -94,8 +94,9 @@ Main Wrapper
 }
 
 .category-table th {
-    background-color: #f1f1f1;
+    background-color: #3e3e3e;
     font-weight: bold;
+      color: white;
 }
 
 .category-table tr:nth-child(even) {

@@ -35,7 +35,21 @@ const loadProduct=async(req,res)=>{
     .sort({createdAt:-1})
     .skip((page-1)*limit)
     .limit(limit)
-    .populate('category', 'name');
+    .populate('category', 'name')
+    .populate("variants")
+
+
+    for(let product of products){
+        if(product.variants &&product.variants.length>0){
+            let totalStock=0
+            for(let variant of product.variants){
+                totalStock+=Number(variant.stock)||0
+            }
+            product.totalStock=totalStock
+        }else{
+            product.totalStock=0
+        }
+    }
       
 
      res.render("admin/products",{
@@ -92,12 +106,14 @@ const addProduct = async (req, res) => {
 
         
         if (!name || !category || !description || parsedVariantDetails.length === 0) {
+            await cleanupTempFiles(allTempFilePaths)
             return res.status(400).json({
                 success: false,
                 message: "Missing products fields "
             });
         }
         if(allFiles.length===0){
+             await cleanupTempFiles(allTempFilePaths)
               return res.status(400).json({
                 success: false,
                 message: "missing images"
@@ -106,6 +122,7 @@ const addProduct = async (req, res) => {
         }
 
         if (allFiles.length !== parsedVariantDetails.length * IMAGES_PER_VARIANT) {
+            await cleanupTempFiles(allTempFilePaths)
             return res.status(400).json({
                 success: false,
                 message: `Each variant must have exactly ${IMAGES_PER_VARIANT} images.`
@@ -128,6 +145,7 @@ const addProduct = async (req, res) => {
 
         const { error: productError } = productValidation.validate(productData);
         if (productError) {
+            await cleanupTempFiles(allTempFilePaths)
             return res.status(400).json({
                 // success: false,
                 message: productError.details[0].message,
@@ -139,6 +157,7 @@ const addProduct = async (req, res) => {
         const existingProduct = await Product.findOne({name: name.trim(),category: category })
     
         if (existingProduct) {
+        await cleanupTempFiles(allTempFilePaths)
         return res.status(400).json({
             success: false,
             message: "A product with the same name already exists in this category.",
@@ -225,10 +244,163 @@ const addProduct = async (req, res) => {
 }
 
 
+const loadProductVariants= async(req,res)=>{
+    try {
+        const productId=req.params.id;
+        const product=await Product.findOne({_id:productId,isListed:true}).populate("category")
+        
+        if(!product){
+        return res.redirect("/admin/products?message=Product not found&messageType=warning")
+        }
+
+        const variants=await ProductVariant.find({product:productId}).sort({createdAt:-1})
+        res.render("admin/productvariants",{
+            product,
+            variants,
+            pageJs:"variantStatus.js",
+            message:req.query.message||null,
+            messageType:req.query.messageType||null
+
+        })
+   
+   
+   
+    } catch (error) {
+        console.error(error)
+        res.redirect("/admin/products?message=Server error&messageType=error")
+        
+    }
+}
+
+const loadEditVariant=async(req,res)=>{
+    try {
+        
+        const variantId=req.params.id
+        const variant=await ProductVariant.findById(variantId)
+
+        if(!variant){
+         return res.redirect('/admin/products?message=Variant not found&messageType=warning');
+
+        }
+
+        res.render("admin/editVariant",{
+            variant,
+            message:req.query.message||null,
+            messageType:req.query.messageType ||null
+        })
+    
+    } catch (error) {
+        console.error(error)
+    res.redirect('/admin/products?message=Server error&messageType=warning');
+ 
+    }
+}
+
+const updateVariant=async(req,res)=>{
+    const variantId=req.params.id
+    const files=req.files||[]
+    const tempFilePaths = files.map(f => f.path)
+
+
+
+    try {
+        
+    const variant=await ProductVariant.findById(variantId)
+    if(!variant){
+     return res.redirect('/admin/products?message=Variant not found&messageType=warning');
+
+    }
+
+    const {color,price,discountedPrice,stock}=req.body
+     if (!color || !price || !stock) {
+         return res.redirect(`/admin/products/variants/edit/${variantId}?message=Missing product variant fields&messageType=warning`)
+        }
+       
+        let imagesToSave = variant.images
+      if(files.length>0){
+        if(files.length!==3){
+            await cleanupTempFiles(tempFilePaths)
+         return res.redirect(`/admin/products/variants/edit/${variantId}?message=Please upload exactly 3 images&messageType=warning`);
+
+        }
+      
+        
+      if(variant.images && variant.images.length>0){
+        for(const url of variant.images){
+            const publicId=url.split("/").slice(-2).join("/").split(".")[0]
+        try {
+            await cloudinary.uploader.destroy(publicId)
+        } catch (error) {
+            console.log("Failed to delete old image from Cloudinary:", error.message)
+        }
+      }
+    }
+
+    const uploadedImages=[]
+    for(const file of files){
+        const result=await cloudinary.uploader.upload(file.path,{
+             folder: 'products',
+            resource_type: 'auto'
+        })
+         uploadedImages.push(result.secure_url)
+
+    }
+     imagesToSave=uploadedImages
+    await cleanupTempFiles(tempFilePaths)
+}
+         const variantData = {
+            color: color.trim().toLowerCase(),
+            price: Number(price),
+            discountedPrice: discountedPrice ? Number(discountedPrice) : undefined,
+            stock: Number(stock),
+            images: imagesToSave
+        }
+
+        const { error: variantError } = productVariantValidation.validate(variantData);
+        if (variantError) {
+            return res.redirect(`/admin/products/variants/edit/${variantId}?message=${encodeURIComponent(variantError.details[0].message)}&messageType=warning`);
+        }
+      variant.set(variantData)
+      await variant.save()
+  console.log("updated varaint:",variant)
+
+ res.redirect(`/admin/products/variants/${variant.product}?message=Variant updated successfully&messageType=success`);
+
+    } catch (error) {
+        console.log(error)
+        await cleanupTempFiles(tempFilePaths)
+        res.redirect(`/admin/products/variants/edit/${variantId}?message=Server error&messageType=error`);
+
+
+    }
+}
+
+
+const toggleVariantStatus=async(req,res)=>{
+    try {
+        const variantId=req.params.id;
+        const variant=await ProductVariant.findById({variantId})
+        if(!variant){
+            return res.status(404).json({success:false,message:"variant not found"})
+        }
+          variant.isListed=!variant.isListed
+          await variant.save()
+            res.json({success:true,message:`Variant ${variant.isListed ? 'listed' : 'unlisted'} successfully`})
+
+    } catch (error) {
+        console.error(error)
+      return  res.status(500).json({success:false,message:"server error"})
+    }
+}
+
 
 module.exports={
     loadProduct,
     loadAddProduct,
-    addProduct
+    addProduct,
+    loadProductVariants,
+    loadEditVariant,
+    updateVariant,
+     toggleVariantStatus
 
 }

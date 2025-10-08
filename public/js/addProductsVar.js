@@ -93,12 +93,28 @@ document.getElementById('saveVariantBtn').addEventListener('click', () => {
         });
         return;
     }
+     if (discountedPrice && parseFloat(discountedPrice) < 0) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Invalid Discount',
+            text: 'Discount price cannot be negative.'
+        });
+        return;
+    }
 
     if (discountedPrice && parseFloat(discountedPrice) > parseFloat(price)) {
         Swal.fire({
             icon: 'error',
             title: 'Invalid Discount',
             text: 'Discount price cannot be greater than regular price.'
+        });
+        return;
+    }
+     if (parseInt(stockLimit) < 0) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Invalid Stock',
+            text: 'Stock limit cannot be negative.'
         });
         return;
     }
@@ -288,7 +304,7 @@ document.getElementById('productForm').addEventListener('submit', async function
                 showConfirmButton: false,
                 timer: 2000
             }).then(() => {
-                window.location.href = '/admin/products?message=Product added successfully&messageType=success';
+                window.location.href = '/admin/products';
             });
         } else {
              Swal.fire('Oops!', data.message, 'warning')
