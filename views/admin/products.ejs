@@ -79,11 +79,13 @@
                     <a href="/admin/products/edit/<%= product._id %>" class="btn btn-edit">
                       <span class="btn-icon"></span> Edit
                     </a>
-                     <button class="toggle-btn" 
+                    <button class="toggle-btn" 
                           data-id="<%= product._id %>" 
-                          data-status="<%= product.isListed %>">
+                          data-status="<%= product.isListed %>" 
+                          data-type="product">
                       <%= product.isListed ? 'Unlist' : 'List' %>
                   </button>
+
 
                   </div>
                 </td>

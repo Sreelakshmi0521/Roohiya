@@ -1,32 +1,38 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const toggleButtons = document.querySelectorAll('.toggle-btn');
+    const tables = document.querySelectorAll('.products-table, .variants-table')
+    tables.forEach(table => {
+        table.addEventListener('click', async function(e) {
+            const btn = e.target.closest('.toggle-btn')
+            if (!btn) return
 
-    toggleButtons.forEach(btn => {
-        btn.addEventListener('click', async function() {
-            const variantId = this.dataset.id;
-            const currentStatus = this.dataset.status === 'true';
+            const id = btn.dataset.id
+            const type = btn.dataset.type
+            const currentStatus = btn.dataset.status === 'true'
 
-          
+         
             const { isConfirmed } = await Swal.fire({
-                title: `Do you want to ${currentStatus ? 'unlist' : 'list'} this variant?`,
+                title: `Do you want to ${currentStatus ? 'unlist' : 'list'} this ${type}?`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: currentStatus ? 'Yes, Unlist' : 'Yes, List',
                 cancelButtonText: 'Cancel'
-            });
+            })
+            if (!isConfirmed) return
 
-            if (!isConfirmed) return;
+            const url = type === 'variant'
+                 ? `/admin/products/variants/toggle/${id}`
+                : `/admin/products/toggle/${id}`
 
             try {
-                const response = await axios.patch(`/admin/products/variants/toggle/${variantId}`);
+                const response = await axios.patch(url)
 
                 if (response.data.success) {
-                    this.dataset.status = (!currentStatus).toString();
-                    this.textContent = !currentStatus ? 'Unlist' : 'List';
+                    btn.dataset.status = (!currentStatus).toString()
+                     btn.textContent = !currentStatus ? 'Unlist' : 'List'
 
-                    const statusCell = this.closest('tr').querySelector('.status');
-                    statusCell.textContent = !currentStatus ? 'Listed' : 'Unlisted';
-                    statusCell.className = `status ${!currentStatus ? 'listed' : 'unlisted'}`;
+                    const statusCell = btn.closest('tr').querySelector('.status')
+                    statusCell.textContent = !currentStatus ? 'Listed' : 'Unlisted'
+                    statusCell.className = `status ${!currentStatus ? 'listed' : 'unlisted'}`
 
                     Swal.fire({
                         icon: 'success',
@@ -34,14 +40,14 @@ document.addEventListener('DOMContentLoaded', function() {
                         text: response.data.message,
                         showConfirmButton: false,
                         timer: 1500
-                    });
+                    })
                 }
             } catch (error) {
-                console.error( error)
+                console.error(error)
                 Swal.fire({
                     icon: 'error',
                     title: 'Error!',
-                    text: 'Failed to update variant status'
+                    text: `Failed to update ${type} status`
                 })
             }
         })

@@ -1,0 +1,232 @@
+.content-wrapper {
+    max-width: 800px; /* Increased width for better layout */
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Page Header Styles */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.page-header h1 {
+    text-align: left; /* Changed from center */
+    color: #333;
+    margin-bottom: 0; /* Remove bottom margin since we have padding */
+    font-size: 28px; /* Slightly larger */
+    font-weight: 700;
+}
+
+.page-actions {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+/* Button Styles */
+.btn {
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 6px; /* Slightly more rounded */
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-align: center;
+    min-width: 120px;
+    justify-content: center;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #545b62;
+    transform: translateY(-2px);
+}
+
+/* New Button Variants */
+.btn-variants {
+    background-color: #115057;
+    color: white;
+}
+
+.btn-variants:hover {
+    background-color: #115057;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(111, 66, 193, 0.3);
+}
+
+.btn-back {
+    background-color: #495057;
+    color: white;
+}
+
+.btn-back:hover {
+    background-color: #343a40;
+    transform: translateY(-2px);
+}
+
+/* Form Styles */
+.form-group {
+    margin-bottom: 25px; /* Increased spacing */
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px; /* Slightly more space */
+    font-weight: 600; /* Bolder */
+    color: #2c3e50; /* Darker color */
+    font-size: 14px;
+    text-transform: uppercase; /* Optional: makes labels stand out */
+    letter-spacing: 0.5px;
+}
+
+.form-group input[type="text"],
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 15px; /* More padding */
+    border: 2px solid #e9ecef; /* Thicker border */
+    border-radius: 6px; /* More rounded */
+    font-size: 16px;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+    background-color: #fff;
+}
+
+.form-group input[type="text"]:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1); /* More subtle shadow */
+    background-color: #f8f9fa;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 120px; /* Slightly taller */
+    font-family: inherit; /* Consistent font */
+}
+
+.help-text {
+    display: block;
+    margin-top: 8px; /* More space */
+    color: #6c757d;
+    font-size: 12px;
+    font-style: italic;
+    line-height: 1.4;
+}
+
+.form-actions {
+    display: flex;
+    gap: 15px; /* More space between buttons */
+    justify-content: flex-end;
+    margin-top: 40px; /* More space above actions */
+    padding-top: 25px;
+    border-top: 1px solid #e9ecef;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .content-wrapper {
+        padding: 15px;
+        margin: 10px;
+        max-width: 100%; /* Full width on mobile */
+    }
+
+    .page-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+
+    .page-header h1 {
+        text-align: center;
+        font-size: 24px;
+    }
+
+    .page-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .page-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .form-actions .btn {
+        width: 100%;
+    }
+
+    .form-group input[type="text"],
+    .form-group select,
+    .form-group textarea {
+        padding: 10px 12px;
+        font-size: 16px; /* Prevent zoom on iOS */
+    }
+}
+
+/* Additional small screen optimization */
+@media (max-width: 480px) {
+    .content-wrapper {
+        padding: 10px;
+        margin: 5px;
+    }
+
+    .page-header h1 {
+        font-size: 22px;
+    }
+
+    .btn {
+        padding: 12px 16px; /* Larger touch targets */
+        font-size: 16px;
+    }
+}
+
+/* Focus styles for accessibility */
+.btn:focus,
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+}
+
+/* Disabled state */
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}

@@ -1,0 +1,39 @@
+<div class="content-wrapper">
+    <h1>Add New Variant</h1>
+    <form action="/admin/products/variants/add" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="productId" value="<%= productId %>">
+
+        <div class="form-group">
+            <label for="color">Color</label>
+            <input type="text" id="color" name="color" placeholder="Enter color name" >
+        </div>
+
+        <div class="form-group">
+            <label for="price">Price</label>
+            <input type="number" id="price" name="price" placeholder="0.00" step="0.01" r>
+        </div>
+
+        <div class="form-group">
+            <label for="discountedPrice">Discounted Price</label>
+            <input type="number" id="discountedPrice" name="discountedPrice" placeholder="0.00" step="0.01">
+        </div>
+
+        <div class="form-group">
+            <label for="stock">Stock</label>
+            <input type="number" id="stock" name="stock" placeholder="0" min="0">
+        </div>
+
+        <div class="form-group">
+            <label for="images">Images (Upload exactly 3 images)</label>
+            <input type="file" id="images" name="images" multiple accept="image/*">
+            <div class="images-preview" id="imagesPreview">
+                <p class="no-images">No images selected. Please upload 3 images.</p>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Add Variant</button>
+            <a href="/admin/products/variants/<%= productId %>" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>

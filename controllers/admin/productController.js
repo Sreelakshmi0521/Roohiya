@@ -1,5 +1,5 @@
 const Product=require("../../models/productModel")
-const productValidation=require("../../validations/productValidation")
+const {addProductValidation,updateProductValidation}=require("../../validations/productValidation")
 const ProductVariant=require("../../models/productVariantModel")
 const  productVariantValidation=require("../../validations/productVariantValidation")
 const Category=require("../../models/categoryModel")
@@ -59,6 +59,7 @@ const loadProduct=async(req,res)=>{
         totalPages,
         search,
         perPage:limit,
+        pageJs:"variantStatus.js",
         message:req.query.message ||null,
         messageType:req.query.messageType||null
     })
@@ -143,7 +144,7 @@ const addProduct = async (req, res) => {
             }))
         }
 
-        const { error: productError } = productValidation.validate(productData);
+        const { error: productError } = addProductValidation.validate(productData);
         if (productError) {
             await cleanupTempFiles(allTempFilePaths)
             return res.status(400).json({
@@ -272,6 +273,15 @@ const loadProductVariants= async(req,res)=>{
     }
 }
 
+const loadAddVariant = async (req, res) => {
+    const productId = req.params.id;
+    const product = await Product.findById(productId);
+    if (!product) {
+        return res.redirect('/admin/products?message=Product not found&messageType=warning');
+    }
+    res.render('admin/addVariant', { product, message: null, messageType: null });
+}
+
 const loadEditVariant=async(req,res)=>{
     try {
         
@@ -379,7 +389,7 @@ const updateVariant=async(req,res)=>{
 const toggleVariantStatus=async(req,res)=>{
     try {
         const variantId=req.params.id;
-        const variant=await ProductVariant.findById({variantId})
+        const variant=await ProductVariant.findById(variantId)
         if(!variant){
             return res.status(404).json({success:false,message:"variant not found"})
         }
@@ -394,13 +404,106 @@ const toggleVariantStatus=async(req,res)=>{
 }
 
 
+const loadEditProduct=async(req,res)=>{
+    try {
+        
+   const productId=req.params.id
+
+   const product=await Product.findById(productId).populate("category").populate("variants")
+   if(!product){
+    return res.redirect("/admin/products?message=Product not found&messageType=warning");
+   }
+     const categories = await Category.find({ isListed: true })
+
+     res.render("admin/editProduct",{
+        product,
+        categories,
+        message:req.query.message||null,
+        messageType:req.query.messageType||null
+     })
+
+    } catch (error) {
+        console.error(error)
+        res.redirect("/admin/products?message=Server error&messageType=error")
+
+    }
+}
+
+const updateProduct=async(req,res)=>{
+    try {
+         const productId=req.params.id
+    const highlightsArray=JSON.parse(req.body.highlights||"[]")
+
+     const productData={
+        name:req.body.name,
+        category:req.body.category,
+        description:req.body.description,
+        highlights:highlightsArray,
+        
+     }
+
+     const {error:productError}=updateProductValidation.validate(productData)
+     if(productError){
+         return res.redirect(`/admin/products/edit/${productId}?message=${encodeURIComponent(productError.details[0].message)}&messageType=warning`);
+     }
+     
+     const product=await Product.findById(productId)
+     if(!product){
+    return res.redirect(`/admin/products?message=Product not found&messageType=warning`)
+     }
+
+    const existingProduct = await Product.findOne({_id: { $ne: productId },name: req.body.name.trim(),category: req.body.category })
+   
+    if (existingProduct) {
+      return res.redirect(`/admin/products/edit/${productId}?message=Product name already exists in this category&messageType=warning`)
+    }
+
+    product.name=req.body.name.trim()
+    product.category=req.body.category
+    product.description=req.body.description
+    product.highlights=highlightsArray
+
+    await product.save()
+     res.redirect(`/admin/products?message=Product updated successfully&messageType=success`);
+
+
+    } catch (error) {
+            console.error(error)
+    }
+    
+}
+
+const toggleProductStatus=async(req,res)=>{
+    try {
+        const productId=req.params.id
+         const product=await Product.findById(productId)
+
+         if(!product){
+            return res.status(404).json({ success: false, message: "Product not found" });
+         }
+         product.isListed=!product.isListed
+         await product.save()
+          res.json({ success: true, message: `Product ${product.isListed ? "listed" : "unlisted"} successfully`, isListed: product.isListed })
+// console.log("Button clicked:", id, type, currentStatus);
+
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({ success: false, message: "Server error" });
+
+    }
+}
+
 module.exports={
     loadProduct,
     loadAddProduct,
     addProduct,
     loadProductVariants,
+    loadAddVariant,
     loadEditVariant,
     updateVariant,
-     toggleVariantStatus
+     toggleVariantStatus,
+     loadEditProduct,
+     updateProduct,
+     toggleProductStatus
 
 }

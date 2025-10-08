@@ -50,13 +50,12 @@
                                        class="btn btn-edit">
                                         <span class="btn-icon"></span> Edit
                                     </a>
-                                      <button class="toggle-btn" 
+                                        <button class="toggle-btn" 
                                                 data-id="<%= variant._id %>" 
-                                                data-status="<%= variant.isListed %>">
+                                                data-status="<%= variant.isListed %>" 
+                                                data-type="variant">
                                             <%= variant.isListed ? 'Unlist' : 'List' %>
                                         </button>
-
-                                    
                                 </div>
                             </td>
                         </tr>
