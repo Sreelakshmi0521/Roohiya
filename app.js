@@ -43,6 +43,12 @@ app.use(passport.session())
 
 app.use(methodOverride("_method"))
 
+app.get("/", (req, res) => {
+    res.render('landing', {
+        user: req.session.user || null,
+        pageTitle: "Roohiya - Adorn Your Soul with Timeless Beauty"
+    });
+});
 app.use("/user",userRoutes)
 app.use("/admin",adminRoutes)
 

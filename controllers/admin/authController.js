@@ -5,8 +5,8 @@ const bcrypt=require("bcrypt")
 const loadLogin=(req,res)=>{
     res.render("admin/login",{
         layout: false, 
-        message:null,
-        messageType:null,
+        message:req.query.message||null,
+        messageType:req.query.messageType||null,
         FormData:{
         }
 
@@ -72,8 +72,8 @@ const loadDashboard=async(req,res)=>{
 
         res.render("admin/dashboard", {
             admin,
-            message: null,
-            messageType: null,
+            message:req.query.message|| null,
+            messageType:req.query.messageType|| null,
           
     
         });
@@ -83,9 +83,25 @@ const loadDashboard=async(req,res)=>{
     }
 }
 
+
+const adminLogout=(req,res)=>{
+req.session.destroy(error=>{
+    if(error){
+        console.error(error)
+     return res.redirect("/admin/dashboard?message=Logout failed&messageType=warning");
+
+    }
+    res.clearCookie("connect.sid")
+     res.redirect("/admin/login?message=Logged out successfully&messageType=success");
+
+})
+}
+
+
 module.exports={
     loadLogin,
     adminLogin,
-    loadDashboard
+    loadDashboard,
+    adminLogout
 
 }

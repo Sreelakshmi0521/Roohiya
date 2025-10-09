@@ -272,14 +272,94 @@ const loadProductVariants= async(req,res)=>{
         
     }
 }
-
 const loadAddVariant = async (req, res) => {
-    const productId = req.params.id;
-    const product = await Product.findById(productId);
-    if (!product) {
-        return res.redirect('/admin/products?message=Product not found&messageType=warning');
+    try {
+        const productId = req.params.id;
+        const product = await Product.findById(productId);
+        
+        if (!product) {
+            return res.redirect('/admin/products?message=Product not found&messageType=warning');
+        }
+        
+        res.render('admin/addVariant', { 
+            product, 
+            productId: product._id,
+            message:req.query.message|| null, 
+            messageType: req.query.messageType||null 
+        });
+    } catch (error) {
+        console.error( error);
+        res.redirect('/admin/products?message=Error loading page&messageType=error');
     }
-    res.render('admin/addVariant', { product, message: null, messageType: null });
+}
+
+
+const addVariant=async(req,res)=>{
+      const productId=req.params.id
+      const files=req.files||[]
+      const tempFilePaths=files.map(f=>f.path)
+
+      try {
+        const {color,price,discountedPrice,stock}=req.body
+
+     if(!color||!price||!stock){
+        await cleanupTempFiles(tempFilePaths)
+        return res.redirect(`/admin/products/variants/${productId}/add?message=Please fill all required fields&messageType=warning`)
+     }
+     if(files.length!==3){
+        await cleanupTempFiles(tempFilePaths)
+        return res.redirect(`/admin/products/variants/${productId}/add?message=Please upload exactly 3 images&messageType=warning`)
+     }
+
+     const existVariant=await ProductVariant.findOne({product:productId,color:color.trim().toLowerCase()})
+     if(existVariant){
+        await cleanupTempFiles(tempFilePaths)
+        return res.redirect(`/admin/products/variants/${productId}/add?message=Variant with this color already exists&messageType=warning`)
+     }
+      
+     const uploadedImages=[]
+     for(const file of files){
+        const result=await cloudinary.uploader.upload(file.path,{
+             folder: "products",
+              resource_type: "auto",
+        })
+        uploadedImages.push(result.secure_url)
+     }
+
+
+     const variantData={
+        product:productId,
+        color:color.trim().toLowerCase(),
+        price:Number(price),
+        discountedPrice:discountedPrice ? Number(discountedPrice):undefined,
+        stock:Number(stock),
+        images:uploadedImages,
+        isListed:true
+     }
+
+     const {error:variantError}=productVariantValidation.validate(variantData)
+
+     if(variantError){
+        await cleanupTempFiles(tempFilePaths)
+        return res.redirect(`/admin/products/variants/${productId}/add?message=${encodeURIComponent(variantError.details[0].message)}&messageType=warning`)
+     }
+     const newVariant=new ProductVariant(variantData)
+     const savedVariant=await newVariant.save()
+     console.log(savedVariant)
+
+     await Product.findByIdAndUpdate(productId,{
+        $push:{variants:savedVariant._id}
+     })
+
+     await cleanupTempFiles(tempFilePaths)
+     res.redirect(`/admin/products/variants/${productId}?message=Variant added successfully&messageType=success`)
+
+
+      } catch (error) {
+        console.error(error)
+        await cleanupTempFiles(tempFilePaths)
+        
+      }
 }
 
 const loadEditVariant=async(req,res)=>{
@@ -499,6 +579,7 @@ module.exports={
     addProduct,
     loadProductVariants,
     loadAddVariant,
+    addVariant,
     loadEditVariant,
     updateVariant,
      toggleVariantStatus,

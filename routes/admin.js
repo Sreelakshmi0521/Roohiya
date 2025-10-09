@@ -16,6 +16,7 @@ router.use(setLayout("admin"))
 
 router.get("/login",isLogin,authController.loadLogin)
 router.post("/login",authController.adminLogin)
+router.get("/logout",nocache,checkSession,authController.adminLogout)
 
 // customer managment
 router.get("/customers",nocache,checkSession,setPagetitle("Customers","customers.css"),customerController.loadCustomer)
@@ -42,9 +43,13 @@ router.patch("/products/toggle/:id",nocache, checkSession, setPagetitle("product
 
 //varaint management
 router.get("/products/variants/:id", nocache, checkSession, setPagetitle("products", "productvariants.css"), productController.loadProductVariants)
-router.get("/products/variants/:id/add",nocache,checkSession,setPagetitle("products", "addVariant.css"),productController.loadAddProduct)
+
+router.get("/products/variants/:id/add",nocache,checkSession,setPagetitle("products", "addVariant.css"),productController.loadAddVariant)
+router.post("/products/variants/:id/add",nocache,checkSession,setPagetitle("products", "addVariant.css"),upload.array("images",3),productController.addVariant)
+
 router.get("/products/variants/edit/:id",nocache, checkSession, setPagetitle("products", "editvariants.css"),productController.loadEditVariant)
 router.post("/products/variants/edit/:id",nocache, checkSession, setPagetitle("products", "editvariants.css"),upload.array("images",3),productController.updateVariant)
+
 router.patch("/products/variants/toggle/:id", nocache, checkSession, setPagetitle("products", "productvariants.css"),productController.toggleVariantStatus)
 
 

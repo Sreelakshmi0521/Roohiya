@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= pageTitle || 'Roohiya - Adorn Your Soul with Timeless Beauty' %></title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #fff;
+        }
+
+        .navbar {
+            background-color: #fff;
+            padding: 1rem 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #000;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #d4af37;
+        }
+
+        .search-bar {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            width: 200px;
+        }
+
+        .hero {
+            background-color: #f9f9f9;
+            padding: 120px 2rem 4rem;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .hero-image {
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .hero-image img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        .hero-content {
+            flex: 1;
+            text-align: left;
+        }
+
+        .hero-content h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .shop-now-btn {
+            background-color: #d4af37;
+            color: #fff;
+            padding: 1rem 2rem;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            display: inline-block;
+            margin-top: 1rem;
+        }
+
+        .shop-now-btn:hover {
+            background-color: #b8942f;
+        }
+
+        .section {
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #333;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .category-card {
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .category-card img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+
+        .category-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+            color: #fff;
+            padding: 2rem 1rem 1rem;
+            text-align: center;
+        }
+
+        .category-overlay h3 {
+            font-size: 1.5rem;
+        }
+
+        .new-arrivals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .product-card {
+            background-color: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+
+        .product-info {
+            padding: 1rem;
+        }
+
+        .product-info h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-price {
+            font-size: 1.1rem;
+            color: #d4af37;
+            font-weight: bold;
+        }
+
+        footer {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 4rem;
+        }
+        /* Add these to your existing CSS */
+
+/* Better mobile responsiveness */
+@media (max-width: 768px) {
+  .nav-container {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .nav-links {
+    gap: 1rem;
+  }
+  
+  .search-bar {
+    width: 100%;
+    max-width: 300px;
+  }
+  
+  .hero {
+    padding-top: 180px; /* More space for fixed nav */
+  }
+  
+  .hero-content h1 {
+    font-size: 2rem;
+  }
+}
+
+/* Loading states for dynamic content */
+.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* Product card enhancements */
+.product-card {
+  position: relative;
+}
+
+.product-card .out-of-stock {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #ff4444;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 3px;
+  font-size: 0.8rem;
+}
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">Roohiya</a>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/shop">Shop</a></li>
+                <li><a href="/new-arrivals">New Arrivals</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/user/signup">Sign in</a></li>
+            </ul>
+            <input type="text" class="search-bar" placeholder="Search...">
+        </div>
+    </nav>
+
+    <section class="hero">
+        <% if (typeof hero !== 'undefined' && hero) { %>
+            <div class="hero-image">
+                <img src="<%= hero.image %>" alt="<%= hero.alt || 'Hero Image' %>">
+            </div>
+            <div class="hero-content">
+                <h1><%= hero.title %></h1>
+                <p><%= hero.description %></p>
+                <a href="<%= hero.shopLink || '/shop' %>" class="shop-now-btn">Shop Now</a>
+            </div>
+        <% } else { %>
+            <div class="hero-image">
+                <img src="/images/hero-woman.jpg" alt="Woman wearing earrings">
+            </div>
+            <div class="hero-content">
+                <h1>Adorn your soul with timeless beauty</h1>
+                <p>Discover exquisite jewelry that complements every moment.</p>
+                <a href="/shop" class="shop-now-btn">Shop Now</a>
+            </div>
+        <% } %>
+    </section>
+
+    <section class="section">
+        <h2>Browse Categories</h2>
+        <div class="categories-grid">
+            <% if (typeof categories !== 'undefined' && categories && categories.length > 0) { %>
+                <% categories.forEach(function(category) { %>
+                    <div class="category-card">
+                        <img src="<%= category.image %>" alt="<%= category.name %>">
+                        <div class="category-overlay">
+                            <h3><%= category.name %></h3>
+                        </div>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <div class="category-card">
+                    <img src="/images/office-wear.jpg" alt="Office Wear">
+                    <div class="category-overlay">
+                        <h3>Office Wear</h3>
+                    </div>
+                </div>
+                <div class="category-card">
+                    <img src="/images/casual-wear.jpg" alt="Casual Wear">
+                    <div class="category-overlay">
+                        <h3>Casual Wear</h3>
+                    </div>
+                </div>
+                <div class="category-card">
+                    <img src="/images/festive-wear.jpg" alt="Festive Wear">
+                    <div class="category-overlay">
+                        <h3>Festive Wear</h3>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>New Arrivals</h2>
+        <div class="new-arrivals-grid">
+            <% if (typeof products !== 'undefined' && products && products.length > 0) { %>
+                <% products.forEach(function(product) { %>
+                    <div class="product-card">
+                        <img src="<%= product.image %>" alt="<%= product.name %>">
+                        <div class="product-info">
+                            <h3><%= product.name %></h3>
+                            <p class="product-price">$<%= product.price %></p>
+                        </div>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <div class="product-card">
+                    <img src="/images/golden-butterfly-studs.jpg" alt="Golden Butterfly Studs">
+                    <div class="product-info">
+                        <h3>Golden Butterfly Studs</h3>
+                        <p class="product-price">$45</p>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <img src="/images/silver-hoops.jpg" alt="Silver Hoops">
+                    <div class="product-info">
+                        <h3>Silver Hoops</h3>
+                        <p class="product-price">$60</p>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <img src="/images/golden-drop-studs.jpg" alt="Golden Drop Studs">
+                    <div class="product-info">
+                        <h3>Golden Drop Studs</h3>
+                        <p class="product-price">$55</p>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <img src="/images/peacock-chandelier.jpg" alt="Peacock Chandelier">
+                    <div class="product-info">
+                        <h3>Peacock Chandelier</h3>
+                        <p class="product-price">$80</p>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 Roohiya. All rights reserved.</p>
+    </footer>
+</body>
+</html>

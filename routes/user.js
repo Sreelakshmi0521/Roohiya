@@ -36,7 +36,6 @@ router.post("/resendRecoveryOtp",authController.resendRecoveryOtp)
 router.get("/newForpassword",authController.loadNewpassword)
 router.post("/newForpassword",authController.newForpassword)
 
-
 router.get("/homepage",requireLogin,nocache,authController.loadHomepage)
 
 

@@ -21,7 +21,7 @@
     text-align: left; /* Changed from center */
     color: #333;
     margin-bottom: 0; /* Remove bottom margin since we have padding */
-    font-size: 28px; /* Slightly larger */
+    font-size: 23px; /* Slightly larger */
     font-weight: 700;
 }
 
@@ -72,12 +72,12 @@
 
 /* New Button Variants */
 .btn-variants {
-    background-color: #115057;
+    background-color: #5a46bb;
     color: white;
 }
 
 .btn-variants:hover {
-    background-color: #115057;
+    background-color: #5a46bb;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(111, 66, 193, 0.3);
 }
