@@ -5,6 +5,7 @@ const passport = require("passport")
 const nocache=require("../middlewares/nocache")
 const {isLogin,requireLogin,requireTempuser}=require("../middlewares/userAuth")
 const setLayout=require("../middlewares/setLayout")
+const userController=require("../controllers/user/userController")
 
 
 
@@ -36,6 +37,7 @@ router.post("/resendRecoveryOtp",authController.resendRecoveryOtp)
 router.get("/newForpassword",authController.loadNewpassword)
 router.post("/newForpassword",authController.newForpassword)
 
+// router.get("/",userController.loadLanding)
 router.get("/homepage",requireLogin,nocache,authController.loadHomepage)
 
 

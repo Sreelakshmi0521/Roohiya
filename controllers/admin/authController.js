@@ -45,7 +45,8 @@ const adminLogin=async(req,res)=>{
         id:admin._id,
         email:admin.email
     }
-     res.redirect("/admin/dashboard")
+   res.redirect("/admin/dashboard?message=Login successful&messageType=success");
+
 
     } catch (error) {
         console.error(error)

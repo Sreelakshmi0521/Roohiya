@@ -7,6 +7,7 @@ const session=require("express-session")
 const nocache=require("nocache")
 const userRoutes=require("./routes/user")
 const adminRoutes=require("./routes/admin")
+const landingRoutes=require("./routes/landing")
 const passport=require("./config/passport")
 const expressLayouts=require("express-ejs-layouts")
 const methodOverride=require("method-override")
@@ -43,12 +44,7 @@ app.use(passport.session())
 
 app.use(methodOverride("_method"))
 
-app.get("/", (req, res) => {
-    res.render('landing', {
-        user: req.session.user || null,
-        pageTitle: "Roohiya - Adorn Your Soul with Timeless Beauty"
-    });
-});
+app.use("/",landingRoutes)
 app.use("/user",userRoutes)
 app.use("/admin",adminRoutes)
 
