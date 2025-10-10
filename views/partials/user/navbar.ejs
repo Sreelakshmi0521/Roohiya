@@ -1,0 +1,67 @@
+<nav class="navbar">
+  <div class="nav-container">
+    <a href="/" class="logo">Roohiya</a>
+    <ul class="nav-links">
+      <li><a href="/">Home</a></li>
+      <li><a href="/user/shop">Shop</a></li>
+      <li><a href="/user/new-arrivals">New Arrivals</a></li>
+      <li><a href="/about">About</a></li>
+      <% if(user){ %>
+        <li><a href="/user/profile"><i class="fas fa-user"></i> <%= user.name %></a></li>
+        <li><a href="/user/logout">Logout</a></li>
+      <% } else { %>
+        <li><a href="/user/signup" class="signin-btn">Sign In</a></li>
+      <% } %>
+    </ul>
+    
+    <div class="nav-actions">
+      <div class="search-container">
+        <input type="text" class="search-bar" placeholder="Search jewelry...">
+        <i class="fas fa-search"></i>
+      </div>
+      
+      <div class="action-icons">
+        <div class="wishlist-icon" title="Wishlist">
+          <i class="far fa-heart"></i>
+          <span class="icon-badge">0</span>
+        </div>
+        <div class="cart-icon" title="Cart">
+          <i class="fas fa-shopping-bag"></i>
+          <span class="icon-badge">0</span>
+        </div>
+      </div>
+      
+      <div class="mobile-menu-toggle">
+        <i class="fas fa-bars"></i>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<script>
+  // Mobile menu toggle
+  document.querySelector('.mobile-menu-toggle')?.addEventListener('click', function() {
+    document.querySelector('.nav-links').classList.toggle('active');
+  });
+
+  // Cart functionality
+  document.querySelector('.cart-icon')?.addEventListener('click', () => {
+    window.location.href = '/cart';
+  });
+
+  // Wishlist functionality
+  document.querySelector('.wishlist-icon')?.addEventListener('click', () => {
+    window.location.href = '/wishlist';
+  });
+
+  // Search functionality
+  document.querySelector('.search-bar')?.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      const query = this.value.trim();
+      if (query) {
+        window.location.href = `/shop?search=${encodeURIComponent(query)}`;
+      }
+    }
+  });
+</script>

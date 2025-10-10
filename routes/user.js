@@ -6,12 +6,12 @@ const nocache=require("../middlewares/nocache")
 const {isLogin,requireLogin,requireTempuser}=require("../middlewares/userAuth")
 const setLayout=require("../middlewares/setLayout")
 const userController=require("../controllers/user/userController")
-
+const setPagetitle=require("../middlewares/setpagetitle")
 
 
 router.use(setLayout("user"))
 //signup
-router.get("/signup",isLogin,nocache,authController.loadSignup)
+router.get("/signup",isLogin,nocache,setPagetitle("Sign Up - Roohiya","signup.css"),authController.loadSignup)
 router.post("/signup",authController.signupUser)
 
 
@@ -38,8 +38,8 @@ router.get("/newForpassword",authController.loadNewpassword)
 router.post("/newForpassword",authController.newForpassword)
 
 // router.get("/",userController.loadLanding)
-router.get("/homepage",requireLogin,nocache,authController.loadHomepage)
-
+router.get("/homepage",requireLogin,nocache,setPagetitle("homepage","homepage.css"),userController.loadHomepage)
+router.get("/logout",requireLogin,userController.logout)
 
 
 

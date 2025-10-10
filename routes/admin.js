@@ -8,7 +8,6 @@ const customerController=require("../controllers/admin/customerController")
 const setLayout=require("../middlewares/setLayout")
 const categoryController=require("../controllers/admin/categoryController")
 const productController=require("../controllers/admin/productController");
-// const{uploadVariantImages}=require("../middlewares/uploadMultImage")
 const upload = require("../middlewares/upload")
 
 

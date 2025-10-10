@@ -10,6 +10,7 @@ const loadSignup=(req,res)=>{
     res.render("user/signup",{
         message:null,
         messageType:null,
+        pageJs:"authValidation.js",
          formData:{}
     })   
 }
@@ -403,18 +404,11 @@ const newForpassword=async(req,res)=>{
     }
 }
 
-const loadHomepage=(req,res)=>{
-    res.render("user/homepage",{ 
-    user: req.session.user || {} 
-})
-}
-
 
 
 module.exports={
     loadSignup,
     signupUser,
-    loadHomepage,
     loadVerifyOtp,
     verifyOtp,
     resendOtp,
