@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title><%= pageTitle %></title> 
+  <link rel="stylesheet" href="/styles/user/common.css">
+  <% if(pagecss){ %>
+    <link rel="stylesheet" href="/styles/user/<%= pagecss %>">
+  <% } %>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+  <%- include('../partials/user/navbar') %>
+
+  <section class="shop-header">
+    <h1>Shop All Jewelry</h1>
+    <form method="GET" action="/user/shop" class="search-form">
+      <input type="text" name="search" placeholder="Search products..." value="<%= search %>">
+      <button type="submit"><i class="fas fa-search"></i> Search</button>
+      <% if (search) { %>
+        <a href="/user/shop" class="clear-btn">Clear</a>
+      <% } %>
+    </form>
+  </section>
+
+   <!-- Category -->
+      <select name="category">
+        <option value="">All Categories</option>
+        <% categories.forEach(cat => { %>
+          <option value="<%= cat._id %>" <%= cat._id == category ? 'selected' : '' %>><%= cat.name %></option>
+        <% }) %>
+      </select>
+
+  <!-- Price Range -->
+      <input type="number" name="minPrice" placeholder="Min Price" value="<%= minPrice %>">
+      <input type="number" name="maxPrice" placeholder="Max Price" value="<%= maxPrice %>">
+   <!-- Sort -->
+      <select name="sort">
+        <option value="latest" <%= sort === 'latest' ? 'selected' : '' %>>Latest</option>
+        <option value="price_asc" <%= sort === 'price_asc' ? 'selected' : '' %>>Price: Low to High</option>
+        <option value="price_desc" <%= sort === 'price_desc' ? 'selected' : '' %>>Price: High to Low</option>
+        <option value="a_z" <%= sort === 'a_z' ? 'selected' : '' %>>A - Z</option>
+        <option value="z_a" <%= sort === 'z_a' ? 'selected' : '' %>>Z - A</option>
+      </select>
+
+      <button type="submit">Apply</button>
+
+      <% if (search || category || minPrice || maxPrice || sort !== 'latest') { %>
+        <a href="/user/shop" class="clear-btn">Clear All</a>
+      <% } %>
+    </form>
+  </section>
+
+  <section class="product-listing">
+    <% if (products.length > 0) { %>
+      <div class="product-grid">
+        <% products.forEach(product => { 
+          const variant = product.variants[0];
+        %>
+          <div class="product-card">
+            <div class="product-image-container">
+              <% if (variant && variant.images.length > 0) { %>
+                <img src="<%= variant.images[0] %>" alt="<%= product.name %>">
+              <% } else { %>
+                <img src="/images/placeholder.jpg" alt="No image">
+              <% } %>
+            </div>
+            <div class="product-info">
+              <h3><%= product.name %></h3>
+              <% if (variant) { %>
+                <p>₹<%= variant.discountedPrice || variant.price %></p>
+              <% } else { %>
+                <p>Not available</p>
+              <% } %>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination">
+        <% if (currentPage > 1) { %>
+          <a href="/user/shop?page=<%= currentPage - 1 %><%= search ? '&search=' + search : '' %>">&laquo; Prev</a>
+        <% } %>
+
+        <% for (let i = 1; i <= totalPages; i++) { %>
+          <a href="/user/shop?page=<%= i %><%= search ? '&search=' + search : '' %>" 
+             class="<%= i === currentPage ? 'active' : '' %>"><%= i %></a>
+        <% } %>
+
+        <% if (currentPage < totalPages) { %>
+          <a href="/user/shop?page=<%= currentPage + 1 %><%= search ? '&search=' + search : '' %>">Next &raquo;</a>
+        <% } %>
+      </div>
+
+    <% } else { %>
+      <div class="empty-state">
+        <i class="fas fa-box-open"></i>
+        <h3>No products found</h3>
+        <% if (search) { %><p>Try a different keyword</p><% } %>
+      </div>
+    <% } %>
+  </section>
+
+  <%- include('../partials/user/footer') %>
+
+</body>
+</html>

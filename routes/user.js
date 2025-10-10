@@ -7,6 +7,7 @@ const {isLogin,requireLogin,requireTempuser}=require("../middlewares/userAuth")
 const setLayout=require("../middlewares/setLayout")
 const userController=require("../controllers/user/userController")
 const setPagetitle=require("../middlewares/setpagetitle")
+const productController=require("../controllers/user/productController")
 
 
 router.use(setLayout("user"))
@@ -27,6 +28,8 @@ router.get("/auth/google/callback",passport.authenticate("google", { failureRedi
 //login
 router.get("/login",isLogin,nocache,authController.loadLogin)
 router.post("/login",authController.loginUser)
+//logout
+router.get("/logout",requireLogin,userController.logout)
 
 //forgot password
 router.get("/forgotPassword",authController.loadForpassEmail)
@@ -37,9 +40,9 @@ router.post("/resendRecoveryOtp",authController.resendRecoveryOtp)
 router.get("/newForpassword",authController.loadNewpassword)
 router.post("/newForpassword",authController.newForpassword)
 
-// router.get("/",userController.loadLanding)
+
 router.get("/homepage",requireLogin,nocache,setPagetitle("homepage","homepage.css"),userController.loadHomepage)
-router.get("/logout",requireLogin,userController.logout)
+router.get("/shop",nocache,setPagetitle("shop","shop.css"),productController.loadShop)
 
 
 
