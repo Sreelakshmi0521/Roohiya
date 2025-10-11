@@ -5,7 +5,7 @@
       <li><a href="/">Home</a></li>
       <li><a href="/user/shop">Shop</a></li>
       <li><a href="/user/new-arrivals">New Arrivals</a></li>
-      <li><a href="/about">About</a></li>
+      <li><a href="/user/about">About</a></li>
       <% if(user){ %>
         <li><a href="/user/profile"><i class="fas fa-user"></i> <%= user.name %></a></li>
         <li><a href="/user/logout">Logout</a></li>
@@ -47,12 +47,12 @@
 
   // Cart functionality
   document.querySelector('.cart-icon')?.addEventListener('click', () => {
-    window.location.href = '/cart';
+    window.location.href = '/user/cart';
   });
 
   // Wishlist functionality
   document.querySelector('.wishlist-icon')?.addEventListener('click', () => {
-    window.location.href = '/wishlist';
+    window.location.href = '/user/wishlist';
   });
 
   // Search functionality
@@ -60,7 +60,7 @@
     if (e.key === 'Enter') {
       const query = this.value.trim();
       if (query) {
-        window.location.href = `/shop?search=${encodeURIComponent(query)}`;
+        window.location.href = `/user/shop?search=${encodeURIComponent(query)}`;
       }
     }
   });

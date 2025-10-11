@@ -26,7 +26,7 @@
     <div class="hero-content">
       <h1>Adorn your soul with timeless beauty</h1>
       <p>Discover exquisite jewelry that complements every moment.</p>
-      <a href="/shop" class="shop-now-btn">Shop Now</a>
+      <a href="/user/shop" class="shop-now-btn">Shop Now</a>
     </div>
     <div class="hero-image">
       <img src="/images/hero-woman.jpg" alt="Woman wearing earrings">
@@ -42,15 +42,28 @@
   <div class="categories-grid">
     <% if (categories && categories.length > 0) { %>
       <% categories.forEach(category => { %>
-        <div class="category-card">
-          <img src="<%= category.image %>" alt="<%= category._doc.name || 'Category' %>">
+        <div class="category-card">    
+          <img src="<%= category.image || '/images/placeholder-category.jpg' %>" alt="<%= category.name || category._doc?.name || 'Category' %>">
           <div class="category-overlay">
             <h3 class="category-title">
               <% 
-                // Access the name from _doc object
-                const categoryName = category._doc.name || '';
+     
+                let categoryName = '';
+                
+                // Try different possible locations for the name
+                if (category.name) {
+                  categoryName = category.name;
+                } else if (category._doc && category._doc.name) {
+                  categoryName = category._doc.name;
+                } else if (category.title) {
+                  categoryName = category.title;
+                } else {
+                  categoryName = 'Category';
+                }
+                
                 const lowerName = categoryName.toLowerCase();
                 
+                // Format the display name
                 if (lowerName.includes('casual')) { 
               %>
                 Casual<br>Wear
@@ -59,12 +72,19 @@
               <% } else if (lowerName.includes('festive')) { %>
                 Festive<br>Wear
               <% } else { %>
-                <%= categoryName || 'Category' %>
+                <%= categoryName %>
               <% } %>
             </h3>
-            <a href="/shop?category=<%= category._id %>" class="category-link">
-              Explore <i class="fas fa-arrow-right"></i>
-            </a>
+      
+            <% if (category._id) { %>
+              <a href="/user/shop?category=<%= category._id %>" class="category-link">
+                Explore <i class="fas fa-arrow-right"></i>
+              </a>
+            <% } else { %>
+              <a href="/user/shop" class="category-link">
+                Explore <i class="fas fa-arrow-right"></i>
+              </a>
+            <% } %>
           </div>
         </div>
       <% }) %>
@@ -131,12 +151,7 @@
   </div>
 </section>
 <%- include('../partials/user/footer') %>
-<script>
-  // Mobile menu toggle
-  document.querySelector('.mobile-menu-toggle').addEventListener('click', function() {
-    document.querySelector('.nav-links').classList.toggle('active');
-  });
-</script>
+
 
 </body>
 </html>

@@ -36,16 +36,24 @@ const loadLanding=async(req,res)=>{
             }
           }
           
-          return {
-            ...category,
-            image: categoryImage
-          }
+          
+           return {
+                        _id: category._id,
+                        name: category.name,
+                        isListed: category.isListed,
+                        createdAt: category.createdAt,
+                        image: categoryImage
+                    }
+          
         } catch (error) {
-          console.error(`Error processing category ${category.name}:`, error)
-          return {
-            ...category,
-            image: '/images/placeholder-category.jpg'
-          }
+         console.error(error)
+             return {
+                    _id: category._id,
+                        name: category.name,
+                        isListed: category.isListed,
+                        createdAt: category.createdAt,
+                        image: '/images/placeholder-category.jpg'
+                  }
         }
       })
     )
@@ -119,16 +127,22 @@ try {
             }
           }
           
-          return {
-            ...category,
-            image: categoryImage
-          }
+           return {
+                        _id: category._id,
+                        name: category.name,
+                        isListed: category.isListed,
+                        createdAt: category.createdAt,
+                        image: categoryImage
+                    }
         } catch (error) {
           console.error(`Error processing category ${category.name}:`, error)
-          return {
-            ...category,
-            image: '/images/placeholder-category.jpg'
-          }
+         return {
+                        _id: category._id,
+                        name: category.name,
+                        isListed: category.isListed,
+                        createdAt: category.createdAt,
+                        image: '/images/placeholder-category.jpg'
+                    }
         }
       })
     )
