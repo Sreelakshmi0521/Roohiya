@@ -8,7 +8,7 @@ const setLayout=require("../middlewares/setLayout")
 const userController=require("../controllers/user/userController")
 const setPagetitle=require("../middlewares/setpagetitle")
 const productController=require("../controllers/user/productController")
-
+const reviewController=require("../controllers/user/reviewController")
 
 router.use(setLayout("user"))
 //signup
@@ -43,8 +43,8 @@ router.post("/newForpassword",authController.newForpassword)
 
 router.get("/homepage",requireLogin,nocache,setPagetitle("homepage","homepage.css"),userController.loadHomepage)
 router.get("/shop",nocache,setPagetitle("shop","shop.css"),productController.loadShop)
-
-
+router.get("/product/:id",nocache,setPagetitle("productDetails","productDetails.css"),productController.loadProductDetails)
+// router.post("/review/add",reviewController.addReview)
 
 
 

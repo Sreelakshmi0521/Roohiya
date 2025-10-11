@@ -29,6 +29,10 @@ type: mongoose.Schema.Types.ObjectId,
 
 
 }],
+reviews: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Review"
+    }],
     isListed:{
 type:Boolean,
 default:true

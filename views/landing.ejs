@@ -6,7 +6,7 @@
     <title><%= pageTitle %></title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="/styles/user/landing.css">
+  <link rel="stylesheet" href="/styles/user/<%= pagecss %>">
 </head>
 <body>
 
@@ -97,8 +97,7 @@
       </div>
     <% } %>
   </div>
-</section>
-<!-- NEW ARRIVALS -->
+</section><!-- NEW ARRIVALS -->
 <section class="section new-arrivals-section">
   <div class="section-header">
     <h2>New Arrivals</h2>
@@ -112,11 +111,14 @@
         %>
         <div class="product-card">
           <div class="product-image-container">
-            <% if (variant && variant.images && variant.images.length > 0) { %>
-              <img src="<%= variant.images[0] %>" alt="<%= product.name %>">
-            <% } else { %>
-              <img src="/images/placeholder.jpg" alt="No image available">
-            <% } %>
+            <!-- ADD PRODUCT IMAGE LINK -->
+            <a href="/user/product/<%= product._id %>" class="product-image-link">
+              <% if (variant && variant.images && variant.images.length > 0) { %>
+                <img src="<%= variant.images[0] %>" alt="<%= product.name %>">
+              <% } else { %>
+                <img src="/images/placeholder.jpg" alt="No image available">
+              <% } %>
+            </a>
             <div class="product-actions">
               <button class="wishlist-btn"><i class="far fa-heart"></i></button>
               <button class="quick-view-btn">Quick View</button>
@@ -126,7 +128,10 @@
             <% } %>
           </div>
           <div class="product-info">
-            <h3><%= product.name %></h3>
+            <!-- ADD PRODUCT NAME LINK -->
+            <a href="/user/product/<%= product._id %>" class="product-name-link">
+              <h3><%= product.name %></h3>
+            </a>
             <% if (variant) { %>
               <div class="price-container">
                 <p class="product-price">₹<%= variant.discountedPrice || variant.price %></p>
