@@ -22,4 +22,5 @@ const requireTempuser=(req,res,next)=>{
     next()
 }
 
+
 module.exports={ isLogin,requireLogin,requireTempuser}

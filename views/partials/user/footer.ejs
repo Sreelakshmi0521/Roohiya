@@ -1,5 +1,6 @@
 <footer>
   <div class="footer-content">
+    <!-- Brand Section -->
     <div class="footer-section">
       <h3>Roohiya</h3>
       <p>Timeless jewelry for every occasion</p>
@@ -9,28 +10,19 @@
         <a href="#"><i class="fab fa-pinterest-p"></i></a>
       </div>
     </div>
+
+    <!-- Shop Section -->
     <div class="footer-section">
       <h4>Shop</h4>
       <ul>
         <li><a href="/user/shop">All Products</a></li>
         <li><a href="/user/new-arrivals">New Arrivals</a></li>
-        
-        <!-- ✅ SAFE: Check if categories exists and handle structure -->
+
         <% if (typeof categories !== 'undefined' && categories && categories.length > 0) { %>
           <% 
-            // Find categories by name - handle both direct and _doc structure
-            const casualCategory = categories.find(cat => {
-              const categoryName = cat.name || (cat._doc && cat._doc.name);
-              return categoryName && categoryName.toLowerCase().includes('casual');
-            });
-            const festiveCategory = categories.find(cat => {
-              const categoryName = cat.name || (cat._doc && cat._doc.name);
-              return categoryName && categoryName.toLowerCase().includes('festive');
-            });
-            const officeCategory = categories.find(cat => {
-              const categoryName = cat.name || (cat._doc && cat._doc.name);
-              return categoryName && categoryName.toLowerCase().includes('office');
-            });
+            const casualCategory = categories.find(cat => (cat.name || (cat._doc && cat._doc.name))?.toLowerCase().includes('casual'));
+            const festiveCategory = categories.find(cat => (cat.name || (cat._doc && cat._doc.name))?.toLowerCase().includes('festive'));
+            const officeCategory = categories.find(cat => (cat.name || (cat._doc && cat._doc.name))?.toLowerCase().includes('office'));
           %>
           <% if (casualCategory) { %>
             <li><a href="/user/shop?category=<%= casualCategory._id %>">Casual Wear</a></li>
@@ -42,31 +34,28 @@
             <li><a href="/user/shop?category=<%= officeCategory._id %>">Office Wear</a></li>
           <% } %>
         <% } else { %>
-          <!-- Fallback links if categories is not available -->
           <li><a href="/user/shop">Casual Wear</a></li>
           <li><a href="/user/shop">Festive Wear</a></li>
           <li><a href="/user/shop">Office Wear</a></li>
         <% } %>
       </ul>
     </div>
+
+    <!-- Information Section -->
     <div class="footer-section">
-      <h4>Help</h4>
+      <h4>Information</h4>
       <ul>
+        <li><a href="/user/about">About Us</a></li>
+        <li><a href="/user/contact">Contact Us</a></li>
+        <li><a href="/user/terms">Terms & Conditions</a></li>
+        <li><a href="/user/privacyPolicy">Privacy Policy</a></li>
         <li><a href="/user/shipping">Shipping Info</a></li>
         <li><a href="/user/returns">Returns</a></li>
-        <li><a href="/user/size-guide">Size Guide</a></li>
-        <li><a href="/user/contact">Contact Us</a></li>
       </ul>
     </div>
-    <div class="footer-section">
-      <h4>Newsletter</h4>
-      <p>Subscribe for updates and exclusive offers</p>
-      <form class="newsletter-form">
-        <input type="email" placeholder="Your email address">
-        <button type="submit">Subscribe</button>
-      </form>
-    </div>
   </div>
+
+  <!-- Footer Bottom -->
   <div class="footer-bottom">
     <p>&copy; 2025 Roohiya. All rights reserved.</p>
   </div>

@@ -141,7 +141,6 @@ const loadProductDetails = async (req, res) => {
 
         if (!variants || variants.length === 0) {
             return res.render("user/productDetails", {
-                // pageTitle: "Product Unavailable",
                 product,
                 variants: [],
                 selectedVariant: null,
@@ -171,7 +170,7 @@ const loadProductDetails = async (req, res) => {
         }
 
         const relatedProducts = await Product.find({
-            category: product.category._id,
+           category: product.category._id,
             _id: { $ne: product._id },
             isListed: true
         }).limit(3).populate("category").lean()
@@ -191,7 +190,6 @@ const loadProductDetails = async (req, res) => {
         }
 
         return res.render("user/productDetails", {
-            // pageTitle: product.name,
             product,
             variants,
             selectedVariant,
@@ -200,11 +198,11 @@ const loadProductDetails = async (req, res) => {
             totalReviews: reviews.length,
             relatedProducts,
             user: req.session.user || null,
-            // pagecss: "productDetails.css"
+         
         })
 
     } catch (error) {
-        console.log("Product details error:", error)
+        console.log(error)
         res.redirect("/user/shop")
     }
 }

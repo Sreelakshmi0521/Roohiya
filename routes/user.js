@@ -44,7 +44,7 @@ router.post("/newForpassword",authController.newForpassword)
 router.get("/homepage",requireLogin,nocache,setPagetitle("homepage","homepage.css"),userController.loadHomepage)
 router.get("/shop",nocache,setPagetitle("shop","shop.css"),productController.loadShop)
 router.get("/product/:id",nocache,setPagetitle("productDetails","productDetails.css"),productController.loadProductDetails)
-// router.post("/review/add",reviewController.addReview)
+router.post("/review/add",requireLogin,reviewController.addReview)
 
 
 

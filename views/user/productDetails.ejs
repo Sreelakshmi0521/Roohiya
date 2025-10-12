@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= pageTitle %></title>
     <link rel="stylesheet" href="/styles/user/common.css">
-       <link rel="stylesheet" href="/styles/user/<%= pagecss %>">
-          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/styles/user/<%= pagecss %>">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
 <body>
-     <%- include('../partials/user/navbar') %>
+    <%- include('../partials/user/navbar') %>
 
     <!-- Breadcrumbs -->
     <section class="breadcrumb-section">
@@ -100,6 +100,7 @@
                                 <span class="current-price">₹<%= selectedVariant.price %></span>
                             <% } %>
                         </div>
+                        
 
                         <!-- Stock Status -->
                         <div class="stock-status">
@@ -120,6 +121,18 @@
                                 </div>
                             <% } %>
                         </div>
+                                                
+                        <!-- Simple Highlights -->
+                        <% if (product.highlights && product.highlights.length > 0) { %>
+                            <div class="product-highlights">
+                                <h3> Highlights</h3>
+                                <ul>
+                                    <% product.highlights.forEach(highlight => { %>
+                                        <li><i class="fas fa-check"></i> <%= highlight %></li>
+                                    <% }) %>
+                                </ul>
+                            </div>
+                        <% } %>
 
                         <!-- Variants -->
                         <% if (variants.length > 1) { %>
@@ -139,7 +152,8 @@
                                 </div>
                             </div>
                         <% } %>
-
+                          
+                        
                         <!-- Product Description -->
                         <div class="product-description">
                             <h3>Description</h3>
@@ -189,13 +203,54 @@
                     </div>
                 </div>
 
-                
                 <!-- Reviews Section -->
                 <section class="reviews-section">
                     <div class="section-header">
                         <h2>Customer Reviews</h2>
                     </div>
-                    
+
+                    <!-- Add Review Form - Only show if user is logged in -->
+                    <% if (user) { %>
+                        <div class="add-review-section">
+                            <h3>Write a Review</h3>
+                            <form id="review-form" class="review-form">
+                                <input type="hidden" id="product-id" value="<%= product._id %>">
+                                
+                                <div class="rating-input">
+                                    <label>Your Rating:</label>
+                                    <div class="star-rating">
+                                        <% for (let i = 1; i <= 5; i++) { %>
+                                            <i class="fas fa-star" data-rating="<%= i %>"></i>
+                                        <% } %>
+                                    </div>
+                                    <input type="hidden" id="rating-value" name="rating" required>
+                                </div>
+
+                                <div class="comment-input">
+                                    <label for="review-comment">Your Review:</label>
+                                    <textarea 
+                                        id="review-comment" 
+                                        name="comment" 
+                                        placeholder="Share your experience with this product..." 
+                                        rows="4" 
+                                        required
+                                    ></textarea>
+                                </div>
+
+                                <button type="submit" class="submit-review-btn">
+                                    <i class="fas fa-paper-plane"></i> Submit Review
+                                </button>
+                            </form>
+                        </div>
+                    <% } else { %>
+                        <div class="login-prompt">
+                            <p>
+                                <a href="/user/login" class="login-link">Login</a> to write a review
+                            </p>
+                        </div>
+                    <% } %>
+
+                    <!-- Existing Reviews Display -->
                     <% if (reviews.length > 0) { %>
                         <div class="reviews-grid">
                             <% reviews.forEach(review => { %>
@@ -227,7 +282,7 @@
                 <% if (relatedProducts.length > 0) { %>
                     <section class="related-products">
                         <div class="section-header">
-                            <h2>You May Also Like</h2>
+                            <h2>Similar Products</h2>
                         </div>
                         <div class="related-products-grid">
                             <% relatedProducts.forEach(relatedProduct => { 
@@ -281,8 +336,9 @@
 
     <%- include('../partials/user/footer') %>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script> -->
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
     <script src="/js/productDetails.js"></script>
+    <script src="/js/reviewSub.js"></script>
 </body>
 </html>

@@ -15,9 +15,10 @@
       <link rel="stylesheet" href="/styles/admin/common.css">
     
       <!-- specific page css -->
-     <% if(pagecss){ %>
-      <link rel="stylesheet" href="/styles/admin/<%= pagecss %>">
-   <% } %>
+   <% if (typeof pagecss !== 'undefined' && pagecss) { %>
+  <link rel="stylesheet" href="/styles/admin/<%= pagecss %>">
+<% } %>
+
 
 
 </head>

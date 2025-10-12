@@ -48,6 +48,16 @@ app.use("/",landingRoutes)
 app.use("/user",userRoutes)
 app.use("/admin",adminRoutes)
 
+app.use((req, res) => {
+  if (req.originalUrl.startsWith('/admin')) {
+    res.status(404).render('admin/404', { layout: false})
+  } else {
+    res.status(404).render('404');
+  }
+})
+
+
+
 db()
 app.listen(process.env.PORT,()=>{
     console.log(`server is running`)
