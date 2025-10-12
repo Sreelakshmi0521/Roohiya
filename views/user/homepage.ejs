@@ -75,44 +75,50 @@
     </div>
 
     <div class="new-arrivals-grid">
-     <% 
-let displayVariant = null;
-if (product.variants && product.variants.length > 0) {
-    displayVariant = product.variants.find(v => v.isListed && v.stock > 0) || product.variants[0];
-}
-const isOutOfStock = !displayVariant || displayVariant.stock <= 0;
-%>
+      <% if (products && products.length > 0) { %>
+        <% products.forEach(product => { 
+             const displayVariant = product.variants && product.variants.length > 0 
+               ? (product.variants.find(v => v.isListed && v.stock > 0) || product.variants[0])
+               : null;
+        %>
+          <div class="product-card">
+            <div class="product-image-container">
+              <a href="/user/product/<%= product._id %>" class="product-image-link">
+                <img 
+                  src="<%= (displayVariant && displayVariant.images && displayVariant.images.length > 0) 
+                          ? displayVariant.images[0] 
+                          : '/images/placeholder.jpg' %>" 
+                  alt="<%= product.name %>">
+              </a>
+              <div class="product-actions">
+                <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+              </div>
 
-<div class="product-card">
-  <div class="product-image-container">
-    <a href="/user/product/<%= product._id %>">
-      <img src="<%= (displayVariant && displayVariant.images.length > 0) 
-                      ? displayVariant.images[0] 
-                      : '/images/placeholder.jpg' %>" 
-           alt="<%= product.name %>">
-    </a>
-    <% if (isOutOfStock) { %>
-      <span class="out-of-stock">Out of Stock</span>
-    <% } %>
-  </div>
+              <% if (!product.isAvailable) { %>
+                <span class="out-of-stock">Out of Stock</span>
+              <% } %>
+            </div>
 
-  <div class="product-info">
-    <h3><%= product.name %></h3>
-    <p class="product-color">Color: <%= displayVariant ? displayVariant.color : '-' %></p>
+            <div class="product-info">
+              <a href="/user/product/<%= product._id %>" class="product-name-link">
+                <h3><%= product.name %></h3>
+              </a>
 
-    <% if (!isOutOfStock) { %>
-      <p class="product-price">₹<%= displayVariant.discountedPrice || displayVariant.price %></p>
-      <% if (displayVariant.discountedPrice && displayVariant.discountedPrice < displayVariant.price) { %>
-        <p class="original-price">₹<%= displayVariant.price %></p>
-      <% } %>
-      <button class="add-to-cart-btn">Add to Cart</button>
-    <% } else { %>
-      <p class="product-price">Unavailable</p>
-      <button class="add-to-cart-btn" disabled>Out of Stock</button>
-    <% } %>
-  </div>
-</div>
-
+              <% if (product.isAvailable) { %>
+                <div class="price-container">
+                  <p class="product-price">₹<%= displayVariant.discountedPrice || displayVariant.price %></p>
+                  <% if (displayVariant.discountedPrice && displayVariant.discountedPrice < displayVariant.price) { %>
+                    <p class="original-price">₹<%= displayVariant.price %></p>
+                  <% } %>
+                </div>
+                <p class="product-color">Color: <%= displayVariant.color || '-' %></p>
+                <button class="add-to-cart-btn">Add to Cart</button>
+              <% } else { %>
+                <p class="product-price">Unavailable</p>
+                <p class="product-color">Color: -</p>
+                <button class="add-to-cart-btn" disabled>Out of Stock</button>
+              <% } %>
+            </div>
           </div>
         <% }) %>
       <% } else { %>
@@ -124,7 +130,6 @@ const isOutOfStock = !displayVariant || displayVariant.stock <= 0;
       <% } %>
     </div>
   </section>
-
   <%- include('../partials/user/footer') %>
 </body>
 </html>

@@ -50,11 +50,11 @@ body, html {
     margin-bottom: 1rem;
 }
 .form-control:focus {
-    border-color: #f7931e;
+    border-color: #d4af37;
     box-shadow: 0 0 0 0.2rem rgba(247, 147, 30, 0.25);
 }
 .create-btn {
-    background: #202b3d;
+    background: #d4af37;
     border: none;
     color: #fff;
     padding: 12px 20px;
@@ -64,7 +64,7 @@ body, html {
     margin-bottom: 1.5rem;
 }
 .create-btn:hover {
-    background: #f7931e;
+    background: #d4af37;
 }
 .login-link a, .forgot-password a {
     color: #f7931e;
