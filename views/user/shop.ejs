@@ -110,59 +110,82 @@
           </div>
 
           <% if (products.length > 0) { %>
-           <div class="product-grid">
+       <div class="product-grid">
   <% products.forEach(product => {
-    const variant = product.variants[0];
-    const hasDiscount = variant && variant.discountedPrice && variant.discountedPrice < variant.price;
+      let displayVariant = null;
+      let isOutOfStock = true; // default assume out of stock
+
+      if (product.variants && product.variants.length > 0) {
+          // Find first variant that is listed and has stock
+          displayVariant = product.variants.find(v => v.isListed && v.stock > 0);
+
+          if (displayVariant) {
+              isOutOfStock = false; // found a variant with stock
+          } else {
+              // fallback to first variant even if stock 0
+              displayVariant = product.variants[0];
+          }
+      }
+
+      // Check for discount
+      const hasDiscount = displayVariant && displayVariant.discountedPrice && displayVariant.discountedPrice < displayVariant.price;
   %>
-    <div class="product-card">
-      <div class="product-image-container">
-        <!-- ADD PRODUCT IMAGE LINK -->
-        <a href="/user/product/<%= product._id %>" class="product-image-link">
-          <% if (variant && variant.images.length > 0) { %>
-            <img src="<%= variant.images[0] %>" alt="<%= product.name %>">
-          <% } else { %>
-            <img src="/images/placeholder.jpg" alt="No image">
-          <% } %>
-        </a>
-        
-        <div class="product-actions">
-          <button class="wishlist-btn" title="Add to Wishlist">
-            <i class="far fa-heart"></i>
-          </button>
-         
-        </div>
-        
-        <% if (hasDiscount) { %>
-          <span class="discount-badge">Sale</span>
-        <% } %>
-      </div>
-      
-      <div class="product-info">
-        <!-- ADD PRODUCT NAME LINK -->
-        <a href="/user/product/<%= product._id %>" class="product-name-link">
-          <h3 class="product-name"><%= product.name %></h3>
-        </a>
-        <% if (variant) { %>
-          <div class="price-container">
-            <% if (hasDiscount) { %>
-              <span class="current-price">₹<%= variant.discountedPrice %></span>
-              <span class="original-price">₹<%= variant.price %></span>
-            <% } else { %>
-              <span class="current-price">₹<%= variant.price %></span>
-            <% } %>
-          </div>
+
+  <div class="product-card">
+    <div class="product-image-container">
+      <a href="/user/product/<%= product._id %>" class="product-image-link">
+        <% if (displayVariant && displayVariant.images.length > 0) { %>
+          <img src="<%= displayVariant.images[0] %>" alt="<%= product.name %>">
         <% } else { %>
-          <p class="not-available">Not available</p>
+          <img src="/images/placeholder.jpg" alt="No image">
         <% } %>
-        
-        <button class="add-to-cart-btn">
-          <i class="fas fa-shopping-bag"></i> Add to Cart
+      </a>
+
+      <div class="product-actions">
+        <button class="wishlist-btn" title="Add to Wishlist">
+          <i class="far fa-heart"></i>
         </button>
       </div>
+
+    <% if (hasDiscount && !isOutOfStock) { %>
+  <span class="discount-badge">Sale</span>
+<% } %>
+
+<% if (isOutOfStock) { %>
+  <span class="out-of-stock-badge">Out of Stock</span>
+<% } %>
+
     </div>
+
+    <div class="product-info">
+      <a href="/user/product/<%= product._id %>" class="product-name-link">
+        <h3 class="product-name"><%= product.name %></h3>
+      </a>
+
+      <% if (displayVariant) { %>
+        <div class="price-container">
+          <% if (hasDiscount) { %>
+            <span class="current-price">₹<%= displayVariant.discountedPrice %></span>
+            <span class="original-price">₹<%= displayVariant.price %></span>
+          <% } else { %>
+            <span class="current-price">₹<%= displayVariant.price %></span>
+          <% } %>
+        </div>
+      <% } else { %>
+        <p class="not-available">Not available</p>
+      <% } %>
+
+      <button class="add-to-cart-btn" <%= isOutOfStock ? 'disabled class="disabled"' : '' %>>
+        <i class="fas fa-shopping-bag"></i>
+        <%= isOutOfStock ? 'Out of Stock' : 'Add to Cart' %>
+      </button>
+    </div>
+  </div>
+
   <% }) %>
 </div>
+
+
             <!-- Pagination -->
             <% if (totalPages > 1) { %>
               <div class="pagination">
@@ -216,9 +239,8 @@
   <%- include('../partials/user/footer') %>
 
   <script>
-    // Product interaction functionality
     document.addEventListener('DOMContentLoaded', function() {
-      // Wishlist buttons
+      // Wishlist toggle
       document.querySelectorAll('.wishlist-btn').forEach(btn => {
         btn.addEventListener('click', function(e) {
           e.preventDefault();
@@ -227,15 +249,15 @@
           this.querySelector('i').classList.toggle('fas');
         });
       });
-      
-      // Add to cart buttons
+
+      // Add to cart
       document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
         btn.addEventListener('click', function(e) {
+          if (this.disabled) return;
           e.preventDefault();
           const originalText = this.innerHTML;
           this.innerHTML = '<i class="fas fa-check"></i> Added to Cart';
           this.classList.add('added');
-          
           setTimeout(() => {
             this.innerHTML = originalText;
             this.classList.remove('added');
@@ -243,6 +265,6 @@
         });
       });
     });
-  </script>
+    </script>
 </body>
 </html>

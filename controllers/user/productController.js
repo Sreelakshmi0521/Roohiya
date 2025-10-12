@@ -135,13 +135,9 @@ const loadProductDetails = async (req, res) => {
         const product = await Product.findById(productId).populate("category").lean()
 
         if (!product || !product.isListed) {
-            return res.redirect("/user/shop")
-        }
-        const variants = await ProductVariant.find({ product: productId,isListed: true }).lean()
-
-        if (!variants || variants.length === 0) {
-            return res.render("user/productDetails", {
-                product,
+             return res.render("user/productDetails", {
+                pageTitle: "Product Unavailable",
+                product: {},
                 variants: [],
                 selectedVariant: null,
                 reviews: [],
@@ -149,17 +145,34 @@ const loadProductDetails = async (req, res) => {
                 totalReviews: 0,
                 relatedProducts: [],
                 user: req.session.user || null,
-            })
+                pagecss: "productDetails.css"
+            });
         }
+        const variants = await ProductVariant.find({ product: productId,isListed: true }).lean()
 
-        let selectedVariant = null
-        if (variantId) {
-            selectedVariant = variants.find(v => v._id.toString() === variantId)
-        }
+       
+            if (!variants || variants.length === 0) {
+                        return res.render("user/productDetails", {
+                            pageTitle: "Product Unavailable",
+                            product,
+                            variants: [],
+                            selectedVariant: null,
+                            reviews: [],
+                            averageRating: 0,
+                            totalReviews: 0,
+                            relatedProducts: [],
+                            user: req.session.user || null,
+                             pagecss: "productDetails.css"
+                        })
+                    }
 
-        if (!selectedVariant) {
-            selectedVariant = variants[0]
-        }
+                            let selectedVariant = null
+                            if (variantId) {
+                                selectedVariant = variants.find(v => v._id.toString() === variantId)
+                            }
+                                if (!selectedVariant) {
+                                    selectedVariant = variants.find(v => v.stock > 0) || variants[0];
+                                }
 
         const reviews = await Review.find({ product: productId }).populate("user", "name").sort({ createdAt: -1 }).lean()
 
@@ -189,7 +202,8 @@ const loadProductDetails = async (req, res) => {
             relprd.variants = await ProductVariant.find({ product: relprd._id, isListed: true }).lean()
         }
 
-        return res.render("user/productDetails", {
+          return res.render("user/productDetails", {
+            pageTitle: product.name,
             product,
             variants,
             selectedVariant,
@@ -198,7 +212,7 @@ const loadProductDetails = async (req, res) => {
             totalReviews: reviews.length,
             relatedProducts,
             user: req.session.user || null,
-         
+            pagecss: "productDetails.css"
         })
 
     } catch (error) {

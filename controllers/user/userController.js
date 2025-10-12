@@ -62,10 +62,12 @@ const loadLanding=async(req,res)=>{
       const products=await Product.find({isListed:true}).sort({createdAt:-1}).limit(6).lean()
 
 
-      for(let product of products){
-        product.variants=await ProductVariant.find({product:product._id,isListed:true}).lean()
+     for (let product of products) {
+      const variants = await ProductVariant.find({ product: product._id, isListed: true }).lean();
+      product.variants = variants;
+      product.isAvailable = variants.some(v => v.isListed && v.stock > 0);
+    }
 
-      }
 
   const hero = {
       image: "/images/hero-woman.jpg",
@@ -135,9 +137,9 @@ try {
                         image: categoryImage
                     }
         } catch (error) {
-          console.error(`Error processing category ${category.name}:`, error)
-         return {
-                        _id: category._id,
+          console.error( error)
+              return {
+                   _id: category._id,
                         name: category.name,
                         isListed: category.isListed,
                         createdAt: category.createdAt,
@@ -149,9 +151,12 @@ try {
 
     const products = await Product.find({ isListed: true }).sort({ createdAt: -1 }).lean()
      
-    for(let product  of products){
-      product.variants=await ProductVariant.find({product:product._id,isListed:true}).lean()
+    for (let product of products) {
+      const variants = await ProductVariant.find({ product: product._id, isListed: true }).lean();
+      product.variants = variants;
+      product.isAvailable = variants.some(v => v.isListed && v.stock > 0);
     }
+
 
 
 

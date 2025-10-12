@@ -1,161 +1,130 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= pageTitle %></title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
- <link rel="stylesheet" href="/styles/user/<%= pagecss %>">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= pageTitle || "Homepage" %></title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/styles/user/common.css">
+  <link rel="stylesheet" href="/styles/user/<%= pagecss %>">
 </head>
 <body>
   <%- include('../partials/user/navbar') %>
 
-<!-- HERO -->
-<section class="hero">
-  <% if (hero) { %>
-    <div class="hero-content">
-      <h1><%= hero.title %></h1>
-      <p><%= hero.description %></p>
-      <a href="<%= hero.shopLink || '/shop' %>" class="shop-now-btn">Shop Now</a>
+  <!-- HERO -->
+  <section class="hero">
+    <% if (hero) { %>
+      <div class="hero-content">
+        <h1><%= hero.title %></h1>
+        <p><%= hero.description %></p>
+        <a href="<%= hero.shopLink || '/shop' %>" class="shop-now-btn">Shop Now</a>
+      </div>
+      <div class="hero-image">
+        <img src="<%= hero.image %>" alt="<%= hero.alt || 'Hero Image' %>">
+      </div>
+    <% } else { %>
+      <div class="hero-content">
+        <h1>Adorn your soul with timeless beauty</h1>
+        <p>Discover exquisite jewelry that complements every moment.</p>
+        <a href="/user/shop" class="shop-now-btn">Shop Now</a>
+      </div>
+      <div class="hero-image">
+        <img src="/images/hero-woman.jpg" alt="Woman wearing earrings">
+      </div>
+    <% } %>
+  </section>
+
+  <!-- CATEGORIES -->
+  <section class="section">
+    <div class="section-header">
+      <h2>Browse Categories</h2>
+      <p>Find the perfect jewelry for every occasion</p>
     </div>
-    <div class="hero-image">
-      <img src="<%= hero.image %>" alt="<%= hero.alt || 'Hero Image' %>">
-    </div>
-  <% } else { %>
-    <div class="hero-content">
-      <h1>Adorn your soul with timeless beauty</h1>
-      <p>Discover exquisite jewelry that complements every moment.</p>
-      <a href="/user/shop" class="shop-now-btn">Shop Now</a>
-    </div>
-    <div class="hero-image">
-      <img src="/images/hero-woman.jpg" alt="Woman wearing earrings">
-    </div>
-  <% } %>
-</section>
-<!-- CATEGORIES -->
-<section class="section">
-  <div class="section-header">
-    <h2>Browse Categories</h2>
-    <p>Find the perfect jewelry for every occasion</p>
-  </div>
-  <div class="categories-grid">
-    <% if (categories && categories.length > 0) { %>
-      <% categories.forEach(category => { %>
-        <div class="category-card">    
-          <img src="<%= category.image || '/images/placeholder-category.jpg' %>" alt="<%= category.name || category._doc?.name || 'Category' %>">
-          <div class="category-overlay">
-            <h3 class="category-title">
-              <% 
-     
-                let categoryName = '';
-                
-                // Try different possible locations for the name
-                if (category.name) {
-                  categoryName = category.name;
-                } else if (category._doc && category._doc.name) {
-                  categoryName = category._doc.name;
-                } else if (category.title) {
-                  categoryName = category.title;
-                } else {
-                  categoryName = 'Category';
-                }
-                
-                const lowerName = categoryName.toLowerCase();
-                
-                // Format the display name
-                if (lowerName.includes('casual')) { 
-              %>
-                Casual<br>Wear
-              <% } else if (lowerName.includes('office')) { %>
-                Office<br>Wear
-              <% } else if (lowerName.includes('festive')) { %>
-                Festive<br>Wear
-              <% } else { %>
-                <%= categoryName %>
-              <% } %>
-            </h3>
-      
-            <% if (category._id) { %>
+    <div class="categories-grid">
+      <% if (categories && categories.length > 0) { %>
+        <% categories.forEach(category => { %>
+          <div class="category-card">
+            <img src="<%= category.image || '/images/placeholder-category.jpg' %>" 
+                 alt="<%= category.name || 'Category' %>">
+            <div class="category-overlay">
+              <h3 class="category-title">
+                <%= category.name %>
+              </h3>
               <a href="/user/shop?category=<%= category._id %>" class="category-link">
                 Explore <i class="fas fa-arrow-right"></i>
               </a>
-            <% } else { %>
-              <a href="/user/shop" class="category-link">
-                Explore <i class="fas fa-arrow-right"></i>
-              </a>
-            <% } %>
-          </div>
-        </div>
-      <% }) %>
-    <% } else { %>
-      <div class="empty-state">
-        <i class="fas fa-gem"></i>
-        <h3>No categories available</h3>
-        <p>Check back soon for new collections</p>
-      </div>
-    <% } %>
-  </div>
-</section><!-- NEW ARRIVALS -->
-<section class="section new-arrivals-section">
-  <div class="section-header">
-    <h2>New Arrivals</h2>
-    <p>Discover our latest jewelry collections</p>
-  </div>
-  <div class="new-arrivals-grid">
-    <% if (products && products.length > 0) { %>
-      <% products.forEach(product => { %>
-        <% 
-          const variant = product.variants.find(v => v.isListed) || null; 
-        %>
-        <div class="product-card">
-          <div class="product-image-container">
-            <!-- ADD PRODUCT IMAGE LINK -->
-            <a href="/user/product/<%= product._id %>" class="product-image-link">
-              <% if (variant && variant.images && variant.images.length > 0) { %>
-                <img src="<%= variant.images[0] %>" alt="<%= product.name %>">
-              <% } else { %>
-                <img src="/images/placeholder.jpg" alt="No image available">
-              <% } %>
-            </a>
-            <div class="product-actions">
-              <button class="wishlist-btn"><i class="far fa-heart"></i></button>
             </div>
-            <% if (!variant || variant.stock === 0) { %>
-              <span class="out-of-stock">Out of Stock</span>
-            <% } %>
           </div>
-          <div class="product-info">
-            <!-- ADD PRODUCT NAME LINK -->
-            <a href="/user/product/<%= product._id %>" class="product-name-link">
-              <h3><%= product.name %></h3>
-            </a>
-            <% if (variant) { %>
-              <div class="price-container">
-                <p class="product-price">₹<%= variant.discountedPrice || variant.price %></p>
-                <% if (variant.discountedPrice && variant.discountedPrice < variant.price) { %>
-                  <p class="original-price">₹<%= variant.price %></p>
-                <% } %>
-              </div>
-              <p class="product-color">Color: <%= variant.color %></p>
-            <% } else { %>
-              <p class="product-price">Not available</p>
-            <% } %>
-            <button class="add-to-cart-btn">Add to Cart</button>
-          </div>
+        <% }) %>
+      <% } else { %>
+        <div class="empty-state">
+          <i class="fas fa-gem"></i>
+          <h3>No categories available</h3>
+          <p>Check back soon for new collections</p>
         </div>
-      <% }) %>
-    <% } else { %>
-      <div class="empty-state">
-        <i class="fas fa-box-open"></i>
-        <h3>No new arrivals</h3>
-        <p>Check back soon for our latest collections</p>
-      </div>
+      <% } %>
+    </div>
+  </section>
+
+  <!-- NEW ARRIVALS -->
+  <section class="section new-arrivals-section">
+    <div class="section-header">
+      <h2>New Arrivals</h2>
+      <p>Discover our latest jewelry collections</p>
+    </div>
+
+    <div class="new-arrivals-grid">
+     <% 
+let displayVariant = null;
+if (product.variants && product.variants.length > 0) {
+    displayVariant = product.variants.find(v => v.isListed && v.stock > 0) || product.variants[0];
+}
+const isOutOfStock = !displayVariant || displayVariant.stock <= 0;
+%>
+
+<div class="product-card">
+  <div class="product-image-container">
+    <a href="/user/product/<%= product._id %>">
+      <img src="<%= (displayVariant && displayVariant.images.length > 0) 
+                      ? displayVariant.images[0] 
+                      : '/images/placeholder.jpg' %>" 
+           alt="<%= product.name %>">
+    </a>
+    <% if (isOutOfStock) { %>
+      <span class="out-of-stock">Out of Stock</span>
     <% } %>
   </div>
-</section>
-<%- include('../partials/user/footer') %>
 
+  <div class="product-info">
+    <h3><%= product.name %></h3>
+    <p class="product-color">Color: <%= displayVariant ? displayVariant.color : '-' %></p>
 
+    <% if (!isOutOfStock) { %>
+      <p class="product-price">₹<%= displayVariant.discountedPrice || displayVariant.price %></p>
+      <% if (displayVariant.discountedPrice && displayVariant.discountedPrice < displayVariant.price) { %>
+        <p class="original-price">₹<%= displayVariant.price %></p>
+      <% } %>
+      <button class="add-to-cart-btn">Add to Cart</button>
+    <% } else { %>
+      <p class="product-price">Unavailable</p>
+      <button class="add-to-cart-btn" disabled>Out of Stock</button>
+    <% } %>
+  </div>
+</div>
+
+          </div>
+        <% }) %>
+      <% } else { %>
+        <div class="empty-state">
+          <i class="fas fa-box-open"></i>
+          <h3>No new arrivals</h3>
+          <p>Check back soon for our latest collections</p>
+        </div>
+      <% } %>
+    </div>
+  </section>
+
+  <%- include('../partials/user/footer') %>
 </body>
 </html>
