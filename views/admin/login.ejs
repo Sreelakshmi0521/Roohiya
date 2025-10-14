@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login</title>
-     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <style>
         body {
             margin: 0;
@@ -91,8 +91,8 @@
         <div class="form-section">
             <h2>ADMIN LOGIN</h2>
        
-            <form id="loginForm" action="/admin/login" method="POST">
-                <input type="email" name="email" placeholder="Email" id="email" value="roohiya@gmail.com">
+            <form id="loginForm" action="/admin/login" method="POST" novalidate>
+                <input type="email" name="email" placeholder="Email" id="email" value="roohiya@gmail.com" >
                 <input type="password" name="password" placeholder="Password" id="password" value="roohiya">
                 <button type="submit">Sign in</button>
             </form>
@@ -100,12 +100,49 @@
         </div>
     </div>
     
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
-    <!-- Include your existing alert partial -->
-    <%- include('../partials/admin/alert', { 
-        message: typeof message !== 'undefined' ? message : null, 
-        messageType: typeof messageType !== 'undefined' ? messageType : null 
-    }) %>
+   <script>
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value.trim();
+
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!email || !emailPattern.test(email)) {
+        e.preventDefault();
+        Toastify({
+            text: "Please enter a valid email address",
+            duration: 1000,
+            gravity: "top", // top or bottom
+            position: "center",
+              offset: {
+        x: 0, // horizontal
+        y: 50 // vertical distance from top
+    }, // left, center or right
+            backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
+        }).showToast();
+        return;
+    }
+
+    if (!password || password.length < 6) {
+        e.preventDefault();
+        Toastify({
+            text: "Password must be at least 6 characters",
+            duration: 1000,
+            gravity: "top",
+            position: "center",
+              offset: {
+        x: 0, 
+        y: 50 
+    },
+            backgroundColor: "linear-gradient(to right, #f12711, #f5af19)",
+        }).showToast();
+        return;
+    }
+});
+</script>
+
+
 </body>
 </html>

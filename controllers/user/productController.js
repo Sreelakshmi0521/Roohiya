@@ -103,7 +103,7 @@ const loadShop=async(req,res)=>{
             totalPages,
             search,
            category: currentCate ? currentCate._id.toString() : "",
-           categoryName:  cateName,
+           categoryName:  cateName||"",
            minPrice: minPrice||"",
            maxPrice: maxPrice||"",
             sort
@@ -120,6 +120,7 @@ const loadShop=async(req,res)=>{
             totalPages:1,
             search:"",
              category:"",
+             categoryName: "",
             minPrice:"",
             maxPrice:"",
             sort:"latest"

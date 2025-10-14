@@ -13,43 +13,43 @@ signupForm.addEventListener("submit",function(e){
     const confirmPassword=document.getElementById("confirmPassword").value.trim()
 
 if(!name||!email||!phone||!password||!confirmPassword){
-     swal("Error", "Please fill all fields", "warning");
-      return;
+     swal("Error", "Please fill all fields", "warning")
+      return
 }
 
 const nameValid=/^[A-Za-z\s]+$/
 if(!nameValid.test(name)){
-      swal("Error", "Name should contain letters only", "error");
-      return;
+      swal("Error", "Name should contain letters only", "error")
+      return
 }
 
 const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 if (!emailValid.test(email)) {
-  swal("Error", "Please enter a valid email address", "error");
-  return;
+  swal("Error", "Please enter a valid email address", "error")
+  return
 }
 
 const phoneValid= /^\d{10}$/
 if(!phoneValid.test(phone)){
-     swal("Error", "Phone Number should be 10 digits", "error");
-      return;
+     swal("Error", "Phone Number should be 10 digits", "error")
+      return
 }
 
-const passwordValid = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{6,}$/
+const passwordValid = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{}':"\\|,.<>\/?]).{6,}$/
 if(!passwordValid.test(password)){
-    swal("Error", "Password must be at least 6 characters and include letters, numbers, and symbols", "error");
-    return;
+    swal("Error", "Password must be at least 6 characters and include letters, numbers, and symbols", "error")
+    return
 }
 
 
 if(password!==confirmPassword){
-      swal("Error", "Passwords do not match", "error");
-      return;
+      swal("Error", "Passwords do not match", "error")
+      return
 }
 
- const btn = document.getElementById("createBtn");
-    btn.disabled = true;
-    btn.innerText = "Processing..."; 
+ const btn = document.getElementById("createBtn")
+    btn.disabled = true
+    btn.innerText = "Processing..." 
 
 signupForm.submit()
 
@@ -68,26 +68,26 @@ loginForm.addEventListener("submit",(e)=>{
       const password=document.getElementById("password").value.trim()
 
       if(!email||!password){
-       swal("Error", "Please fill all fields", "warning");
-      return;
+       swal("Error", "Please fill all fields", "warning")
+      return
       }
 
        const emailValid = /^[^\s:@]+@[^\s@]+\.[^\s@]+$/
       if (!emailValid.test(email)) {
-       swal("Error", "Please enter a valid email address", "error");
-        return;
+       swal("Error", "Please enter a valid email address", "error")
+        return
         }
 
-        const passwordValid = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{6,}$/
+        const passwordValid = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{}':"\\|,.<>\/?]).{6,}$/
         if(!passwordValid.test(password)){
-         swal("Error", "Password must be at least 6 characters and include letters, numbers, and symbols", "error");
-          return;
+         swal("Error", "Password must be at least 6 characters and include letters, numbers, and symbols", "error")
+          return
          }
          
-      const btn = document.getElementById("loginBtn");
-      btn.disabled = true;
-      btn.innerText = "Processing...";
-          loginForm.submit();
+      const btn = document.getElementById("loginBtn")
+      btn.disabled = true
+      btn.innerText = "Processing..."
+          loginForm.submit()
 })
 
 }
