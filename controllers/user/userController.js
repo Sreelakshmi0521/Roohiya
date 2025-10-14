@@ -187,23 +187,13 @@ try {
 
    
 }
-
-const logout=(req,res)=>{
+const logout = (req, res) => {
   try {
-    
-    req.session.destroy((error)=>{
-      if(error){
-        console.log(error)
-        return res.redirect("/user/homepage")
-      }
-        res.clearCookie("connect.sid")
-         res.redirect("/")
-    })
+    req.session.user = null
+    res.redirect("/")
   } catch (error) {
     console.error(error)
-    
-   res.redirect("/user/homepage")
-    
+    res.redirect("/user/homepage")
   }
 }
 

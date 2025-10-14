@@ -85,18 +85,17 @@ const loadDashboard=async(req,res)=>{
 }
 
 
-const adminLogout=(req,res)=>{
-req.session.destroy(error=>{
-    if(error){
-        console.error(error)
-     return res.redirect("/admin/dashboard?message=Logout failed&messageType=warning")
+// admin logout
+const adminLogout = (req, res) => {
+  try {
+    req.session.admin = null
+    res.redirect("/admin/login");
+  } catch (error) {
+    console.error(error);
+    res.redirect("/admin/dashboard");
+  }
+};
 
-    }
-    res.clearCookie("connect.sid")
-     res.redirect("/admin/login?message=Logged out successfully&messageType=success")
-
-})
-}
 
 
 module.exports={

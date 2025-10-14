@@ -416,7 +416,7 @@ const updateVariant=async(req,res)=>{
     const files=req.files||[]
     const tempFilePaths = files.map(f => f.path)
 
-
+console.log("jhhjhjhj")
 
     try {
         
