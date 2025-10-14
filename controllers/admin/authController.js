@@ -45,7 +45,7 @@ const adminLogin=async(req,res)=>{
         id:admin._id,
         email:admin.email
     }
-   res.redirect("/admin/dashboard?message=Login successful&messageType=success");
+   res.redirect("/admin/dashboard?message=Login successful&messageType=success")
 
 
     } catch (error) {
@@ -67,8 +67,8 @@ const loadDashboard=async(req,res)=>{
         }
         const admin=await Admin.findById(req.session.admin.id)
            if (!admin) {
-            req.session.destroy();
-            return res.redirect("/admin/login");
+            req.session.destroy()
+            return res.redirect("/admin/login")
         }
 
         res.render("admin/dashboard", {
@@ -77,7 +77,7 @@ const loadDashboard=async(req,res)=>{
             messageType:req.query.messageType|| null,
           
     
-        });
+        })
     } catch (error) {
         console.error(error)
         res.status(500).send("Internal Server Error")
@@ -89,11 +89,11 @@ const adminLogout=(req,res)=>{
 req.session.destroy(error=>{
     if(error){
         console.error(error)
-     return res.redirect("/admin/dashboard?message=Logout failed&messageType=warning");
+     return res.redirect("/admin/dashboard?message=Logout failed&messageType=warning")
 
     }
     res.clearCookie("connect.sid")
-     res.redirect("/admin/login?message=Logged out successfully&messageType=success");
+     res.redirect("/admin/login?message=Logged out successfully&messageType=success")
 
 })
 }

@@ -3,7 +3,7 @@ const router =express.Router()
 const authController=require("../controllers/user/authController")
 const passport = require("passport")
 const nocache=require("../middlewares/nocache")
-const {isLogin,requireLogin,requireTempuser}=require("../middlewares/userAuth")
+const {isLogin,requireLogin,requireTempuser,checkUserBlocked}=require("../middlewares/userAuth")
 const setLayout=require("../middlewares/setLayout")
 const userController=require("../controllers/user/userController")
 const setPagetitle=require("../middlewares/setpagetitle")
@@ -41,9 +41,9 @@ router.get("/newForpassword",authController.loadNewpassword)
 router.post("/newForpassword",authController.newForpassword)
 
 
-router.get("/homepage",requireLogin,nocache,setPagetitle("homepage","homepage.css"),userController.loadHomepage)
-router.get("/shop",nocache,setPagetitle("shop","shop.css"),productController.loadShop)
-router.get("/product/:id",nocache,productController.loadProductDetails)
+router.get("/homepage",requireLogin,checkUserBlocked,nocache,setPagetitle("homepage","homepage.css"),userController.loadHomepage)
+router.get("/shop",checkUserBlocked,nocache,setPagetitle("shop","shop.css"),productController.loadShop)
+router.get("/product/:id",checkUserBlocked,nocache,productController.loadProductDetails)
 router.post("/review/add",requireLogin,reviewController.addReview)
 
 

@@ -1,48 +1,48 @@
-<div class="content-wrapper">
+<div class="admin-container">
+  <div class="page-header">
     <h1>Edit Variant</h1>
-    <form action="/admin/products/variants/edit/<%= variant._id %>" method="POST" enctype="multipart/form-data">
-        <input type="hidden" name="productId" value="<%= variant.product %>">
+  
 
-        <div class="form-group">
-            <label for="color">Color</label>
-            <input type="text" id="color" name="color" value="<%= variant.color %>"
-        </div>
+  <form action="/admin/products/variants/edit/<%= variant._id %>" method="POST" enctype="multipart/form-data">
+  
 
-        <div class="form-group">
-            <label for="price">Price</label>
-            <input type="number" id="price" name="price" value="<%= variant.price %>" step="0.01" >
-        </div>
+    <div class="form-group">
+      <label for="color">Color</label>
+      <input type="text" id="color" name="color" value="<%= variant.color %>" >
+    </div>
 
-        <div class="form-group">
-            <label for="discountedPrice">Discounted Price</label>
-            <input type="number" id="discountedPrice" name="discountedPrice" value="<%= variant.discountedPrice || '' %>" step="0.01">
-        </div>
+    <div class="form-group">
+      <label for="price">Price</label>
+      <input type="number" id="price" name="price" value="<%= variant.price %>" step="0.01" >
+    </div>
 
-        <div class="form-group">
-            <label for="stock">Stock</label>
-            <input type="number" id="stock" name="stock" value="<%= variant.stock %>" min="0" >
-        </div>
+    <div class="form-group">
+      <label for="discountedPrice">Discounted Price</label>
+      <input type="number" id="discountedPrice" name="discountedPrice" value="<%= variant.discountedPrice %>" step="0.01">
+    </div>
 
-        <div class="form-group">
-            <label for="images">Images (Optional - upload exactly 3 new images to replace current ones)</label>
-            <input type="file" id="images" name="images" multiple accept="image/*" max="3">
-            <% if (variant.images && variant.images.length > 0) { %>
-                <div class="current-images">
-                    <p>Current Images:</p>
-                    <div class="images-preview">
-                        <% variant.images.forEach(function(imgUrl, index) { %>
-                            <img src="<%= imgUrl %>" alt="Current Variant Image <%= index + 1 %>" class="preview-image">
-                        <% }); %>
-                    </div>
-                </div>
-            <% } else { %>
-                <p class="no-images">No images currently uploaded.</p>
-            <% } %>
-        </div>
+    <div class="form-group">
+      <label for="stock">Stock</label>
+      <input type="number" id="stock" name="stock" value="<%= variant.stock %>" min="0" >
+    </div>
 
-        <div class="form-actions">
-            <button type="submit" class="btn btn-primary">Update Variant</button>
-            <a href="/admin/products/variants/<%= variant.product %>" class="btn btn-secondary">Cancel</a>
-        </div>
-    </form>
+    <div class="form-group">
+      <label for="images">Images (Upload to replace existing images)</label>
+      <input type="file" id="images" name="images" multiple accept="image/*">
+      <div class="images-preview" id="imagesPreview">
+        <% if (variant.images && variant.images.length > 0) { %>
+          <% variant.images.forEach(function(img, i) { %>
+            <img src="<%= img %>" class="preview-image" alt="Existing Image <%= i+1 %>">
+          <% }) %>
+        <% } else { %>
+          <p class="no-images">No images selected.</p>
+        <% } %>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Update Variant</button>
+      <a href="/admin/products/variants/<%= productId || product._id %>" class="btn btn-secondary">Cancel</a>
+    </div>
+  </form>
 </div>

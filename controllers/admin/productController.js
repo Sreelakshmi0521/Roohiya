@@ -1,7 +1,7 @@
 const Product=require("../../models/productModel")
 const {addProductValidation,updateProductValidation}=require("../../validations/productValidation")
 const ProductVariant=require("../../models/productVariantModel")
-const  productVariantValidation=require("../../validations/productVariantValidation")
+const  {addVariantValidation, editVariantValidation}=require("../../validations/productVariantValidation")
 const Category=require("../../models/categoryModel")
 const cloudinary=require("../../config/cloudinary")
 const { cleanupTempFiles } = require("../../utils/cleanUpTemp")
@@ -192,7 +192,7 @@ const addProduct = async (req, res) => {
                 images: imageUrls
             };
 
-            const { error: variantError } = productVariantValidation.validate(variantData);
+            const { error: variantError } =addVariantValidation.validate(variantData);
             if (variantError) {
                 await comprehensiveCleanup(allTempFilePaths, uploadedImages, savedVariantIds, ProductVariant)
                 return res.status(400).json({
@@ -285,7 +285,8 @@ const loadAddVariant = async (req, res) => {
             product, 
             productId: product._id,
             message:req.query.message|| null, 
-            messageType: req.query.messageType||null 
+            messageType: req.query.messageType||null ,
+             previousData: null
         });
     } catch (error) {
         console.error( error);
@@ -301,21 +302,38 @@ const addVariant=async(req,res)=>{
 
       try {
         const {color,price,discountedPrice,stock}=req.body
-
-     if(!color||!price||!stock){
-        await cleanupTempFiles(tempFilePaths)
-        return res.redirect(`/admin/products/variants/${productId}/add?message=Please fill all required fields&messageType=warning`)
-     }
-     if(files.length!==3){
-        await cleanupTempFiles(tempFilePaths)
-        return res.redirect(`/admin/products/variants/${productId}/add?message=Please upload exactly 3 images&messageType=warning`)
-     }
+     if (!color || !price || !stock) {
+            await cleanupTempFiles(tempFilePaths);
+            return res.render('admin/addVariant', {
+                productId,
+                product: await Product.findById(productId),
+                message: 'Please fill all required fields',
+                messageType: 'warning',
+                previousData: { color, price, discountedPrice, stock }
+            })
+        }
+     if (files.length !== IMAGES_PER_VARIANT) {
+            await cleanupTempFiles(tempFilePaths);
+            return res.render('admin/addVariant', {
+                productId,
+                product: await Product.findById(productId),
+                message: `Please upload exactly ${IMAGES_PER_VARIANT} images`,
+                messageType: 'warning',
+                previousData: { color, price, discountedPrice, stock }
+            })
+        }
 
      const existVariant=await ProductVariant.findOne({product:productId,color:color.trim().toLowerCase()})
-     if(existVariant){
-        await cleanupTempFiles(tempFilePaths)
-        return res.redirect(`/admin/products/variants/${productId}/add?message=Variant with this color already exists&messageType=warning`)
-     }
+      if (existVariant) {
+            await cleanupTempFiles(tempFilePaths);
+            return res.render('admin/addVariant', {
+                productId,
+                product: await Product.findById(productId),
+                message: 'Variant with this color already exists',
+                messageType: 'warning',
+                previousData: { color, price, discountedPrice, stock }
+            })
+        }
       
      const uploadedImages=[]
      for(const file of files){
@@ -337,12 +355,18 @@ const addVariant=async(req,res)=>{
         isListed:true
      }
 
-     const {error:variantError}=productVariantValidation.validate(variantData)
+     const {error:variantError}=addVariantValidation.validate(variantData)
 
-     if(variantError){
-        await cleanupTempFiles(tempFilePaths)
-        return res.redirect(`/admin/products/variants/${productId}/add?message=${encodeURIComponent(variantError.details[0].message)}&messageType=warning`)
-     }
+      if (variantError) {
+            await cleanupTempFiles(tempFilePaths);
+            return res.render('admin/addVariant', {
+                productId,
+                product: await Product.findById(productId),
+                message: variantError.details[0].message,
+                messageType: 'warning',
+                previousData: { color, price, discountedPrice, stock }
+            })
+        }
      const newVariant=new ProductVariant(variantData)
      const savedVariant=await newVariant.save()
      console.log(savedVariant)
@@ -375,6 +399,7 @@ const loadEditVariant=async(req,res)=>{
 
         res.render("admin/editVariant",{
             variant,
+             productId: variant.product,
             message:req.query.message||null,
             messageType:req.query.messageType ||null
         })
@@ -421,7 +446,7 @@ const updateVariant=async(req,res)=>{
         try {
             await cloudinary.uploader.destroy(publicId)
         } catch (error) {
-            console.log("Failed to delete old image from Cloudinary:", error.message)
+            console.log(error)
         }
       }
     }
@@ -439,6 +464,7 @@ const updateVariant=async(req,res)=>{
     await cleanupTempFiles(tempFilePaths)
 }
          const variantData = {
+     
             color: color.trim().toLowerCase(),
             price: Number(price),
             discountedPrice: discountedPrice ? Number(discountedPrice) : undefined,
@@ -446,7 +472,7 @@ const updateVariant=async(req,res)=>{
             images: imagesToSave
         }
 
-        const { error: variantError } = productVariantValidation.validate(variantData);
+        const { error: variantError } = editVariantValidation.validate(variantData);
         if (variantError) {
             return res.redirect(`/admin/products/variants/edit/${variantId}?message=${encodeURIComponent(variantError.details[0].message)}&messageType=warning`);
         }
@@ -454,7 +480,7 @@ const updateVariant=async(req,res)=>{
       await variant.save()
   console.log("updated varaint:",variant)
 
- res.redirect(`/admin/products/variants/${variant.product}?message=Variant updated successfully&messageType=success`);
+res.redirect(`/admin/products/variants/${variant.product}?message=Variant updated successfully&messageType=success`)
 
     } catch (error) {
         console.log(error)

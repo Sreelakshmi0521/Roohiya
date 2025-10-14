@@ -14,7 +14,7 @@ const loadShop=async(req,res)=>{
         const maxPrice=req.query.maxPrice?parseInt(req.query.maxPrice):null
         const sort =req.query.sort||"latest"
         const page=parseInt(req.query.page)||1
-        const limit=8
+        const limit=4
         const skip=(page-1)*limit
 
 
