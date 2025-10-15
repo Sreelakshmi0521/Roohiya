@@ -33,22 +33,36 @@ const checkUserBlocked=async(req,res,next)=>{
     const user=await User.findById(req.session.user.id).select("isBlocked")
 
     if(!user||user.isBlocked){
-        req.session.destroy(error=>{
-            if(error){
-            console.error(error)
-          return res.redirect("/user/login")
-            }
-          return res.redirect("/user/login")
-        })
-    }else{
-        next()
+        req.session.user=null
+        return res.redirect("/user/login")
     }
+        next()
     } catch (error) {
         console.error(error)
+         req.session.user = null
          return res.redirect("/user/login")
     }
    
 }
 
 
-module.exports={ isLogin,requireLogin,requireTempuser,checkUserBlocked}
+const checkBlockedGoogleUser = async (req, res, next) => {
+  try {
+    if (req.user) {
+      const user = await User.findById(req.user._id).select("isBlocked")
+      if (user && user.isBlocked) {
+          req.session.user = null
+          return res.redirect(
+            `/user/login?blocked=true&message=${encodeURIComponent("Your account is blocked by admin")}`)
+        }
+      
+    }
+    next()
+  } catch (error) {
+    console.error(error)
+       req.session.user = null
+    return res.redirect("/user/login")
+  }
+}
+
+module.exports={ isLogin,requireLogin,requireTempuser,checkUserBlocked,checkBlockedGoogleUser}

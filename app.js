@@ -26,17 +26,17 @@ app.set('layout', 'layouts/mainLayout');
 
 
 
-
 app.use(session({
-    secret: process.env.SESSION_SECRET,
-   resave: false,
+  name: 'sid',  // one cookie for everyone
+  secret: process.env.SESSION_SECRET,
+  resave: false,
   saveUninitialized: false,
   cookie: { 
-    maxAge: 1000 * 60 * 60 * 24, 
-    secure: false,
-     httpOnly:true
-} 
-}));  
+    maxAge: 1000 * 60 * 60 * 24, // 1 day
+    httpOnly: true,
+    secure: false
+  } 
+}))
 app.use(nocache()); 
 
 app.use(passport.initialize())

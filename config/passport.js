@@ -6,11 +6,17 @@ require("dotenv").config({ quiet: true });
 passport.use(
   new GoogleStrategy(
     {
-      clientID: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "http://localhost:5000/user/auth/google/callback",
+      clientID:process.env.GOOGLE_CLIENT_ID,
+      clientSecret:process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL:process.env.GOOGLE_CALLBACK_URL,
     },
     async (accessToken, refreshToken, profile, done) => {
+//         console.log('AccessToken:', accessToken);
+//       console.log('RefreshToken:', refreshToken);
+//       console.log('Profile:', profile);
+// console.log('GOOGLE_CLIENT_ID:', process.env.GOOGLE_CLIENT_ID);
+// console.log('GOOGLE_CLIENT_SECRET:', process.env.GOOGLE_CLIENT_SECRET);
+// console.log("Google Callback URL:", process.env.GOOGLE_CALLBACK_URL);
 
       try {
         const email =profile.emails && profile.emails[0]? profile.emails[0].value : null;
@@ -57,5 +63,7 @@ passport.deserializeUser(async (id, done) => {
     done(error, null);
   }
 });
+
+
 
 module.exports = passport;

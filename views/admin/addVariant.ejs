@@ -54,6 +54,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const imagesPreview = document.getElementById('imagesPreview');
     const MAX_IMAGES = 3;
 
+    const form = document.querySelector('form');
+    const addButton = form.querySelector('button[type="submit"]');
 
     function showToast(message, type = "warning") {
         let bgColor = type === "success" ? "#4CAF50" : "#FF6B6B"; // green for success, red for warning/error
@@ -72,11 +74,9 @@ document.addEventListener('DOMContentLoaded', function() {
         imagesPreview.innerHTML = '<p class="no-images">No images selected. Please upload 3 images.</p>';
     }
 
-    // Listen for file input change
+    // Image preview logic
     imagesInput.addEventListener('change', function() {
         const files = this.files;
-
-        // Clear previous preview
         imagesPreview.innerHTML = '';
 
         if (!files || files.length === 0) {
@@ -84,19 +84,15 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Check maximum number of images
         if (files.length > MAX_IMAGES) {
             showToast(`You can only upload exactly ${MAX_IMAGES} images.`);
-            this.value = ''; // reset input
+            this.value = '';
             resetPreview();
             return;
         }
 
-        // Display image previews
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
-
-            // Optional: Check file type (jpg, jpeg, png)
             if (!file.type.match('image.*')) {
                 showToast("Only image files (jpg, jpeg, png) are allowed.");
                 this.value = '';
@@ -114,6 +110,16 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             reader.readAsDataURL(file);
         }
+    });
+
+    // Handle form submission - prevent double click
+    form.addEventListener('submit', function(e) {
+        // Disable the button & show loading state
+        addButton.disabled = true;
+        addButton.innerHTML = 'Adding Variant... <span class="spinner"></span>';
+
+        // Optional: show a toast reminder
+        showToast("Variant is being added, please wait...", "success");
     });
 });
 </script>

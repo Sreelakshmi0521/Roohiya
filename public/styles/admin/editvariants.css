@@ -114,6 +114,26 @@
     background-color: #545b62;
 }
 
+
+.spinner {
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #555;
+    border-radius: 50%;
+    width: 14px;
+    height: 14px;
+    display: inline-block;
+    margin-left: 6px;
+    vertical-align: middle;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+
+
 @media (max-width: 768px) {
     .content-wrapper {
         padding: 15px;

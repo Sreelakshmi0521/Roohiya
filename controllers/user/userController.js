@@ -182,11 +182,9 @@ try {
             hero: null
         })
 }
-
-
-
    
 }
+
 const logout = (req, res) => {
   try {
     req.session.user = null
