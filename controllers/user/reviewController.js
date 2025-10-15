@@ -7,6 +7,9 @@ const Review = require("../../models/reviewModel")
 const addReview = async (req, res) => {
   try{
 
+    if (!req.session.user) {
+      return res.status(401).json({ success: false, message: "You must be logged in to submit a review." });
+    }
         const userId = req.session.user._id || req.session.user.id 
         const { productId, rating, comment } = req.body
 
