@@ -234,6 +234,7 @@ const googleLogin = (req, res) => {
         if (req.user) {
             req.session.user ={
                 id:req.user._id,
+                name: req.user.name || req.user.displayName,
                 email:req.user.email
             }
             return res.redirect("/user/homepage");

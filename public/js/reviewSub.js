@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const ratingInput = document.getElementById('rating-value');
     let currentRating = 0;
 
-    // ⭐ Star rating
+ 
     stars.forEach(star => {
         star.addEventListener('click', () => {
             currentRating = parseInt(star.getAttribute('data-rating'));

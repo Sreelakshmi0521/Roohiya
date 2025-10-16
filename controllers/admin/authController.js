@@ -89,12 +89,12 @@ const loadDashboard=async(req,res)=>{
 const adminLogout = (req, res) => {
   try {
     req.session.admin = null
-    res.redirect("/admin/login");
+    res.redirect("/admin/login")
   } catch (error) {
-    console.error(error);
-    res.redirect("/admin/dashboard");
+    console.error(error)
+    res.redirect("/admin/dashboard")
   }
-};
+}
 
 
 

@@ -227,5 +227,6 @@ const loadProductDetails = async (req, res) => {
 
 module.exports={
      loadShop,
-     loadProductDetails
+     loadProductDetails,
+  
 }

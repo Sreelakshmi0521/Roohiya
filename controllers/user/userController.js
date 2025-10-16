@@ -129,12 +129,14 @@ try {
             }
           }
           
+
+
            return {
-                        _id: category._id,
-                        name: category.name,
-                        isListed: category.isListed,
-                        createdAt: category.createdAt,
-                        image: categoryImage
+                    _id: category._id,
+                      name: category.name,
+                       isListed: category.isListed,
+                       createdAt: category.createdAt,
+                        image: categoryImage, 
                     }
         } catch (error) {
           console.error( error)

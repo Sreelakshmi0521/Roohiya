@@ -10,7 +10,8 @@ const addReview = async (req, res) => {
     if (!req.session.user) {
       return res.status(401).json({ success: false, message: "You must be logged in to submit a review." });
     }
-        const userId = req.session.user._id || req.session.user.id 
+        const userId = req.session.user.id 
+        console.log(userId)
         const { productId, rating, comment } = req.body
 
         if (!productId || !rating || !comment) {
@@ -23,7 +24,7 @@ const addReview = async (req, res) => {
         }
 
         const review = await Review.create({
-            user: userId,
+            user:userId,
             product: productId,
             rating,
             comment,
