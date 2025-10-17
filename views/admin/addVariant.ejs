@@ -48,6 +48,7 @@
 </div>
 
 
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const imagesInput = document.getElementById('images');
@@ -58,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const addButton = form.querySelector('button[type="submit"]');
 
     function showToast(message, type = "warning") {
-        let bgColor = type === "success" ? "#4CAF50" : "#FF6B6B"; // green for success, red for warning/error
+        let bgColor = type === "success" ? "#4CAF50" : "#FF6B6B"; 
         Toastify({
             text: message,
             duration: 3000,
@@ -112,13 +113,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Handle form submission - prevent double click
     form.addEventListener('submit', function(e) {
-        // Disable the button & show loading state
         addButton.disabled = true;
         addButton.innerHTML = 'Adding Variant... <span class="spinner"></span>';
-
-        // Optional: show a toast reminder
         showToast("Variant is being added, please wait...", "success");
     });
 });

@@ -26,41 +26,41 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <% variants.forEach((variant, index) => { %>
-                        <tr>
-                            <td><%= variant.color %></td>
-                            <td>$<%= variant.price %></td>
-                            <td>$<%= variant.discountedPrice || 'N/A' %></td>
-                            <td><%= variant.stock %></td>
-                            <td>
-                                <div class="variant-images">
-                                    <% variant.images.slice(0, 3).forEach(image => { %>
-                                        <img src="<%= image %>" alt="Variant Image" class="variant-thumbnail">
-                                    <% }) %>
-                                </div>
-                            </td>
-                            <td>
-                                <span class="status <%= variant.isListed ? 'listed' : 'unlisted' %>">
-                                    <%= variant.isListed ? 'Listed' : 'Unlisted' %>
-                                </span>
-                            </td>
-                            <td class="action-cell">
-                                <div class="button-group">
-                                    <a href="/admin/products/variants/edit/<%= variant._id %>" 
-                                       class="btn btn-edit">
-                                        <span class="btn-icon"></span> Edit
-                                    </a>
-                                        <button class="toggle-btn" 
-                                                data-id="<%= variant._id %>" 
-                                                data-status="<%= variant.isListed %>" 
-                                                data-type="variant">
-                                            <%= variant.isListed ? 'Unlist' : 'List' %>
-                                        </button>
-                                </div>
-                            </td>
-                        </tr>
-                    <% }) %>
-                </tbody>
+                <% variants.forEach((variant, index) => { %>
+                    <tr>
+                        <td><%= variant.color %></td>
+                        <td>₹<%= variant.price %></td>
+                        <td>₹<%= variant.discountedPrice || 'N/A' %></td>
+                        <td><%= variant.stock %></td>
+                        <td>
+                            <div class="variant-images">
+                                <% variant.images.slice(0, 3).forEach(image => { %>
+                                    <img src="<%= image %>" alt="Variant Image" class="variant-thumbnail">
+                                <% }) %>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="status <%= variant.isListed ? 'listed' : 'unlisted' %>">
+                                <%= variant.isListed ? 'Listed' : 'Unlisted' %>
+                            </span>
+                        </td>
+                        <td class="action-cell">
+                            <div class="button-group">
+                                <a href="/admin/products/variants/edit/<%= variant._id %>" 
+                                class="btn btn-edit">
+                                    <span class="btn-icon"></span> Edit
+                                </a>
+                                <button class="toggle-btn" 
+                                        data-id="<%= variant._id %>" 
+                                        data-status="<%= variant.isListed %>" 
+                                        data-type="variant">
+                                    <%= variant.isListed ? 'Unlist' : 'List' %>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                <% }) %>
+            </tbody>
             </table>
         </div>
     <% } %>

@@ -23,6 +23,7 @@
         <thead>
           <tr>
             <th>Sl.No</th>
+            <th>Image</th>
             <th>Product Name</th>
             <th>Category</th>
             <th>Status</th>
@@ -33,66 +34,84 @@
           </tr>
         </thead>
         <tbody>
-          <% if (products.length === 0) { %>
-            <tr>
-              <td colspan="8" class="no-results">No products found</td>
-            </tr>
+  <% if (products.length === 0) { %>
+    <tr>
+      <td colspan="9" class="no-results">No products found</td>
+    </tr>
+  <% } else { %>
+    <% for(let i = 0; i < products.length; i++) { 
+      let product = products[i]; 
+      let index = (currentPage - 1) * perPage + i + 1; %>
+
+      <tr>
+        <td><%= index %></td>
+
+         <td>
+    <% if (product.previewImage) { %>
+      <img src="<%= product.previewImage %>" alt="Preview" class="preview-thumb">
+    <% } else { %>
+      <span style="color:#aaa;">No Image</span>
+    <% } %>
+  </td>
+
+        <td><%= product.name %></td>
+
+        <td>
+          <% if (product.category && product.category.name) { %>
+            <%= product.category.name %>
           <% } else { %>
-            <% for(let i = 0; i < products.length; i++) { 
-              let product = products[i]; 
-              let index = (currentPage - 1) * perPage + i + 1; %>
-              <tr>
-                <td><%= index %></td>
-                <td><%= product.name %></td>
-                 <td>
-                    <% if (product.category && product.category.name) { %>
-                      <%= product.category.name %>
-                    <% } else { %>
-                      No Category
-                    <% } %>
-                  </td>
-                <td><span class="status <%= product.isListed ? 'listed' : 'unlisted' %>"><%= product.isListed ? 'Listed' : 'Unlisted' %></span></td>
-                  <td>
-                    <% if (product.totalStock !== undefined) { %>
-                      <%= product.totalStock %>
-                    <% } else { %>
-                      0
-                    <% } %>
-                  </td>
-
-                <td class="action-cell">
-                  <div class="button-group">
-                   <a href="/admin/products/variants/<%= product._id %>" class="btn btn-variant">
-                      <span class="btn-icon"></span> Variant
-                  </a>
-                  </div>
-                </td>
-                <td>
-                  <% if (product.createdAt) { %>
-                    <%= product.createdAt.toLocaleDateString() %>
-                  <% } else { %>
-                    N/A
-                  <% } %>
-                </td>
-                <td class="action-cell">
-                  <div class="button-group">
-                    <a href="/admin/products/edit/<%= product._id %>" class="btn btn-edit">
-                      <span class="btn-icon"></span> Edit
-                    </a>
-                    <button class="toggle-btn" 
-                          data-id="<%= product._id %>" 
-                          data-status="<%= product.isListed %>" 
-                          data-type="product">
-                      <%= product.isListed ? 'Unlist' : 'List' %>
-                  </button>
-
-
-                  </div>
-                </td>
-              </tr>
-            <% } %>
+            No Category
           <% } %>
-        </tbody>
+        </td>
+
+        <td>
+          <span class="status <%= product.isListed ? 'listed' : 'unlisted' %>">
+            <%= product.isListed ? 'Listed' : 'Unlisted' %>
+          </span>
+        </td>
+
+        <td>
+          <% if (product.totalStock !== undefined) { %>
+            <%= product.totalStock %>
+          <% } else { %>
+            0
+          <% } %>
+        </td>
+
+        <td class="action-cell">
+          <div class="button-group">
+            <a href="/admin/products/variants/<%= product._id %>" class="btn btn-variant">
+              <span class="btn-icon"></span> Variant
+            </a>
+          </div>
+        </td>
+
+        <td>
+          <% if (product.createdAt) { %>
+            <%= product.createdAt.toLocaleDateString() %>
+          <% } else { %>
+            N/A
+          <% } %>
+        </td>
+
+        <td class="action-cell">
+          <div class="button-group">
+            <a href="/admin/products/edit/<%= product._id %>" class="btn btn-edit">
+              <span class="btn-icon"></span> Edit
+            </a>
+            <button class="toggle-btn" 
+                    data-id="<%= product._id %>" 
+                    data-status="<%= product.isListed %>" 
+                    data-type="product">
+              <%= product.isListed ? 'Unlist' : 'List' %>
+            </button>
+          </div>
+        </td>
+      </tr>
+    <% } %>
+  <% } %>
+</tbody>
+
       </table>
     </div>
 

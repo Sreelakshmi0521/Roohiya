@@ -8,7 +8,7 @@ const storage = multer.diskStorage({
         const uploadPath = path.join(process.cwd(), 'temp');
         fs.mkdir(uploadPath, { recursive: true }, (err) => {
             if (err) {
-                console.error("Error creating upload directory:", err);
+                console.error("error:",err);
                 return  callback(err); 
             }
              callback(null, uploadPath); 

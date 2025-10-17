@@ -4,58 +4,129 @@ const variantModal = document.getElementById('variantModal')
 const closeModalBtn = document.getElementById('closeModalBtn')
 const variantForm = document.getElementById('variantForm')
 const closeSpan = document.querySelector('.close')
+let cropper = null;
+let currentInput = null; // to keep track of which file input is being cropped
+
+const cropModal = document.getElementById('cropModal');
+const cropImage = document.getElementById('cropImage');
+const closeCropModal = document.getElementById('closeCropModal');
+const cancelCropBtn = document.getElementById('cancelCropBtn');
+const applyCropBtn = document.getElementById('applyCropBtn');
+
 
 const variants = []
 
 addVariantBtn.addEventListener('click', () => {
-    variantModal.style.display = 'block';
+    variantModal.style.display = 'block'
 })
 
 closeModalBtn.addEventListener('click', () => {
-    variantModal.style.display = 'none';
-    resetVariantForm();
+    variantModal.style.display = 'none'
+    resetVariantForm()
 })
 
 closeSpan.addEventListener('click', () => {
-    variantModal.style.display = 'none';
-    resetVariantForm();
-});
+    variantModal.style.display = 'none'
+    resetVariantForm()
+})
 
 window.addEventListener('click', (event) => {
     if (event.target === variantModal) {
-        variantModal.style.display = 'none';
-        resetVariantForm();
+        variantModal.style.display = 'none'
+        resetVariantForm()
     }
-});
+})
 
 function resetVariantForm() {
-    variantForm.reset();
-    document.querySelectorAll('.preview-img').forEach(img => img.remove());
+    variantForm.reset()
+    document.querySelectorAll('.preview-img').forEach(img => img.remove())
 }
 
 
 ['image1', 'image2', 'image3'].forEach(id => {
     const input = document.getElementById(id);
+
     input.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (!file) return;
 
-        const parent = input.parentElement;
-        const existingPreview = parent.querySelector('.preview-img');
-        if (existingPreview) {
-            existingPreview.remove();
-        }
+        // Save reference to current input for later
+        currentInput = input;
 
-        const img = document.createElement('img');
-        img.src = URL.createObjectURL(file);
-        img.className = 'preview-img';
-        img.style.width = '60px';
-        img.style.height = '60px';
-        img.style.marginLeft = '10px';
-        img.style.objectFit = 'cover';
-        img.style.borderRadius = '4px';
-        parent.appendChild(img);
+        // Show image inside crop modal
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+            cropImage.src = evt.target.result;
+
+            // Destroy old cropper if any
+            if (cropper) cropper.destroy();
+
+            // Initialize cropper
+            cropper = new Cropper(cropImage, {
+                aspectRatio: 1,   // Square crop (adjust as needed)
+                viewMode: 1,
+                autoCropArea: 1,
+                responsive: true,
+                movable: true,
+                zoomable: true,
+                rotatable: false
+            });
+
+            cropModal.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
     });
+});
+
+closeCropModal.addEventListener('click', () => {
+    cropModal.style.display = 'none';
+    if (cropper) cropper.destroy();
+    cropper = null;
+    currentInput = null;
+});
+
+cancelCropBtn.addEventListener('click', () => {
+    cropModal.style.display = 'none';
+    if (cropper) cropper.destroy();
+    cropper = null;
+    currentInput = null;
+});
+
+applyCropBtn.addEventListener('click', () => {
+    if (!cropper || !currentInput) return;
+
+    cropper.getCroppedCanvas().toBlob((blob) => {
+        if (!blob) return;
+
+        // Create new File object from cropped blob
+        const croppedFile = new File([blob], `${currentInput.id}_cropped.jpg`, { type: 'image/jpeg' });
+
+        // Replace input's file with cropped file using DataTransfer
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(croppedFile);
+        currentInput.files = dataTransfer.files;
+
+        // Show cropped preview near input
+        const parent = currentInput.parentElement;
+        const existingPreview = parent.querySelector('.preview-img');
+        if (existingPreview) existingPreview.remove();
+
+        const previewImg = document.createElement('img');
+        previewImg.src = URL.createObjectURL(croppedFile);
+        previewImg.className = 'preview-img';
+        previewImg.style.width = '60px';
+        previewImg.style.height = '60px';
+        previewImg.style.marginLeft = '10px';
+        previewImg.style.objectFit = 'cover';
+        previewImg.style.borderRadius = '4px';
+        parent.appendChild(previewImg);
+
+        // Clean up cropper
+        cropModal.style.display = 'none';
+        cropper.destroy();
+        cropper = null;
+        currentInput = null;
+    }, 'image/jpeg');
 });
 
 
@@ -73,16 +144,16 @@ document.getElementById('saveVariantBtn').addEventListener('click', () => {
             icon: 'error',
             title: 'Missing Fields',
             text: 'Please fill all fields '
-        });
-        return;
+        })
+        return
     }
     if(!image1 || !image2 || !image3){
         Swal.fire({
             icon: 'error',
             title: 'Missing Fields',
             text: 'Please add images '
-        });
-        return;
+        })
+        return
     }
 
     if (parseFloat(price) <= 0) {
@@ -90,16 +161,16 @@ document.getElementById('saveVariantBtn').addEventListener('click', () => {
             icon: 'error',
             title: 'Invalid Price',
             text: 'Price must be greater than 0.'
-        });
-        return;
+        })
+        return
     }
      if (discountedPrice && parseFloat(discountedPrice) < 0) {
         Swal.fire({
             icon: 'error',
             title: 'Invalid Discount',
             text: 'Discount price cannot be negative.'
-        });
-        return;
+        })
+        return
     }
 
     if (discountedPrice && parseFloat(discountedPrice) > parseFloat(price)) {
@@ -107,16 +178,16 @@ document.getElementById('saveVariantBtn').addEventListener('click', () => {
             icon: 'error',
             title: 'Invalid Discount',
             text: 'Discount price cannot be greater than regular price.'
-        });
-        return;
+        })
+        return
     }
      if (parseInt(stockLimit) < 0) {
         Swal.fire({
             icon: 'error',
             title: 'Invalid Stock',
             text: 'Stock limit cannot be negative.'
-        });
-        return;
+        })
+        return
     }
 
     const variant = {
@@ -125,42 +196,42 @@ document.getElementById('saveVariantBtn').addEventListener('click', () => {
         discountedPrice: discountedPrice ? parseFloat(discountedPrice) : null,
         stockLimit: parseInt(stockLimit),
         images: [image1, image2, image3]
-    };
-    variants.push(variant);
+    }
+    variants.push(variant)
 
    
-    const container = document.getElementById('variantsContainer');
-    const div = document.createElement('div');
-    div.className = 'variant-card';
+    const container = document.getElementById('variantsContainer')
+    const div = document.createElement('div')
+    div.className = 'variant-card'
     div.innerHTML = `
         <div class="variant-header">
             <h4>${color}</h4>
             <button type="button" class="remove-variant-btn" onclick="removeVariant(this)">×</button>
         </div>
         <div class="variant-details">
-            <div>Price: $${variant.price}</div>
-            <div>Discount: $${variant.discountedPrice || 'N/A'}</div>
+            <div>Price: ₹${variant.price}</div>
+            <div>Discount: ₹${variant.discountedPrice || 'N/A'}</div>
             <div>Stock: ${variant.stockLimit}</div>
         </div>
         <div class="variant-preview-images"></div>
-    `;
+    `
 
-    const previewContainer = div.querySelector('.variant-preview-images');
+    const previewContainer = div.querySelector('.variant-preview-images')
     variant.images.forEach(file => {
-        const img = document.createElement('img');
-        img.src = URL.createObjectURL(file);
-        img.style.width = '50px';
-        img.style.height = '50px';
-        img.style.marginRight = '5px';
-        img.style.objectFit = 'cover';
-        img.style.borderRadius = '4px';
-        previewContainer.appendChild(img);
-    });
+        const img = document.createElement('img')
+        img.src = URL.createObjectURL(file)
+        img.style.width = '50px'
+        img.style.height = '50px'
+        img.style.marginRight = '5px'
+        img.style.objectFit = 'cover'
+        img.style.borderRadius = '4px'
+        previewContainer.appendChild(img)
+    })
 
-    container.appendChild(div);
+    container.appendChild(div)
 
-    resetVariantForm();
-    variantModal.style.display = 'none';
+    resetVariantForm()
+    variantModal.style.display = 'none'
 
     Swal.fire({
         icon: 'success',
@@ -168,78 +239,78 @@ document.getElementById('saveVariantBtn').addEventListener('click', () => {
         text: 'Variant has been added successfully.',
         timer: 1500,
         showConfirmButton: false
-    });
-});
+    })
+})
 
 
 function removeVariant(button) {
-    const variantCard = button.closest('.variant-card');
-    const index = Array.from(variantCard.parentElement.children).indexOf(variantCard);
-    variants.splice(index, 1);
-    variantCard.remove();
+    const variantCard = button.closest('.variant-card')
+    const index = Array.from(variantCard.parentElement.children).indexOf(variantCard)
+    variants.splice(index, 1)
+    variantCard.remove()
 }
 
 // Highlight
-const highlightsContainer = document.getElementById('highlightsContainer');
-const addHighlightBtn = document.getElementById('addHighlightBtn');
+const highlightsContainer = document.getElementById('highlightsContainer')
+const addHighlightBtn = document.getElementById('addHighlightBtn')
 
 
 function createHighlightInput(value = '', isMain = false) {
-    const wrapper = document.createElement('div');
-    wrapper.className = 'highlight-wrapper';
-    wrapper.style.display = 'flex';
-    wrapper.style.alignItems = 'center';
-    wrapper.style.marginBottom = '5px';
+    const wrapper = document.createElement('div')
+    wrapper.className = 'highlight-wrapper'
+    wrapper.style.display = 'flex'
+    wrapper.style.alignItems = 'center'
+    wrapper.style.marginBottom = '5px'
 
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.className = 'highlight-input';
-    input.name = 'highlights';
-    input.placeholder = 'Add highlight';
-    input.value = value;
-    input.style.flex = '1';
+    const input = document.createElement('input')
+    input.type = 'text'
+    input.className = 'highlight-input'
+    input.name = 'highlights'
+    input.placeholder = 'Add highlight'
+    input.value = value
+    input.style.flex = '1'
 
     if (!isMain) {
-        const removeBtn = document.createElement('button');
-        removeBtn.type = 'button';
-        removeBtn.textContent = 'Remove';
-        removeBtn.className = 'remove-highlight-btn';
-        removeBtn.style.marginLeft = '5px';
-        removeBtn.addEventListener('click', () => wrapper.remove());
-        wrapper.appendChild(removeBtn);
+        const removeBtn = document.createElement('button')
+        removeBtn.type = 'button'
+        removeBtn.textContent = 'Remove'
+        removeBtn.className = 'remove-highlight-btn'
+        removeBtn.style.marginLeft = '5px'
+        removeBtn.addEventListener('click', () => wrapper.remove())
+        wrapper.appendChild(removeBtn)
     }
 
-    wrapper.appendChild(input);
-    return wrapper;
+    wrapper.appendChild(input)
+    return wrapper
 }
 
 
 document.querySelectorAll('#highlightsContainer .highlight-input').forEach((input, index) => {
-    const wrapper = createHighlightInput(input.value, index === 0);
-    input.replaceWith(wrapper);
-});
+    const wrapper = createHighlightInput(input.value, index === 0)
+    input.replaceWith(wrapper)
+})
 
 
 addHighlightBtn.addEventListener('click', () => {
     highlightsContainer.appendChild(createHighlightInput())
-});
+})
 
 
 document.getElementById('productForm').addEventListener('submit', async function (e) {
-    e.preventDefault();
+    e.preventDefault()
 
   
-    const saveBtn = document.querySelector('.save-btn');
-    const originalText = saveBtn.textContent;
-    saveBtn.disabled = true;
-    saveBtn.textContent = 'Saving...';
+    const saveBtn = document.querySelector('.save-btn')
+    const originalText = saveBtn.textContent
+    saveBtn.disabled = true
+    saveBtn.textContent = 'Saving...'
 
   
-    const productName = document.getElementById('productName').value.trim();
-    const category = document.getElementById('category').value;
-    const description = document.getElementById('description').value.trim();
-    const highlightInputs = document.querySelectorAll('.highlight-input');
-    const highlights = Array.from(highlightInputs).map(input => input.value.trim()).filter(h => h);
+    const productName = document.getElementById('productName').value.trim()
+    const category = document.getElementById('category').value
+    const description = document.getElementById('description').value.trim()
+    const highlightInputs = document.querySelectorAll('.highlight-input')
+    const highlights = Array.from(highlightInputs).map(input => input.value.trim()).filter(h => h)
 
 
     if (!productName || !category || !description) {
@@ -247,10 +318,10 @@ document.getElementById('productForm').addEventListener('submit', async function
             icon: 'error',
             title: 'Missing Fields',
             text: 'Please fill all required product fields.'
-        });
-        saveBtn.disabled = false;
-        saveBtn.textContent = originalText;
-        return;
+        })
+        saveBtn.disabled = false
+        saveBtn.textContent = originalText
+        return
     }
 
     if (variants.length === 0) {
@@ -258,19 +329,19 @@ document.getElementById('productForm').addEventListener('submit', async function
             icon: 'error',
             title: 'No Variants',
             text: 'Please add at least one product variant.'
-        });
-        saveBtn.disabled = false;
-        saveBtn.textContent = originalText;
-        return;
+        })
+        saveBtn.disabled = false
+        saveBtn.textContent = originalText
+        return
     }
 
-    const formData = new FormData();
+    const formData = new FormData()
 
     // Append basic fields
-    formData.append('name', productName);
-    formData.append('category', category);
-    formData.append('description', description);
-    formData.append('highlights', JSON.stringify(highlights));
+    formData.append('name', productName)
+    formData.append('category', category)
+    formData.append('description', description)
+    formData.append('highlights', JSON.stringify(highlights))
 
     // Append variants data
     variants.forEach((variant) => {
@@ -279,14 +350,14 @@ document.getElementById('productForm').addEventListener('submit', async function
             price: variant.price,
             discountedPrice: variant.discountedPrice,
             stockLimit: variant.stockLimit,
-        };
-        formData.append('variantDetails', JSON.stringify(variantData));
+        }
+        formData.append('variantDetails', JSON.stringify(variantData))
 
         // Append all images
         variant.images.forEach(img => {
-            formData.append('variantImages', img);
-        });
-    });
+            formData.append('variantImages', img)
+        })
+    })
 
     try {
         const response = await axios.post('/admin/products/add', formData, {
@@ -294,7 +365,7 @@ document.getElementById('productForm').addEventListener('submit', async function
                 'Content-Type': 'multipart/form-data'
             },
             timeout: 30000
-        });
+        })
 
         if (response.data.success) {
             Swal.fire({
@@ -304,27 +375,27 @@ document.getElementById('productForm').addEventListener('submit', async function
                 showConfirmButton: false,
                 timer: 2000
             }).then(() => {
-                window.location.href = '/admin/products';
-            });
+                window.location.href = '/admin/products'
+            })
         } else {
              Swal.fire('Oops!', data.message, 'warning')
         }
     } catch (error) {
-         console.error('Error:', error);
+         console.error('Error:', error)
 
-        const msg = error?.response?.data?.message || 'Something went wrong. Please try again.';
+        const msg = error?.response?.data?.message || 'Something went wrong. Please try again.'
 
         Swal.fire({
             icon: 'error',
             title: 'Error!',
             text: msg
-        });
+        })
 
     } finally {
-        saveBtn.disabled = false;
-        saveBtn.textContent = originalText;
+        saveBtn.disabled = false
+        saveBtn.textContent = originalText
     }
-});
+})
 
 
 document.querySelector('.cancel-btn').addEventListener('click', () => {
@@ -340,10 +411,10 @@ document.querySelector('.cancel-btn').addEventListener('click', () => {
             cancelButtonText: 'No, keep editing'
         }).then((result) => {
             if (result.isConfirmed) {
-                window.location.href = '/admin/products';
+                window.location.href = '/admin/products'
             }
-        });
+        })
     } else {
-        window.location.href = '/admin/products';
+        window.location.href = '/admin/products'
     }
-});
+})

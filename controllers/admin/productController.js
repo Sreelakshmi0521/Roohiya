@@ -38,6 +38,11 @@ const loadProduct=async(req,res)=>{
     .populate('category', 'name')
     .populate("variants")
 
+products.forEach(product => {
+  if (product.variants?.length > 0 && product.variants[0].images?.length > 0) {
+    product.previewImage = product.variants[0].images[0]
+  }
+})
 
     for(let product of products){
         if(product.variants &&product.variants.length>0){
@@ -73,7 +78,7 @@ const loadProduct=async(req,res)=>{
 
 const loadAddProduct=async(req,res)=>{
     try {
-        const categories = await Category.find({ isListed: true });
+        const categories = await Category.find({ isListed: true })
         res.render("admin/addProducts",{
             message:null,
             messageType:null,
@@ -83,20 +88,20 @@ const loadAddProduct=async(req,res)=>{
 
         })
     } catch (error) {
-         console.error(error);
-    res.status(500).send("Server error");
+         console.error(error)
+    res.status(500).send("Server error")
     }
 }
 
 
 const addProduct = async (req, res) => {
-    const allFiles = req.files || [];
-    const allTempFilePaths = allFiles.map(file => file.path);
-    let uploadedImages = [];
-    let savedVariantIds = [];
+    const allFiles = req.files || []
+    const allTempFilePaths = allFiles.map(file => file.path)
+    let uploadedImages = []
+    let savedVariantIds = []
 
     try {
-        const { name, category, description } = req.body;
+        const { name, category, description } = req.body
         const highlightsArray = JSON.parse(req.body.highlights || "[]")
         const rawVariantDetails = req.body.variantDetails
 
@@ -111,14 +116,14 @@ const addProduct = async (req, res) => {
             return res.status(400).json({
                 success: false,
                 message: "Missing products fields "
-            });
+            })
         }
         if(allFiles.length===0){
              await cleanupTempFiles(allTempFilePaths)
               return res.status(400).json({
                 success: false,
                 message: "missing images"
-            });
+            })
 
         }
 
@@ -127,7 +132,7 @@ const addProduct = async (req, res) => {
             return res.status(400).json({
                 success: false,
                 message: `Each variant must have exactly ${IMAGES_PER_VARIANT} images.`
-            });
+            })
         }
 
     
@@ -144,7 +149,7 @@ const addProduct = async (req, res) => {
             }))
         }
 
-        const { error: productError } = addProductValidation.validate(productData);
+        const { error: productError } = addProductValidation.validate(productData)
         if (productError) {
             await cleanupTempFiles(allTempFilePaths)
             return res.status(400).json({
@@ -171,17 +176,17 @@ const addProduct = async (req, res) => {
             const result = await cloudinary.uploader.upload(file.path, {
                 folder: "products",
                 resource_type: "auto"
-            });
+            })
             uploadedImages.push({
                 url: result.secure_url,
                 public_id: result.public_id
-            });
+            })
         }
 
-        let fileIndex = 0;
+        let fileIndex = 0
         for (const details of parsedVariantDetails) {
-            const imagesForVariant = uploadedImages.slice(fileIndex, fileIndex + IMAGES_PER_VARIANT);
-            const imageUrls = imagesForVariant.map(img => img.url);
+            const imagesForVariant = uploadedImages.slice(fileIndex, fileIndex + IMAGES_PER_VARIANT)
+            const imageUrls = imagesForVariant.map(img => img.url)
 
            
             const variantData = {
@@ -190,9 +195,9 @@ const addProduct = async (req, res) => {
                 price: Number(details.price),
                 discountedPrice: details.discountedPrice ? Number(details.discountedPrice) : undefined,
                 images: imageUrls
-            };
+            }
 
-            const { error: variantError } =addVariantValidation.validate(variantData);
+            const { error: variantError } =addVariantValidation.validate(variantData)
             if (variantError) {
                 await comprehensiveCleanup(allTempFilePaths, uploadedImages, savedVariantIds, ProductVariant)
                 return res.status(400).json({
@@ -200,13 +205,13 @@ const addProduct = async (req, res) => {
                     message: variantError.details[0].message,
                     messageType:"warning"
     
-                });
+                })
             }
 
-            const newVariant = new ProductVariant(variantData);
-            const savedVariant = await newVariant.save();
-            savedVariantIds.push(savedVariant._id);
-            fileIndex += IMAGES_PER_VARIANT;
+            const newVariant = new ProductVariant(variantData)
+            const savedVariant = await newVariant.save()
+            savedVariantIds.push(savedVariant._id)
+            fileIndex += IMAGES_PER_VARIANT
         }
 
      
@@ -216,38 +221,38 @@ const addProduct = async (req, res) => {
             description,
             highlights: highlightsArray,
             variants: savedVariantIds
-        });
+        })
 
-        const savedProduct = await newProduct.save();
+        const savedProduct = await newProduct.save()
         await ProductVariant.updateMany(
             { _id: { $in: savedVariantIds } },
             { $set: { product: savedProduct._id } }
-        );
+        )
 
-        await cleanupTempFiles(allTempFilePaths);
+        await cleanupTempFiles(allTempFilePaths)
 
         return res.json({
             success: true,
             message: "Product added successfully!",
             productId: savedProduct._id
-        });
+        })
 
     } catch (error) {
-        console.error("Error in addProduct:", error);
+        console.error("Error in addProduct:", error)
            await comprehensiveCleanup(allTempFilePaths, uploadedImages, savedVariantIds, ProductVariant)
 
         return res.status(500).json({
             success: false,
             message: "Something went wrong while adding the product. Please try again."
 
-        });
+        })
     }
 }
 
 
 const loadProductVariants= async(req,res)=>{
     try {
-        const productId=req.params.id;
+        const productId=req.params.id
         const product=await Product.findOne({_id:productId,isListed:true}).populate("category")
         
         if(!product){
@@ -274,11 +279,11 @@ const loadProductVariants= async(req,res)=>{
 }
 const loadAddVariant = async (req, res) => {
     try {
-        const productId = req.params.id;
-        const product = await Product.findById(productId);
+        const productId = req.params.id
+        const product = await Product.findById(productId)
         
         if (!product) {
-            return res.redirect('/admin/products?message=Product not found&messageType=warning');
+            return res.redirect('/admin/products?message=Product not found&messageType=warning')
         }
         
         res.render('admin/addVariant', { 
@@ -287,10 +292,10 @@ const loadAddVariant = async (req, res) => {
             message:req.query.message|| null, 
             messageType: req.query.messageType||null ,
              previousData: null
-        });
+        })
     } catch (error) {
-        console.error( error);
-        res.redirect('/admin/products?message=Error loading page&messageType=error');
+        console.error( error)
+        res.redirect('/admin/products?message=Error loading page&messageType=error')
     }
 }
 
@@ -303,7 +308,7 @@ const addVariant=async(req,res)=>{
       try {
         const {color,price,discountedPrice,stock}=req.body
      if (!color || !price || !stock) {
-            await cleanupTempFiles(tempFilePaths);
+            await cleanupTempFiles(tempFilePaths)
             return res.render('admin/addVariant', {
                 productId,
                 product: await Product.findById(productId),
@@ -313,7 +318,7 @@ const addVariant=async(req,res)=>{
             })
         }
      if (files.length !== IMAGES_PER_VARIANT) {
-            await cleanupTempFiles(tempFilePaths);
+            await cleanupTempFiles(tempFilePaths)
             return res.render('admin/addVariant', {
                 productId,
                 product: await Product.findById(productId),
@@ -325,7 +330,7 @@ const addVariant=async(req,res)=>{
 
      const existVariant=await ProductVariant.findOne({product:productId,color:color.trim().toLowerCase()})
       if (existVariant) {
-            await cleanupTempFiles(tempFilePaths);
+            await cleanupTempFiles(tempFilePaths)
             return res.render('admin/addVariant', {
                 productId,
                 product: await Product.findById(productId),
@@ -358,7 +363,7 @@ const addVariant=async(req,res)=>{
      const {error:variantError}=addVariantValidation.validate(variantData)
 
       if (variantError) {
-            await cleanupTempFiles(tempFilePaths);
+            await cleanupTempFiles(tempFilePaths)
             return res.render('admin/addVariant', {
                 productId,
                 product: await Product.findById(productId),
@@ -393,7 +398,7 @@ const loadEditVariant=async(req,res)=>{
         const variant=await ProductVariant.findById(variantId)
 
         if(!variant){
-         return res.redirect('/admin/products?message=Variant not found&messageType=warning');
+         return res.redirect('/admin/products?message=Variant not found&messageType=warning')
 
         }
 
@@ -406,7 +411,7 @@ const loadEditVariant=async(req,res)=>{
     
     } catch (error) {
         console.error(error)
-    res.redirect('/admin/products?message=Server error&messageType=warning');
+    res.redirect('/admin/products?message=Server error&messageType=warning')
  
     }
 }
@@ -422,7 +427,7 @@ console.log("jhhjhjhj")
         
     const variant=await ProductVariant.findById(variantId)
     if(!variant){
-     return res.redirect('/admin/products?message=Variant not found&messageType=warning');
+     return res.redirect('/admin/products?message=Variant not found&messageType=warning')
 
     }
 
@@ -435,7 +440,7 @@ console.log("jhhjhjhj")
       if(files.length>0){
         if(files.length!==3){
             await cleanupTempFiles(tempFilePaths)
-         return res.redirect(`/admin/products/variants/edit/${variantId}?message=Please upload exactly 3 images&messageType=warning`);
+         return res.redirect(`/admin/products/variants/edit/${variantId}?message=Please upload exactly 3 images&messageType=warning`)
 
         }
       
@@ -472,9 +477,9 @@ console.log("jhhjhjhj")
             images: imagesToSave
         }
 
-        const { error: variantError } = editVariantValidation.validate(variantData);
+        const { error: variantError } = editVariantValidation.validate(variantData)
         if (variantError) {
-            return res.redirect(`/admin/products/variants/edit/${variantId}?message=${encodeURIComponent(variantError.details[0].message)}&messageType=warning`);
+            return res.redirect(`/admin/products/variants/edit/${variantId}?message=${encodeURIComponent(variantError.details[0].message)}&messageType=warning`)
         }
       variant.set(variantData)
       await variant.save()
@@ -485,7 +490,7 @@ res.redirect(`/admin/products/variants/${variant.product}?message=Variant update
     } catch (error) {
         console.log(error)
         await cleanupTempFiles(tempFilePaths)
-        res.redirect(`/admin/products/variants/edit/${variantId}?message=Server error&messageType=error`);
+        res.redirect(`/admin/products/variants/edit/${variantId}?message=Server error&messageType=error`)
 
 
     }
@@ -494,7 +499,7 @@ res.redirect(`/admin/products/variants/${variant.product}?message=Variant update
 
 const toggleVariantStatus=async(req,res)=>{
     try {
-        const variantId=req.params.id;
+        const variantId=req.params.id
         const variant=await ProductVariant.findById(variantId)
         if(!variant){
             return res.status(404).json({success:false,message:"variant not found"})
@@ -517,7 +522,7 @@ const loadEditProduct=async(req,res)=>{
 
    const product=await Product.findById(productId).populate("category").populate("variants")
    if(!product){
-    return res.redirect("/admin/products?message=Product not found&messageType=warning");
+    return res.redirect("/admin/products?message=Product not found&messageType=warning")
    }
      const categories = await Category.find({ isListed: true })
 
@@ -550,7 +555,7 @@ const updateProduct=async(req,res)=>{
 
      const {error:productError}=updateProductValidation.validate(productData)
      if(productError){
-         return res.redirect(`/admin/products/edit/${productId}?message=${encodeURIComponent(productError.details[0].message)}&messageType=warning`);
+         return res.redirect(`/admin/products/edit/${productId}?message=${encodeURIComponent(productError.details[0].message)}&messageType=warning`)
      }
      
      const product=await Product.findById(productId)
@@ -570,7 +575,7 @@ const updateProduct=async(req,res)=>{
     product.highlights=highlightsArray
 
     await product.save()
-     res.redirect(`/admin/products?message=Product updated successfully&messageType=success`);
+     res.redirect(`/admin/products?message=Product updated successfully&messageType=success`)
 
 
     } catch (error) {
@@ -585,16 +590,16 @@ const toggleProductStatus=async(req,res)=>{
          const product=await Product.findById(productId)
 
          if(!product){
-            return res.status(404).json({ success: false, message: "Product not found" });
+            return res.status(404).json({ success: false, message: "Product not found" })
          }
          product.isListed=!product.isListed
          await product.save()
           res.json({ success: true, message: `Product ${product.isListed ? "listed" : "unlisted"} successfully`, isListed: product.isListed })
-// console.log("Button clicked:", id, type, currentStatus);
+// console.log("Button clicked:", id, type, currentStatus)
 
     } catch (error) {
         console.error(error)
-        res.status(500).json({ success: false, message: "Server error" });
+        res.status(500).json({ success: false, message: "Server error" })
 
     }
 }
