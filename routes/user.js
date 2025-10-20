@@ -46,6 +46,8 @@ router.get("/shop",checkUserBlocked,nocache,setPagetitle("shop","shop.css"),prod
 router.get("/product/:id",checkUserBlocked,nocache,productController.loadProductDetails)
 router.post("/review/add",requireLogin,reviewController.addReview)
 
+//profile
 
-
+router.get("/profile",requireLogin,checkUserBlocked,nocache,setPagetitle("profile","profile.css"),userController.loadProfile)
+router.get("/editProfile",nocache,setPagetitle("editProfile","editProfile.css"),userController.loadEditProfile)
 module.exports=router

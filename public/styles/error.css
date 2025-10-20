@@ -1,0 +1,66 @@
+/* error.css - for Admin, User, and Landing error pages */
+
+/* Common body style for all error pages */
+body {
+  background-color: #f8f9fa;
+  font-family: 'Roboto', sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+/* Generic container for user and landing pages */
+.error-container, 
+/* Admin container */
+.admin-error-container {
+  background-color: #fff;
+  padding: 40px 60px;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  text-align: center;
+  max-width: 500px;
+}
+
+/* Headings */
+.error-container h1,
+.admin-error-container h1 {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+}
+
+/* Specific colors */
+.error-container h1 {
+  color: #dc3545; /* red for user/landing */
+}
+
+.admin-error-container h1 {
+  color: #ff5722; /* orange for admin */
+}
+
+/* Paragraphs */
+.error-container p,
+.admin-error-container p {
+  color: #555;
+  font-size: 1.1rem;
+  margin-bottom: 30px;
+}
+
+/* Back buttons */
+.error-container .btn-back,
+.admin-error-container .btn-back {
+  display: inline-block;
+  padding: 10px 25px;
+  background-color: #007bff;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 5px;
+  font-weight: 500;
+  transition: background 0.3s ease;
+}
+
+.error-container .btn-back:hover,
+.admin-error-container .btn-back:hover {
+  background-color: #0056b3;
+}

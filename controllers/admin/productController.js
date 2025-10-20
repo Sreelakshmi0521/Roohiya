@@ -289,6 +289,7 @@ const loadAddVariant = async (req, res) => {
         res.render('admin/addVariant', { 
             product, 
             productId: product._id,
+            pageJs:"addVariant.js",
             message:req.query.message|| null, 
             messageType: req.query.messageType||null ,
              previousData: null
@@ -359,6 +360,7 @@ const addVariant=async(req,res)=>{
         images:uploadedImages,
         isListed:true
      }
+     console.log("images:", uploadedImages)
 
      const {error:variantError}=addVariantValidation.validate(variantData)
 

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+      <link rel="stylesheet" href="/styles/user/common.css">
+  <link rel="stylesheet" href="/styles/user/<%= pagecss %>">
+</head>
+<body>
+  <%- include('../partials/user/navbar') %>
+    <div class="profile-container">
+        <div class="profile-header">
+            <h1>User Profile</h1>
+            <a href="/user/editProfile" class="edit-btn">Edit Profile</a>
+        </div>
+
+        <div class="profile-content">
+            <div class="profile-sidebar">
+                <div class="profile-image-section">
+                    <div class="profile-image">
+                        <img src="<%= user.profileImage || '/images/default-profile.png' %>" alt="Profile Image">
+                    </div>
+                    <h2><%= user.name %></h2>
+                </div>
+
+                <nav class="profile-nav">
+                    <ul>
+                        <li><a href="/user/details" class="nav-link active">Personal Details</a></li>
+                        <li><a href="/user/address" class="nav-link">Address</a></li>
+                        <li><a href="/user/orders" class="nav-link">My Orders</a></li>
+                        <li><a href="/user/forgotPassword" class="nav-link">Change Password</a></li>
+                    </ul>
+                </nav>
+            </div>
+
+            <div class="profile-main">
+                <!-- Personal Details Section -->
+                <section id="details" class="profile-section active">
+                    <h2>Personal Details</h2>
+                    <div class="details-grid">
+                        <div class="detail-item">
+                            <label>Full Name</label>
+                            <p><%= user.name %></p>
+                        </div>
+                        <div class="detail-item">
+                            <label>Email</label>
+                            <p><%= user.email %></p>
+                        </div>
+                        <div class="detail-item">
+                            <label>Phone</label>
+                            <p><%= user.phone || 'Not provided' %></p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Address Section -->
+                <section id="address" class="profile-section">
+                    <h2>Address</h2>
+                    <% if (user.address) { %>
+                        <div class="address-card">
+                            <div class="address-header">
+                                <h3>Primary Address</h3>
+                            </div>
+                            <div class="address-details">
+                                <p><%= user.address.street %></p>
+                                <p><%= user.address.city %>, <%= user.address.state %> <%= user.address.zipCode %></p>
+                                <p><%= user.address.country %></p>
+                            </div>
+                        </div>
+                    <% } else { %>
+                        <div class="no-address">
+                            <p>No address saved yet.</p>
+                            <a href="/user/address" class="btn">Add Address</a>
+                        </div>
+                    <% } %>
+                </section>
+
+                <!-- Orders Section -->
+                <section id="orders" class="profile-section">
+                    <h2>My Orders</h2>
+                    <% if (user.orders && user.orders.length > 0) { %>
+                        <div class="orders-list">
+                            <% user.orders.forEach(order => { %>
+                                <div class="order-card">
+                                    <div class="order-header">
+                                        <div class="order-info">
+                                            <h3>Order #<%= order.orderId %></h3>
+                                            <p class="order-date">Placed on <%= order.orderDate %></p>
+                                        </div>
+                                        <div class="order-status">
+                                            <span class="status <%= order.status.toLowerCase() %>"><%= order.status %></span>
+                                        </div>
+                                    </div>
+                                    <div class="order-details">
+                                        <div class="order-items">
+                                            <p><%= order.items.length %> item(s)</p>
+                                            <p class="order-total">Total: $<%= order.total %></p>
+                                        </div>
+                                        <div class="order-actions">
+                                            <% if (order.status !== 'Cancelled' && order.status !== 'Delivered') { %>
+                                                <button class="cancel-btn" data-order-id="<%= order.orderId %>">Cancel Order</button>
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                </div>
+                            <% }); %>
+                        </div>
+                    <% } else { %>
+                        <div class="no-orders">
+                            <p>You haven't placed any orders yet.</p>
+                            <a href="/products" class="btn">Start Shopping</a>
+                        </div>
+                    <% } %>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cancel Order Confirmation Modal -->
+    <div id="cancelModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Cancel Order</h2>
+            <p>Are you sure you want to cancel this order?</p>
+            <div class="modal-actions">
+                <button id="confirmCancel" class="btn-danger">Yes, Cancel Order</button>
+                <button id="cancelAction" class="btn-secondary">No, Keep Order</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/profile.js"></script>
+      <%- include('../partials/user/footer') %>
+</body>
+</html>

@@ -1,122 +1,71 @@
-<!-- Include your admin header/sidebar if you have one -->
 <div class="admin-container">
     <div class="page-header">
         <h1>Add New Variant</h1>
     </div>
-
     
-    <form action="/admin/products/variants/<%= productId %>/add" method="POST" enctype="multipart/form-data">
-
+    <form id="variantForm" method="POST" enctype="multipart/form-data">
         <div class="form-group">
             <label for="color">Color</label>
             <input type="text" id="color" name="color" placeholder="Enter color name"
-                   value="<%= previousData ? previousData.color : '' %>" >
+                   value="<%= previousData ? previousData.color : '' %>">
         </div>
 
         <div class="form-group">
             <label for="price">Price</label>
             <input type="number" id="price" name="price" placeholder="0.00" step="0.01"
-                   value="<%= previousData ? previousData.price : '' %>" >
+                   value="<%= previousData ? previousData.price : '' %>">
         </div>
 
         <div class="form-group">
             <label for="discountedPrice">Discounted Price</label>
             <input type="number" id="discountedPrice" name="discountedPrice" placeholder="0.00" step="0.01"
-                   value="<%= previousData ? previousData.discountedPrice : '' %>" >
+                   value="<%= previousData ? previousData.discountedPrice : '' %>">
         </div>
 
         <div class="form-group">
             <label for="stock">Stock</label>
             <input type="number" id="stock" name="stock" placeholder="0" min="0"
-                   value="<%= previousData ? previousData.stock : '' %>" >
+                   value="<%= previousData ? previousData.stock : '' %>">
         </div>
-
-        <div class="form-group">
-            <label for="images">Images (Upload exactly 3 images)</label>
-            <input type="file" id="images" name="images" multiple accept="image/*">
-            <div class="images-preview" id="imagesPreview">
-                <p class="no-images">No images selected. Please upload 3 images.</p>
+<div class="form-group">
+    <label>Images (Upload exactly 3 images)</label>
+    <div class="image-uploads">
+        <% for (let i = 1; i <= 3; i++) { %>
+            <div class="file-upload-group">
+                <label for="image<%= i %>">Image <%= i %></label>
+                <input type="file" id="image<%= i %>" name="images" accept="image/*">
+                <div class="preview-container">
+                    <% if (previousData && previousData.images && previousData.images[i-1]) { %>
+                        <img src="<%= previousData.images[i-1] %>" class="preview-img" />
+                    <% } %>
+                </div>
             </div>
-        </div>
+        <% } %>
+    </div>
+</div>
+
 
         <div class="form-actions">
             <button type="submit" class="btn btn-primary">Add Variant</button>
             <a href="/admin/products/variants/<%= productId %>" class="btn btn-secondary">Cancel</a>
         </div>
-
     </form>
 </div>
 
-
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const imagesInput = document.getElementById('images');
-    const imagesPreview = document.getElementById('imagesPreview');
-    const MAX_IMAGES = 3;
-
-    const form = document.querySelector('form');
-    const addButton = form.querySelector('button[type="submit"]');
-
-    function showToast(message, type = "warning") {
-        let bgColor = type === "success" ? "#4CAF50" : "#FF6B6B"; 
-        Toastify({
-            text: message,
-            duration: 3000,
-            close: true,
-            gravity: "top",
-            position: "right",
-            backgroundColor: bgColor,
-        }).showToast();
-    }
-
-    // Reset preview
-    function resetPreview() {
-        imagesPreview.innerHTML = '<p class="no-images">No images selected. Please upload 3 images.</p>';
-    }
-
-    // Image preview logic
-    imagesInput.addEventListener('change', function() {
-        const files = this.files;
-        imagesPreview.innerHTML = '';
-
-        if (!files || files.length === 0) {
-            resetPreview();
-            return;
-        }
-
-        if (files.length > MAX_IMAGES) {
-            showToast(`You can only upload exactly ${MAX_IMAGES} images.`);
-            this.value = '';
-            resetPreview();
-            return;
-        }
-
-        for (let i = 0; i < files.length; i++) {
-            const file = files[i];
-            if (!file.type.match('image.*')) {
-                showToast("Only image files (jpg, jpeg, png) are allowed.");
-                this.value = '';
-                resetPreview();
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = document.createElement('img');
-                img.src = e.target.result;
-                img.className = 'preview-image';
-                img.alt = 'Preview Image ' + (i + 1);
-                imagesPreview.appendChild(img);
-            }
-            reader.readAsDataURL(file);
-        }
-    });
-
-    form.addEventListener('submit', function(e) {
-        addButton.disabled = true;
-        addButton.innerHTML = 'Adding Variant... <span class="spinner"></span>';
-        showToast("Variant is being added, please wait...", "success");
-    });
-});
-</script>
+<!-- Image Crop Modal -->
+<div class="modal" id="cropModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Crop Image</h3>
+            <span class="close" id="closeCropModal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <img id="cropImage" style="max-width:100%; display:block;" />
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="cancelCropBtn">Cancel</button>
+            <button type="button" class="btn btn-primary" id="applyCropBtn">Crop & Replace</button>
+        </div>
+    </div>
+</div>
+   

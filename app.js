@@ -11,7 +11,7 @@ const landingRoutes=require("./routes/landing")
 const passport=require("./config/passport")
 const expressLayouts=require("express-ejs-layouts")
 const methodOverride=require("method-override")
-
+const errorHandler=require("./middlewares/errorHandler")
 
 
 app.use(express.json())
@@ -56,7 +56,7 @@ app.use((req, res) => {
   }
 })
 
-
+app.use(errorHandler)
 
 db()
 app.listen(process.env.PORT,()=>{
