@@ -9,6 +9,8 @@ const userController=require("../controllers/user/userController")
 const setPagetitle=require("../middlewares/setpagetitle")
 const productController=require("../controllers/user/productController")
 const reviewController=require("../controllers/user/reviewController")
+const profileController=require("../controllers/user/profileController")
+const upload = require("../middlewares/upload")
 
 router.use(setLayout("user"))
 //signup
@@ -18,7 +20,7 @@ router.post("/signup",authController.signupUser)
 
 //otp
 router.get("/verifyOtp",requireTempuser,nocache,authController.loadVerifyOtp)
-router.post("/verifyOtp",requireTempuser, authController.verifyOtp);
+router.post("/verifyOtp",requireTempuser, authController.verifyOtp)
 router.post("/resendOtp",requireTempuser,authController.resendOtp)
 
 //google auth
@@ -48,6 +50,27 @@ router.post("/review/add",requireLogin,reviewController.addReview)
 
 //profile
 
-router.get("/profile",requireLogin,checkUserBlocked,nocache,setPagetitle("profile","profile.css"),userController.loadProfile)
-router.get("/editProfile",nocache,setPagetitle("editProfile","editProfile.css"),userController.loadEditProfile)
+router.get("/profile",requireLogin,checkUserBlocked,nocache,setPagetitle("profile","profile.css"),profileController.loadProfile)
+router.get("/editProfile",requireLogin,nocache,setPagetitle("editProfile","editProfile.css"),profileController.loadEditProfile)
+router.post("/editProfile",requireLogin,upload.single("profileImage"),setPagetitle("editProfile","editProfile.css"),profileController.editProfile)
+router.get("/verifyEmailOtp", requireLogin, nocache, profileController.loadVerifyEmailOtpPage);
+router.post("/verifyEmailOtp",requireLogin,profileController.verifyEmailOtp)
+router.post("/resendEmailOtp", requireLogin,profileController.resendEmailOtp)
+
+// newpassword
+router.get("/changePassword",nocache,profileController.loadChangePasswordPage)
+router.post("/changePassword",nocache,profileController.changePassword)
+
+router.get("/forgotChangePassword", profileController.loadForgotPasswordPage)
+router.post("/sendResetPasswordOtp", profileController.sendResetPasswordOtp)
+router.get("/resetForgotChangePassword", profileController.loadResetForgotPasswordPage)
+router.post("/resetPassword", profileController.resetPassword)
+
+
+
+
+
+
+
+
 module.exports=router

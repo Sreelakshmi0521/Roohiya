@@ -1,4 +1,5 @@
 const mongoose=require("mongoose")
+const { type } = require("os")
 const userSchema=new mongoose.Schema({
     name:{
         type:String,
@@ -27,6 +28,14 @@ const userSchema=new mongoose.Schema({
         unique:true,
         sparse:true
     },
+    isGoogleUser: {
+    type: Boolean,
+    default: false
+  },
+  profileImage: {
+  type: String,
+  required:false
+},
     isBlocked:{
         type:Boolean,
         default:false
@@ -38,7 +47,30 @@ const userSchema=new mongoose.Schema({
       isVerified: { 
         type: Boolean,
         default: false
-    }
+    },
+    pendingEmail:{
+        type:String,
+         default: null
+    },
+      emailOtp:{ 
+        type: String,
+         default: null
+     },
+    emailOtpExpires:{ 
+        type: Date, 
+        default: null 
+    },
+
+    resetPasswordOtp:{ 
+        type: String, 
+        default: null 
+    },
+  resetPasswordOtpExpires:{
+    type: Date, 
+    default: null
+ }
+
+
 
 },{timestamps:true})
 

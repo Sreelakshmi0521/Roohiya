@@ -12,16 +12,33 @@ async function sendVerificationEmail(email,otp,context="signup") {
             }
            
         })
-        let subject,text,html;
-        if(context==="forgot"){
-            subject="Reset Your Password";
-            text = `Your OTP for password reset is ${otp}`;
-            html = `<b>Your OTP for password reset: ${otp}</b>`;
-        }else{
-             subject="Verify your account";
-            text=`Your OTP is ${otp}`;
-            html=`<b> Your OTP: ${otp}</b>`;
+        let subject, text, html
+
+        switch(context) {
+            case "signup":
+                subject = "Verify your account"
+                text = `Your OTP is ${otp}`
+                html = `<b>Your OTP: ${otp}</b>`
+                break
+
+            case "emailChange":
+                subject = "Verify Your New Email Address"
+                text = `Your OTP for email change is ${otp}`
+                html = `<b>Your OTP for email change is ${otp}</b>`
+                break
+
+            case "forgot":
+                subject = "Reset Your Password"
+                text = `Your OTP for password reset is ${otp}`
+                html = `<b>Your OTP for password reset: ${otp}</b>`
+                break
+
+            default:
+                subject = "Verify your account"
+                text = `Your OTP is ${otp}`
+                html = `<b>Your OTP: ${otp}</b>`
         }
+
         const emailInfo=await transporter.sendMail({
 
             from:process.env.NODEMAILER_EMAIL,
@@ -33,8 +50,8 @@ async function sendVerificationEmail(email,otp,context="signup") {
         return emailInfo.accepted.length>0
         
     } catch (error) {
-         console.error("Email sending failed", error);
-        return false;
+         console.error("Email sending failed", error)
+        return false
 
     }
     

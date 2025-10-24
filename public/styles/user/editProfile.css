@@ -35,6 +35,7 @@
     font-weight: 700;
 }
 
+
 .back-btn {
     background: var(--text-light);
     color: var(--white);
@@ -181,6 +182,12 @@
 .form-group input:required:invalid {
     border-color: #e74c3c;
 }
+.disabled-input {
+  background-color: #f2f2f2;
+  color: #777;
+  cursor: not-allowed;
+}
+
 
 /* Form Actions */
 .form-actions {

@@ -6,7 +6,7 @@ const Category=require("../../models/categoryModel")
 const cloudinary=require("../../config/cloudinary")
 const { cleanupTempFiles } = require("../../utils/cleanUpTemp")
 const{comprehensiveCleanup}=require("../../utils/cleanUpHelper")
-const IMAGES_PER_VARIANT = 3
+
 
 
 const loadProduct=async(req,res)=>{
@@ -127,11 +127,11 @@ const addProduct = async (req, res) => {
 
         }
 
-        if (allFiles.length !== parsedVariantDetails.length * IMAGES_PER_VARIANT) {
+        if (allFiles.length !== parsedVariantDetails.length * 3) {
             await cleanupTempFiles(allTempFilePaths)
             return res.status(400).json({
                 success: false,
-                message: `Each variant must have exactly ${IMAGES_PER_VARIANT} images.`
+                message: "Each variant must have exactly 3 images."
             })
         }
 
@@ -185,7 +185,7 @@ const addProduct = async (req, res) => {
 
         let fileIndex = 0
         for (const details of parsedVariantDetails) {
-            const imagesForVariant = uploadedImages.slice(fileIndex, fileIndex + IMAGES_PER_VARIANT)
+            const imagesForVariant = uploadedImages.slice(fileIndex, fileIndex + 3)
             const imageUrls = imagesForVariant.map(img => img.url)
 
            
@@ -211,7 +211,7 @@ const addProduct = async (req, res) => {
             const newVariant = new ProductVariant(variantData)
             const savedVariant = await newVariant.save()
             savedVariantIds.push(savedVariant._id)
-            fileIndex += IMAGES_PER_VARIANT
+            fileIndex +=3
         }
 
      
@@ -318,12 +318,12 @@ const addVariant=async(req,res)=>{
                 previousData: { color, price, discountedPrice, stock }
             })
         }
-     if (files.length !== IMAGES_PER_VARIANT) {
+     if (files.length !==3) {
             await cleanupTempFiles(tempFilePaths)
             return res.render('admin/addVariant', {
                 productId,
                 product: await Product.findById(productId),
-                message: `Please upload exactly ${IMAGES_PER_VARIANT} images`,
+                message: "Please upload exactly 3 images",
                 messageType: 'warning',
                 previousData: { color, price, discountedPrice, stock }
             })
@@ -360,7 +360,7 @@ const addVariant=async(req,res)=>{
         images:uploadedImages,
         isListed:true
      }
-     console.log("images:", uploadedImages)
+    //  console.log("images:", uploadedImages)
 
      const {error:variantError}=addVariantValidation.validate(variantData)
 
@@ -390,6 +390,13 @@ const addVariant=async(req,res)=>{
         console.error(error)
         await cleanupTempFiles(tempFilePaths)
         
+       res.render("admin/addVariant", {
+      productId,
+      product: await Product.findById(productId),
+      message: "Error adding variant",
+      messageType: "error",
+      previousData: req.body,
+      })
       }
 }
 

@@ -52,7 +52,7 @@ const signupUser=async(req,res)=>{
 
        const otp=generateOtp()
 
-       const sentEmail=await sendVerificationEmail(email,otp)
+       const sentEmail=await sendVerificationEmail(email,otp,"signup")
         if (!sentEmail) {
             return res.render("user/signup", {
                 message: "Failed to send OTP, try again later.",
@@ -135,7 +135,7 @@ const resendOtp=async(req,res)=>{
     
     const email=req.session.tempUser.email
     const otp=generateOtp()
-    const sentEmail=await sendVerificationEmail(email,otp)
+    const sentEmail=await sendVerificationEmail(email,otp,"signup")
 
     if(!sentEmail){
         return res.json({success:false,message: "Failed to resend OTP. Try again later."})

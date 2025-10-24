@@ -1,6 +1,7 @@
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const User = require("../models/userModel");
+const { log } = require("console");
 require("dotenv").config({ quiet: true });
 
 passport.use(
@@ -26,19 +27,22 @@ passport.use(
         if (email) {
           user = await User.findOne({ email });
         }
-
+        // console.log( profile.id);
+        
         if (user) {
           if (!user.googleId) {
             user.googleId = profile.id;
-            user.isVerified = true;
-            await user.save();
           }
+           user.isVerified = true;
+            user.isGoogleUser= true,
+            await user.save();
           return done(null, user);
         } else {
           const newUser = new User({
             name: profile.displayName,
             email: email,
             googleId: profile.id,
+            isGoogleUser: true,
             isVerified: true,
           });
           await newUser.save();

@@ -5,8 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Profile</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-      <link rel="stylesheet" href="/styles/user/common.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <link rel="stylesheet" href="/styles/user/common.css">
   <link rel="stylesheet" href="/styles/user/<%= pagecss %>">
+
 </head>
 <body>
     
@@ -18,7 +20,7 @@
         </div>
 
         <div class="edit-profile-content">
-            <form id="editProfileForm" class="edit-profile-form" action="/editProfile" method="POST" enctype="multipart/form-data">
+            <form id="editProfileForm" class="edit-profile-form" action="/user/editProfile" method="POST" enctype="multipart/form-data">
                 <div class="form-section">
                     <h2>Profile Image</h2>
                     <div class="profile-image-edit">
@@ -42,54 +44,15 @@
                         </div>
                         <div class="form-group">
                             <label for="email">Email Address *</label>
-                            <input type="email" id="email" name="email" value="<%= user.email %>">
+                           <input type="email" id="email" name="email" value="<%= user.email %>" <%= isGoogleUser ? 'readonly' : '' %>  <%= isGoogleUser ? 'class="disabled-input"' : '' %>>
+                                <% if (isGoogleUser) { %>
+                                <small style="color: gray;">Email cannot be changed for Google users.</small>
+                                <% } %>
                         </div>
                         <div class="form-group">
                             <label for="phone">Phone Number</label>
                             <input type="tel" id="phone" name="phone" value="<%= user.phone || '' %>">
                         </div>
-                    </div>
-                </div>
-
-                <div class="form-section">
-                    <h2>Address Information</h2>
-                    <div class="form-grid">
-                        <div class="form-group full-width">
-                            <label for="street">Street Address</label>
-                            <input type="text" id="street" name="street" value="<%= user.address ? user.address.street : '' %>">
-                        </div>
-                        <div class="form-group">
-                            <label for="city">City</label>
-                            <input type="text" id="city" name="city" value="<%= user.address ? user.address.city : '' %>">
-                        </div>
-                       <div class="form-group">
-                                <label for="state">State</label>
-                                <select id="state" name="state" required>
-                                    <option value="">Select State</option>
-                                    <% 
-                                        const states = [
-                                            "Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chhattisgarh",
-                                            "Goa","Gujarat","Haryana","Himachal Pradesh","Jharkhand",
-                                            "Karnataka","Kerala","Madhya Pradesh","Maharashtra","Manipur",
-                                            "Meghalaya","Mizoram","Nagaland","Odisha","Punjab",
-                                            "Rajasthan","Sikkim","Tamil Nadu","Telangana","Tripura",
-                                            "Uttar Pradesh","Uttarakhand","West Bengal"
-                                        ];
-                                        states.forEach(state => { 
-                                    %>
-                                        <option value="<%= state %>" <%= user.address && user.address.state === state ? 'selected' : '' %>><%= state %></option>
-                                    <% }); %>
-                                </select>
-                            </div>
-
-                        <div class="form-group">
-                            <label for="zipCode">Pin Code</label>
-                            <input type="text" id="zipCode" name="zipCode" value="<%= user.address ? user.address.zipCode : '' %>">
-                        </div>
-                     <div class="form-group">
-                        <label for="country">Country</label>
-                        <input type="text" id="country" name="country" value="<%= user.address ? user.address.country : '' %>">
-                     </div>
                     </div>
                 </div>
 
@@ -101,6 +64,8 @@
         </div>
     </div>
 
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="/js/editProfile.js"></script>
      <%- include('../partials/user/footer') %>
 </body>

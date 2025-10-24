@@ -44,7 +44,7 @@ router.patch("/products/toggle/:id",nocache, checkSession, setPagetitle("product
 router.get("/products/variants/:id", nocache, checkSession, setPagetitle("products", "productvariants.css"), productController.loadProductVariants)
 
 router.get("/products/variants/:id/add",nocache,checkSession,setPagetitle("products", "addVariant.css"),productController.loadAddVariant)
-router.post("/products/variants/:id/add",nocache,checkSession,setPagetitle("products", "addVariant.css"),upload.array("images",3),productController.addVariant)
+router.post("/products/variants/:id/add",nocache,checkSession,setPagetitle("products", "addVariant.css"),upload.array('variantImages',3),productController.addVariant)
 
 router.get("/products/variants/edit/:id",nocache, checkSession, setPagetitle("products", "editvariants.css"),productController.loadEditVariant)
 router.post("/products/variants/edit/:id",nocache, checkSession, setPagetitle("products", "editvariants.css"),upload.array("images",3),productController.updateVariant)

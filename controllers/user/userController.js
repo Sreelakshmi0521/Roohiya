@@ -4,7 +4,6 @@ const ProductVariant=require("../../models/productVariantModel")
 const User=require("../../models/userModel")
 
 
-
 const loadLanding=async(req,res)=>{
    
     try {
@@ -199,52 +198,9 @@ const logout = (req, res) => {
 }
 
 
-const loadProfile=async(req,res,next)=>{
-  try {
-        if (!req.session.user) {
-      return res.redirect("/user/login")
-    }
-    const userId=req.session.user.id
-   const user=await User.findById(userId).lean()
-   
-   if(!user) throw new Error("User not found")
-    res.render("user/profile",{
-      user,
-
-   })
-   
-   
-  } catch (error) {
-    next(error)
-  }
-}
-
-const loadEditProfile = async (req, res, next) => {
-  try {
-        if (!req.session.user) {
-      return res.redirect("/user/login")
-    }
-    const userId=req.session.user.id
-   const user=await User.findById(userId).lean()
-
-    if (!user) {
-      return res.redirect("/user/login")
-    }
-
-    res.render("user/editProfile", {
-      user,
-     
-    })
-  } catch (error) {
-    next(error)
-  }
-}
-
-
 module.exports={
     loadLanding,
     loadHomepage,
     logout,
-     loadProfile,
-     loadEditProfile
+     
 }

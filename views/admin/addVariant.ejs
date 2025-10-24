@@ -1,71 +1,73 @@
-<div class="admin-container">
-    <div class="page-header">
-        <h1>Add New Variant</h1>
-    </div>
-    
-    <form id="variantForm" method="POST" enctype="multipart/form-data">
+<!-- Add Variant Page -->
+<div class="variant-form">
+    <form id="variantForm" enctype="multipart/form-data" method="POST" action="/admin/products/variants/<%= productId %>/add">
+        
+        <% if(message) { %>
+            <div class="alert <%= messageType %>"><%= message %></div>
+        <% } %>
+
+        <!-- Color -->
         <div class="form-group">
-            <label for="color">Color</label>
-            <input type="text" id="color" name="color" placeholder="Enter color name"
-                   value="<%= previousData ? previousData.color : '' %>">
+            <label for="color">Color *</label>
+            <input type="text" id="color" name="color" value="<%= previousData?.color || '' %>" >
         </div>
 
+        <!-- Price -->
         <div class="form-group">
-            <label for="price">Price</label>
-            <input type="number" id="price" name="price" placeholder="0.00" step="0.01"
-                   value="<%= previousData ? previousData.price : '' %>">
+            <label for="price">Price *</label>
+            <input type="number" id="price" name="price" step="0.01" min="0" value="<%= previousData?.price || '' %>" >
         </div>
 
+        <!-- Discounted Price -->
         <div class="form-group">
-            <label for="discountedPrice">Discounted Price</label>
-            <input type="number" id="discountedPrice" name="discountedPrice" placeholder="0.00" step="0.01"
-                   value="<%= previousData ? previousData.discountedPrice : '' %>">
+            <label for="discountedPrice">Discount Price</label>
+            <input type="number" id="discountedPrice" name="discountedPrice" step="0.01" min="0" value="<%= previousData?.discountedPrice || '' %>">
         </div>
 
+        <!-- Stock -->
         <div class="form-group">
-            <label for="stock">Stock</label>
-            <input type="number" id="stock" name="stock" placeholder="0" min="0"
-                   value="<%= previousData ? previousData.stock : '' %>">
+            <label for="stock">Stock *</label>
+            <input type="number" id="stock" name="stock" min="0" value="<%= previousData?.stock || '' %>" >
         </div>
-<div class="form-group">
-    <label>Images (Upload exactly 3 images)</label>
-    <div class="image-uploads">
-        <% for (let i = 1; i <= 3; i++) { %>
+
+        <!-- Upload 3 Images -->
+        <div class="image-uploads">
+            <% for(let i = 0; i < 3; i++) { %>
             <div class="file-upload-group">
-                <label for="image<%= i %>">Image <%= i %></label>
-                <input type="file" id="image<%= i %>" name="images" accept="image/*">
+                <label for="image<%= i + 1 %>" class="file-label">Image <%= i + 1 %> *</label>
+                <input type="file" id="image<%= i + 1 %>" name="variantImages" accept="image/*" >
+                <button type="button" class="crop-btn" data-image-index="<%= i + 1 %>" style="display: none;">Crop Image</button>
                 <div class="preview-container">
-                    <% if (previousData && previousData.images && previousData.images[i-1]) { %>
-                        <img src="<%= previousData.images[i-1] %>" class="preview-img" />
-                    <% } %>
+                    <img class="preview-img" alt="Preview" style="display: none; max-width: 200px; max-height: 200px;">
                 </div>
             </div>
-        <% } %>
-    </div>
-</div>
+            <% } %>
+        </div>
 
+        <!-- Crop Modal -->
+        <div class="modal" id="cropModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Crop Image</h3>
+                    <span class="close" id="closeCropModal">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <div id="cropper-container">
+                        <img id="cropImage" style="max-width: 100%;" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" id="cancelCropBtn">Cancel</button>
+                    <button type="button" class="btn-primary" id="applyCropBtn">Apply Crop</button>
+                </div>
+            </div>
+        </div>
 
+        <!-- Form Actions -->
         <div class="form-actions">
-            <button type="submit" class="btn btn-primary">Add Variant</button>
-            <a href="/admin/products/variants/<%= productId %>" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="save-btn btn-primary">Add Variant</button>
+            <a href="/admin/products/variants/<%= productId %>" class="btn-secondary">Cancel</a>
         </div>
     </form>
 </div>
 
-<!-- Image Crop Modal -->
-<div class="modal" id="cropModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>Crop Image</h3>
-            <span class="close" id="closeCropModal">&times;</span>
-        </div>
-        <div class="modal-body">
-            <img id="cropImage" style="max-width:100%; display:block;" />
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" id="cancelCropBtn">Cancel</button>
-            <button type="button" class="btn btn-primary" id="applyCropBtn">Crop & Replace</button>
-        </div>
-    </div>
-</div>
-   
