@@ -1,4 +1,4 @@
-// addVariant.js
+
 
 document.addEventListener('DOMContentLoaded', function() {
     let cropper = null;
@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Crop button click handlers
+
     const cropBtns = document.querySelectorAll('.crop-btn');
     cropBtns.forEach(btn => {
         btn.addEventListener('click', function() {
@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Modal close handlers
+  
     document.getElementById('closeCropModal').addEventListener('click', closeCropModal);
     document.getElementById('cancelCropBtn').addEventListener('click', closeCropModal);
     document.getElementById('cropModal').addEventListener('click', function(e) {
@@ -93,13 +93,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     lastModified: Date.now()
                 });
 
-                // Replace the file in the input
+      
                 const dt = new DataTransfer();
                 dt.items.add(croppedFile);
                 const input = document.getElementById(`image${currentImageIndex}`);
                 input.files = dt.files;
 
-                // Update preview
+             
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const previewImg = input.closest('.file-upload-group').querySelector('.preview-img');
@@ -108,8 +108,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 reader.readAsDataURL(croppedFile);
 
                 closeCropModal();
-                originalFile = null; // Reset
-            }, 'image/jpeg', 0.9); // 90% quality
+                originalFile = null;
+            }, 'image/jpeg', 0.9); 
         }
     });
 

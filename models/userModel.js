@@ -1,5 +1,51 @@
 const mongoose=require("mongoose")
-const { type } = require("os")
+
+const addressSchema=new mongoose.Schema({
+    name:{
+        type:String,
+        required:true,
+        trim:true
+    },
+    phone:{ 
+        type: String,
+         required: true 
+   },
+  street:{ 
+      type: String,
+      required: true
+  }, 
+ city:{ 
+     type: String,
+     required: true
+},
+state:{
+  type: String,
+   required: true
+ },
+
+country:{
+   type: String, 
+  required: true
+},
+
+  pincode:{ 
+  type: String,
+   required: true 
+    
+ },
+
+  landmark:{ 
+  type: String 
+  },
+  
+  addressType: {
+    type: String,
+    enum: ["Home", "Work", "Other"],
+    default: "Home",
+  },  
+})
+
+
 const userSchema=new mongoose.Schema({
     name:{
         type:String,
@@ -36,6 +82,7 @@ const userSchema=new mongoose.Schema({
   type: String,
   required:false
 },
+
     isBlocked:{
         type:Boolean,
         default:false
@@ -68,7 +115,8 @@ const userSchema=new mongoose.Schema({
   resetPasswordOtpExpires:{
     type: Date, 
     default: null
- }
+ },
+  addresses: [addressSchema],
 
 
 

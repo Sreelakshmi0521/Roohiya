@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title><%= pageTitle %></title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+   <link rel="stylesheet" href="/styles/user/common.css">
+  <link rel="stylesheet" href="/styles/user/<%= pagecss %>">
+</head>
+<body>
+   <%- include('../partials/user/navbar') %>
+
+
+  <form action="/user/addresses/add" method="POST" class="address-form">
+    <h3>Add New Address</h3>
+    <div class="form-group">
+      <input type="text" name="name" placeholder="Full Name" >
+    </div>
+    <div class="form-group">
+      <input type="tel" name="phone" placeholder="Phone" >
+    </div>
+    <div class="form-group">
+      <input type="text" name="street" placeholder="Street" >
+    </div>
+    <div class="form-group">
+      <input type="text" name="city" placeholder="City" >
+    </div>
+    <div class="form-group">
+      <input type="text" name="state" placeholder="State" >
+    </div>
+    <div class="form-group">
+      <input type="text" name="country" placeholder="Country" >
+    </div>
+    <div class="form-group">
+      <input type="text" name="pincode" placeholder="Pincode" >
+    </div>
+    <div class="form-group">
+      <input type="text" name="landmark" placeholder="Landmark (Optional)">
+    </div>
+    <div class="form-group">
+      <label for="addressType">Address Type:</label>
+      <select name="addressType" id="addressType">
+        <option value="Home">Home</option>
+        <option value="Work">Work</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+    <button type="submit">Add Address</button>
+  </form>
+
+  <hr>
+
+  <% if (addresses && addresses.length > 0) { %>
+    <% addresses.forEach(addr => { %>
+      <div class="address-card">
+        <div class="address-details">
+          <h4><%= addr.name %> (<%= addr.addressType %>)</h4>
+          <p><%= addr.street %>, <%= addr.landmark ? addr.landmark + ', ' : '' %><%= addr.city %>, <%= addr.state %> - <%= addr.pincode %></p>
+          <p><%= addr.country %></p>
+          <p><strong>Phone:</strong> <%= addr.phone %></p>
+        </div>
+        <div class="address-actions">
+          <a href="/user/addresses/edit/<%= addr._id %>" class="btn btn-edit">Edit</a>
+          <form action="/user/addresses/delete/<%= addr._id %>" method="POST" style="display: inline;">
+            <button type="submit" class="btn btn-delete" onclick="return confirm('Are you sure you want to delete this address?')">Delete</button>
+          </form>
+        </div>
+      </div>
+    <% }) %>
+  <% } else { %>
+    <p class="no-addresses">No addresses added yet.</p>
+  <% } %>
+    <%- include('../partials/user/footer') %>
+
+</body>
+</html>

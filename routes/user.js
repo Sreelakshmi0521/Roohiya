@@ -10,6 +10,7 @@ const setPagetitle=require("../middlewares/setpagetitle")
 const productController=require("../controllers/user/productController")
 const reviewController=require("../controllers/user/reviewController")
 const profileController=require("../controllers/user/profileController")
+const addressController=require("../controllers/user/addressController")
 const upload = require("../middlewares/upload")
 
 router.use(setLayout("user"))
@@ -66,9 +67,8 @@ router.post("/sendResetPasswordOtp", profileController.sendResetPasswordOtp)
 router.get("/resetForgotChangePassword", profileController.loadResetForgotPasswordPage)
 router.post("/resetPassword", profileController.resetPassword)
 
-
-
-
+// // address
+router.get("/addresses",requireLogin,setPagetitle("My Addresses", "addresses.css"),addressController.loadAddressesPage);
 
 
 
