@@ -1,0 +1,18 @@
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+<% if (message) { %>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    Toastify({
+      text: "<%- message %>",
+      duration: 3000,
+      close: true,
+      gravity: "top",
+      position: "right",
+      backgroundColor: "<%- type === 'error' ? '#ff5f6d' : '#4CAF50' %>",
+    }).showToast();
+  });
+</script>
+<% } %>

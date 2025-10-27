@@ -5,9 +5,9 @@ const isLogin=(req,res,next)=>{
     if(req.session.user){
         return res.redirect("/user/homepage")
     }
-    if(req.session.tempUser){
-        return res.redirect("/user/verifyOtp")
-    }
+    // if(req.session.tempUser){
+    //     return res.redirect("/user/verifyOtp")
+    // }
     next()
 }
 

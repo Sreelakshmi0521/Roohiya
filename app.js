@@ -44,7 +44,7 @@ app.use(passport.session())
 
 app.use(methodOverride("_method"))
 
-app.use("/",landingRoutes)
+app.use('/', landingRoutes);
 app.use("/user",userRoutes)
 app.use("/admin",adminRoutes)
 
