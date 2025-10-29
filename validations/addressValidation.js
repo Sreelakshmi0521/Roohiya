@@ -5,7 +5,7 @@ const addAddressValidation=joi.object({
     .min(3)
     .max(50)
     .required()
-    .message({
+    .messages({
        "string.empty": "Full name is required",
        "string.min": "Name should have at least 3 characters",
 
@@ -45,15 +45,16 @@ const addAddressValidation=joi.object({
   state: joi.string().trim().required().messages({
     "string.empty": "State is required",
   }),
+  
+country: joi.string()
+  .trim()
+  .valid("India")
+  .required()
+  .messages({
+    "any.only": "Country must be India",
+    "string.empty": "Country is required",
+  }),
 
-  country: joi.string()
-    .trim()
-    .valid("India", "United Arab Emirates", "Nepal", "Sri Lanka")
-    .required()
-    .messages({
-      "any.only": "Country must be India, UAE, Nepal, or Sri Lanka",
-      "string.empty": "Country is required",
-    }),
 
   landmark: joi.string().trim().allow(""),
 
@@ -79,10 +80,13 @@ const editAddressValidation = joi.object({
 
   state: joi.string().trim().optional(),
 
-  country: joi.string()
-    .trim()
-    .valid("India", "United Arab Emirates", "Nepal", "Sri Lanka")
+
+country: joi.string()
+  .trim()
+  .valid("India")
     .optional(),
+
+
 
   landmark: joi.string().trim().allow("").optional(),
 

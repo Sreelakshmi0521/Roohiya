@@ -212,7 +212,9 @@ const resendOtp=async(req,res)=>{
         req.session.user={
             id:user._id,
             name:user.name,
-            email:user.email
+            email:user.email,
+             profileImage: user.profileImage,
+               isGoogleUser: user.isGoogleUser 
         }
 
         res.redirect("/user/homepage")
@@ -235,7 +237,9 @@ const googleLogin = (req, res) => {
             req.session.user ={
                 id:req.user._id,
                 name: req.user.name || req.user.displayName,
-                email:req.user.email
+                email:req.user.email,
+                 profileImage: req.user.profileImage || '/images/default-profile.png',
+                 isGoogleUser: true
             }
             return res.redirect("/user/homepage");
         } else {

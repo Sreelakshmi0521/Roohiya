@@ -2,258 +2,401 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= pageTitle %></title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
   <link rel="stylesheet" href="/styles/user/common.css">
+  <link rel="stylesheet" href="/styles/user/sidebar.css">
   <link rel="stylesheet" href="/styles/user/<%= pagecss %>">
 </head>
+
 <body>
-     <%- include('../partials/user/navbar') %>
+  <%- include('../partials/user/navbar') %>
 
-  <div class="address-container">
-    <h1>My Addresses</h1>
+  <div class="profile-wrapper">
+    <%- include('../partials/user/sidebar', { user, activePage: 'addresses' }) %>
 
-    <!-- Add Address Form -->
-    <form action="/user/addresses/add" method="POST" class="add-address-form">
-      <div class="form-group">
-        <input type="text" name="name" placeholder="Full Name" value="<%= oldData.name || '' %>">
+    <div class="address-container">
+      <h1>My Addresses</h1>
+
+      <!-- Add Address Button -->
+      <div class="add-address-header">
+        <button class="add-address-btn" onclick="openAddModal()">
+          <i class="fas fa-plus"></i>
+          Add New Address
+        </button>
       </div>
 
-      <div class="form-group">
-<input type="tel" name="phone" placeholder="Phone" value="<%= oldData.phone || '' %>">
+      <!-- Saved Addresses -->
+      <div class="section-header">
+        <h2>Saved Addresses</h2>
+        <span class="address-count"><%= addresses.length %> address<%= addresses.length !== 1 ? 'es' : '' %></span>
       </div>
-
-      <div class="form-group">
-<input type="text" name="houseName" placeholder="House / Building" value="<%= oldData.houseName || '' %>">
-      </div>
-
-      <div class="form-group">
-<input type="text" name="locality" placeholder="Locality" value="<%= oldData.locality || '' %>">
-      </div>
-
-      <div class="form-group">
-        <input type="text" name="pincode" placeholder="Pincode" maxlength="6" >
-      </div>
-
-      <div class="form-group">
-      <input type="text" name="city" placeholder="City" value="<%= oldData.city || '' %>">
-      </div>
-
-      <div class="form-group">
-        <label for="state">State:</label>
-        <select name="state" id="state" >
-          <option value="">Select State</option>
-          <option value="Andhra Pradesh">Andhra Pradesh</option>
-          <option value="Arunachal Pradesh">Arunachal Pradesh</option>
-          <option value="Assam">Assam</option>
-          <option value="Bihar">Bihar</option>
-          <option value="Chhattisgarh">Chhattisgarh</option>
-          <option value="Goa">Goa</option>
-          <option value="Gujarat">Gujarat</option>
-          <option value="Haryana">Haryana</option>
-          <option value="Himachal Pradesh">Himachal Pradesh</option>
-          <option value="Jharkhand">Jharkhand</option>
-          <option value="Karnataka">Karnataka</option>
-          <option value="Kerala">Kerala</option>
-          <option value="Madhya Pradesh">Madhya Pradesh</option>
-          <option value="Maharashtra">Maharashtra</option>
-          <option value="Manipur">Manipur</option>
-          <option value="Meghalaya">Meghalaya</option>
-          <option value="Mizoram">Mizoram</option>
-          <option value="Nagaland">Nagaland</option>
-          <option value="Odisha">Odisha</option>
-          <option value="Punjab">Punjab</option>
-          <option value="Rajasthan">Rajasthan</option>
-          <option value="Sikkim">Sikkim</option>
-          <option value="Tamil Nadu">Tamil Nadu</option>
-          <option value="Telangana">Telangana</option>
-          <option value="Tripura">Tripura</option>
-          <option value="Uttar Pradesh">Uttar Pradesh</option>
-          <option value="Uttarakhand">Uttarakhand</option>
-          <option value="West Bengal">West Bengal</option>
-          <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
-          <option value="Chandigarh">Chandigarh</option>
-          <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and Daman and Diu</option>
-          <option value="Delhi">Delhi</option>
-          <option value="Jammu and Kashmir">Jammu and Kashmir</option>
-          <option value="Ladakh">Ladakh</option>
-          <option value="Lakshadweep">Lakshadweep</option>
-          <option value="Puducherry">Puducherry</option>
-        </select>
-      </div>
-
-<div class="form-group">
-  <label for="country">Country:</label>
-  <select name="country" id="country">
-    <option value="">Select Country</option>
-    <option value="India">India</option>
-    <option value="United Arab Emirates">UAE</option>
-    <option value="Nepal">Nepal</option>
-    <option value="Sri Lanka">Sri Lanka</option>
-  </select>
-</div>
-
-
-      <div class="form-group">
-        <input type="text" name="landmark" placeholder="Landmark (Optional)">
-      </div>
-
-      <div class="form-group">
-        <label for="addressType">Address Type:</label>
-        <select name="addressType" id="addressType">
-          <option value="Home">Home</option>
-          <option value="Work">Work</option>
-          <option value="Other">Other</option>
-        </select>
-      </div>
-
-      <button type="submit" class="save-btn">Add Address</button>
-    </form>
-
-     <!-- Saved Addresses -->
-    <div class="address-list">
-      <% if (addresses.length === 0) { %>
-        <p>No addresses saved yet.</p>
-      <% } else { %>
-        <% addresses.forEach(addr => { %>
-          <div class="address-card">
-            <p><strong><%= addr.name %></strong> - <%= addr.phone %></p>
-            <p><%= addr.houseName %>, <%= addr.locality %></p>
-            <p><%= addr.city %>, <%= addr.state %> - <%= addr.pincode %></p>
-            <% if (addr.landmark) { %>
-              <p><em>Landmark: <%= addr.landmark %></em></p>
-            <% } %>
-            <p>Type: <%= addr.addressType %></p>
-
-            <% if (addr.isDefault) { %>
-              <p class="default">⭐ Default Address</p>
-            <% } else { %>
-              <a href="/user/addresses/default/<%= addr._id %>" class="set-default-btn">Set as Default</a>
-            <% } %>
-
-            <!-- Edit and Delete -->
-            <div class="address-actions">
-              <a href="/user/addresses/edit/<%= addr._id %>" class="edit-btn">Edit</a>
-              <a href="/user/addresses/delete/<%= addr._id %>" class="delete-btn">Delete</a>
-            </div>
+      
+      <div class="address-list">
+        <% if (!addresses || addresses.length === 0) { %>
+          <div class="empty-state">
+            <i class="fas fa-map-marker-alt"></i>
+            <p>No addresses saved yet.</p>
+            <p class="empty-subtext">Add your first address to get started</p>
           </div>
-        <% }) %>
-      <% } %>
+        <% } else { %>
+          <% addresses.forEach(addr => { %>
+            <div class="address-card <%= addr.isDefault ? 'default-address' : '' %>">
+              <div class="address-header">
+                <div class="address-type-badge"><%= addr.addressType %></div>
+                <% if (addr.isDefault) { %>
+                  <div class="default-indicator">
+                    <i class="fas fa-star"></i>
+                    Default Address
+                  </div>
+                <% } %>
+              </div>
+              
+              <div class="address-content">
+                <p class="address-name-phone">
+                  <strong><%= addr.name %></strong> • <%= addr.phone %>
+                </p>
+                <p class="address-line"><%= addr.houseName %>, <%= addr.locality %></p>
+                <p class="address-line"><%= addr.city %>, <%= addr.state %> - <%= addr.pincode %></p>
+                <p class="address-line"><%= addr.country %></p>
+                <% if (addr.landmark) { %>
+                  <p class="address-landmark">
+                    <i class="fas fa-map-marker-alt"></i>
+                    Landmark: <%= addr.landmark %>
+                  </p>
+                <% } %>
+              </div>
+              
+              <div class="address-footer">
+                <div class="address-actions">
+                  <% if (!addr.isDefault) { %>
+                    <button class="set-default-btn" onclick="setAsDefault('<%= addr._id %>')">
+                      <i class="fas fa-star"></i>
+                      Set as Default
+                    </button>
+                  <% } %>
+                  
+                  <button class="edit-btn" onclick="openEditModal('<%= addr._id %>')">
+                    <i class="fas fa-edit"></i>
+                    Edit
+                  </button>
+                  
+                 <button class="delete-btn" onclick="openDeleteModal('<%= addr._id %>')">
+                  <i class="fas fa-trash"></i>
+                  Delete
+                </button>
+
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        <% } %>
+      </div>
     </div>
   </div>
-  <%- include('../partials/toast', { message, type }) %>
-   <%- include('../partials/user/footer') %>
-  <!-- Auto-fill Script -->
- <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const pincodeInput = document.querySelector('input[name="pincode"]');
-    const cityInput = document.querySelector('input[name="city"]');
-    const stateSelect = document.getElementById('state');
-    const countrySelect = document.getElementById('country');
 
-    pincodeInput.addEventListener("blur", async () => {
-      const pincode = pincodeInput.value.trim();
-     if (pincode.length === 6) {
-  try {
-    const response = await fetch(`https://api.postalpincode.in/pincode/${pincode}`);
-    const data = await response.json();
+  <!-- Add Address Modal -->
+  <div id="addAddressModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>
+          <i class="fas fa-plus-circle"></i>
+          Add New Address
+        </h2>
+        <button class="close-btn" onclick="closeAddModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
 
-    if (data[0].Status === "Success") {
-      const info = data[0].PostOffice[0];
-      cityInput.value = info.District;
-      stateSelect.value = info.State;
-      countrySelect.value = "India";
-      countrySelect.disabled = true;
-    } else {
-      Toastify({
-        text: "Invalid Pincode!",
-        duration: 3000,
-        close: true,
-        gravity: "top",
-        position: "right",
-        backgroundColor: "#ff5f6d",
-      }).showToast();
-      cityInput.value = "";
-      stateSelect.value = "";
-      countrySelect.disabled = false;
-    }
-  } catch (err) {
-    Toastify({
-      text: "Error fetching pincode info!",
-      duration: 3000,
-      close: true,
-      gravity: "top",
-      position: "right",
-      backgroundColor: "#ff5f6d",
-    }).showToast();
-  }
-} else {
-  // When user clears or types less than 6 digits
-  cityInput.value = "";
-  stateSelect.value = "";
-  countrySelect.disabled = false;
-}
+      <form class="address-form" id="addAddressForm">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="name" class="form-label">
+              <i class="fas fa-user"></i>
+              Full Name *
+            </label>
+            <input type="text" id="name" name="name" placeholder="Enter your full name" >
+            <span class="error-message" id="nameError"></span>
+          </div>
 
-    });
-  });
-</script>
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const form = document.querySelector(".add-address-form");
-    const submitBtn = document.querySelector(".save-btn");
-    let isSubmitting = false;
+          <div class="form-group">
+            <label for="phone" class="form-label">
+              <i class="fas fa-phone"></i>
+              Phone Number *
+            </label>
+            <input type="tel" id="phone" name="phone" placeholder="10-digit phone number" maxlength="10" pattern="[6-9][0-9]{9}" >
+            <span class="error-message" id="phoneError"></span>
+          </div>
 
-    form.addEventListener("submit", (e) => {
-      // If already submitting, block further clicks
-      if (isSubmitting) {
-        e.preventDefault();
-        return;
-      }
+          <div class="form-group full-width">
+            <label for="houseName" class="form-label">
+              <i class="fas fa-home"></i>
+              House / Building *
+            </label>
+            <input type="text" id="houseName" name="houseName" placeholder="House no. and building name" >
+            <span class="error-message" id="houseNameError"></span>
+          </div>
 
-      // Validate required fields before disabling
-      const requiredFields = form.querySelectorAll("input[required], select[required]");
-      let hasError = false;
-      requiredFields.forEach(field => {
-        if (!field.value.trim()) {
-          hasError = true;
-        }
-      });
+          <div class="form-group full-width">
+            <label for="locality" class="form-label">
+              <i class="fas fa-map-pin"></i>
+              Locality / Area *
+            </label>
+            <input type="text" id="locality" name="locality" placeholder="Area, Street, Locality" >
+            <span class="error-message" id="localityError"></span>
+          </div>
 
-      if (hasError) {
-        e.preventDefault();
-        Toastify({
-          text: "Please fill all required fields!",
-          duration: 3000,
-          close: true,
-          gravity: "top",
-          position: "right",
-          backgroundColor: "#ff5f6d",
-        }).showToast();
-        return;
-      }
+          <div class="form-group">
+            <label for="pincode" class="form-label">
+              <i class="fas fa-map-marked-alt"></i>
+              Pincode *
+            </label>
+            <div class="pincode-wrapper">
+              <input type="text" id="pincode" name="pincode" maxlength="6" placeholder="6-digit pincode" pattern="[1-9][0-9]{5}" >
+              <div id="spinner" class="spinner"></div>
+            </div>
+            <span class="error-message" id="pincodeError"></span>
+          </div>
 
-      // Disable the button and show loading state
-      isSubmitting = true;
-      submitBtn.disabled = true;
-      submitBtn.style.backgroundColor = "#aaa";
-      submitBtn.style.cursor = "not-allowed";
-      submitBtn.textContent = "Saving...";
+          <div class="form-group">
+            <label for="city" class="form-label">
+              <i class="fas fa-city"></i>
+              City *
+            </label>
+            <input type="text" id="city" name="city" placeholder="City" >
+            <span class="error-message" id="cityError"></span>
+          </div>
 
-      // Safety: Re-enable after 6 seconds (in case of slow response or error)
-      setTimeout(() => {
-        isSubmitting = false;
-        submitBtn.disabled = false;
-        submitBtn.style.backgroundColor = "#4CAF50";
-        submitBtn.style.cursor = "pointer";
-        submitBtn.textContent = "Add Address";
-      }, 6000);
-    });
-  });
-</script>
+          <div class="form-group">
+            <label for="state" class="form-label">
+              <i class="fas fa-landmark"></i>
+              State *
+            </label>
+            <input type="text" id="state" name="state" placeholder="State" readonly >
+            <span class="error-message" id="stateError"></span>
+          </div>
 
+          <div class="form-group">
+            <label for="country" class="form-label">
+              <i class="fas fa-globe"></i>
+              Country *
+            </label>
+            <input type="text" id="country" name="country" placeholder="Country" readonly >
+          </div>
 
-     
+          <div class="form-group full-width">
+            <label for="landmark" class="form-label">
+              <i class="fas fa-map-marker-alt"></i>
+              Landmark (Optional)
+            </label>
+            <input type="text" id="landmark" name="landmark" placeholder="Nearby landmark for easy identification">
+          </div>
 
+          <div class="form-group">
+            <label for="addressType" class="form-label">
+              <i class="fas fa-tag"></i>
+              Address Type *
+            </label>
+            <select name="addressType" id="addressType" >
+              <option value="" disabled selected>Select type</option>
+              <option value="Home">🏠 Home</option>
+              <option value="Work">💼 Work</option>
+              <option value="Other">📦 Other</option>
+            </select>
+            <span class="error-message" id="addressTypeError"></span>
+          </div>
+
+          <div class="form-group checkbox-group full-width">
+            <label class="checkbox-label">
+              <input type="checkbox" id="isDefault" name="isDefault" value="true">
+              <span class="checkmark"></span>
+              Set as default address
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeAddModal()">
+            <i class="fas fa-times"></i>
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i>
+            Save Address
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Address Modal -->
+  <div id="editAddressModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>
+          <i class="fas fa-edit"></i>
+          Edit Address
+        </h2>
+        <button class="close-btn" onclick="closeEditModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <form class="address-form" id="editAddressForm">
+        <input type="hidden" id="editAddressId">
+        
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="editName" class="form-label">
+              <i class="fas fa-user"></i>
+              Full Name *
+            </label>
+            <input type="text" id="editName" name="name" >
+            <span class="error-message" id="editNameError"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="editPhone" class="form-label">
+              <i class="fas fa-phone"></i>
+              Phone Number *
+            </label>
+            <input type="tel" id="editPhone" name="phone" maxlength="10" pattern="[6-9][0-9]{9}" >
+            <span class="error-message" id="editPhoneError"></span>
+          </div>
+
+          <div class="form-group full-width">
+            <label for="editHouse" class="form-label">
+              <i class="fas fa-home"></i>
+              House / Building *
+            </label>
+            <input type="text" id="editHouse" name="houseName" >
+            <span class="error-message" id="editHouseError"></span>
+          </div>
+
+          <div class="form-group full-width">
+            <label for="editLocality" class="form-label">
+              <i class="fas fa-map-pin"></i>
+              Locality / Area *
+            </label>
+            <input type="text" id="editLocality" name="locality" >
+            <span class="error-message" id="editLocalityError"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="editPincode" class="form-label">
+              <i class="fas fa-map-marked-alt"></i>
+              Pincode *
+            </label>
+            <div class="pincode-wrapper">
+              <input type="text" id="editPincode" name="pincode" maxlength="6" pattern="[1-9][0-9]{5}" >
+              <div id="editSpinner" class="spinner"></div>
+            </div>
+            <span class="error-message" id="editPincodeError"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="editCity" class="form-label">
+              <i class="fas fa-city"></i>
+              City *
+            </label>
+            <input type="text" id="editCity" name="city" >
+            <span class="error-message" id="editCityError"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="editState" class="form-label">
+              <i class="fas fa-landmark"></i>
+              State *
+            </label>
+            <input type="text" id="editState" name="state" readonly >
+            <span class="error-message" id="editStateError"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="editCountry" class="form-label">
+              <i class="fas fa-globe"></i>
+              Country *
+            </label>
+            <input type="text" id="editCountry" name="country" readonly >
+          </div>
+
+          <div class="form-group full-width">
+            <label for="editLandmark" class="form-label">
+              <i class="fas fa-map-marker-alt"></i>
+              Landmark (Optional)
+            </label>
+            <input type="text" id="editLandmark" name="landmark">
+          </div>
+
+          <div class="form-group">
+            <label for="editType" class="form-label">
+              <i class="fas fa-tag"></i>
+              Address Type *
+            </label>
+            <select id="editType" name="addressType" >
+              <option value="Home">🏠 Home</option>
+              <option value="Work">💼 Work</option>
+              <option value="Other">📦 Other</option>
+            </select>
+            <span class="error-message" id="editTypeError"></span>
+          </div>
+
+          <div class="form-group checkbox-group full-width">
+            <label class="checkbox-label">
+              <input type="checkbox" id="editIsDefault" name="isDefault" value="true">
+              <span class="checkmark"></span>
+              Set as default address
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeEditModal()">
+            <i class="fas fa-times"></i>
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i>
+            Update Address
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div id="deleteModal" class="modal">
+    <div class="modal-content confirmation-modal">
+      <div class="confirmation-icon">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <h3>Delete Address</h3>
+      <p>Are you sure you want to delete this address? This action cannot be undone.</p>
+      <div class="confirmation-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()">
+          <i class="fas fa-times"></i>
+          Cancel
+        </button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+          <i class="fas fa-trash"></i>
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <%- include('../partials/user/alert', { message, messageType }) %>
+  <%- include('../partials/user/footer') %>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+   <script src="/js/pincodeAutofill.js"></script>
+  <script src="/js/address.js"></script>
 </body>
 </html>

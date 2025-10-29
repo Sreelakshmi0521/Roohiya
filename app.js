@@ -21,7 +21,7 @@ app.set("view engine","ejs")
 app.set("views",path.join(__dirname,"views"))
 app.use(express.static(path.join(__dirname,"public")))
 app.use("/admin",expressLayouts)
-app.set('layout', 'layouts/mainLayout');
+app.set('layout', 'layouts/mainLayout')
 
 
 
@@ -37,14 +37,22 @@ app.use(session({
     secure: false
   } 
 }))
-app.use(nocache()); 
+
 
 app.use(passport.initialize())
 app.use(passport.session())
 
+app.use((req, res, next) => {
+  res.locals.user = req.session.user;
+  next();
+})
+
+app.use(nocache()) 
+
+
 app.use(methodOverride("_method"))
 
-app.use('/', landingRoutes);
+app.use('/', landingRoutes)
 app.use("/user",userRoutes)
 app.use("/admin",adminRoutes)
 
@@ -52,7 +60,7 @@ app.use((req, res) => {
   if (req.originalUrl.startsWith('/admin')) {
     res.status(404).render('admin/404', { layout: false})
   } else {
-    res.status(404).render('404');
+    res.status(404).render('404')
   }
 })
 

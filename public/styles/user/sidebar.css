@@ -1,0 +1,105 @@
+/* === Sidebar Section === */
+.profile-sidebar {
+  width: 280px;
+  background-color: #fff;
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+}
+
+/* === Profile Image Section === */
+.profile-image-section {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.profile-image {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin: 0 auto;
+  border: 3px solid #d4af37; /* gold border */
+}
+
+.profile-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-image-section h2 {
+  font-size: 18px;
+  margin-top: 10px;
+  color: #333;
+  font-weight: 600;
+}
+.profile-wrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 30px;
+  padding: 30px 80px;
+}
+
+.profile-sidebar {
+  flex: 0 0 250px;
+}
+
+.address-container {
+  flex: 1;
+  background: #fff;
+  border-radius: 10px;
+  padding: 25px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* === Navigation Section === */
+.profile-nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.profile-nav li {
+  margin-bottom: 12px;
+}
+
+.profile-nav a {
+  display: block;
+  padding: 12px 16px;
+  text-decoration: none;
+  color: #444;
+  font-weight: 500;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+/* === Active Link === */
+.profile-nav a.active {
+  background-color: #d4af37;
+  color: #fff;
+}
+
+/* === Hover Effect === */
+.profile-nav a:hover {
+  background-color: #f7e8b7;
+  color: #000;
+}
+
+/* === Responsive Sidebar === */
+@media (max-width: 768px) {
+  .profile-sidebar {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+
+  .profile-image-section h2 {
+    font-size: 16px;
+  }
+
+  .profile-nav a {
+    padding: 10px 14px;
+    font-size: 15px;
+  }
+}
