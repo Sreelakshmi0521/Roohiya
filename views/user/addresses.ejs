@@ -8,7 +8,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
   <link rel="stylesheet" href="/styles/user/common.css">
   <link rel="stylesheet" href="/styles/user/sidebar.css">
@@ -258,7 +257,7 @@
               Full Name *
             </label>
             <input type="text" id="editName" name="name" >
-            <span class="error-message" id="editNameError"></span>
+            <span class="error-message" id="nameEditError"></span>
           </div>
 
           <div class="form-group">
@@ -267,7 +266,7 @@
               Phone Number *
             </label>
             <input type="tel" id="editPhone" name="phone" maxlength="10" pattern="[6-9][0-9]{9}" >
-            <span class="error-message" id="editPhoneError"></span>
+            <span class="error-message" id="phoneEditError"></span>
           </div>
 
           <div class="form-group full-width">
@@ -276,7 +275,7 @@
               House / Building *
             </label>
             <input type="text" id="editHouse" name="houseName" >
-            <span class="error-message" id="editHouseError"></span>
+            <span class="error-message" id="houseNameEditError"></span>
           </div>
 
           <div class="form-group full-width">
@@ -285,7 +284,7 @@
               Locality / Area *
             </label>
             <input type="text" id="editLocality" name="locality" >
-            <span class="error-message" id="editLocalityError"></span>
+            <span class="error-message" id="localityEditError"></span>
           </div>
 
           <div class="form-group">
@@ -297,7 +296,7 @@
               <input type="text" id="editPincode" name="pincode" maxlength="6" pattern="[1-9][0-9]{5}" >
               <div id="editSpinner" class="spinner"></div>
             </div>
-            <span class="error-message" id="editPincodeError"></span>
+            <span class="error-message" id="pincodeEditError"></span>
           </div>
 
           <div class="form-group">
@@ -306,7 +305,7 @@
               City *
             </label>
             <input type="text" id="editCity" name="city" >
-            <span class="error-message" id="editCityError"></span>
+            <span class="error-message" id="cityEditError"></span>
           </div>
 
           <div class="form-group">
@@ -315,7 +314,7 @@
               State *
             </label>
             <input type="text" id="editState" name="state" readonly >
-            <span class="error-message" id="editStateError"></span>
+            <span class="error-message" id="stateEditError"></span>
           </div>
 
           <div class="form-group">
@@ -344,7 +343,7 @@
               <option value="Work">💼 Work</option>
               <option value="Other">📦 Other</option>
             </select>
-            <span class="error-message" id="editTypeError"></span>
+            <span class="error-message" id="addressTypeEditError"></span>
           </div>
 
           <div class="form-group checkbox-group full-width">

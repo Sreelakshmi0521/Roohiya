@@ -1,0 +1,50 @@
+
+const mongoose = require("mongoose");
+
+const cartSchema = new mongoose.Schema({
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      index: true,
+    },
+    items: [
+      {
+        productId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Product",
+          required: true,
+        },
+        productVariantId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "ProductVariant",
+          required: true,
+        },
+        quantity: {
+          type: Number,
+          required: true,
+          min: 1,
+          default: 1,
+            validate: {
+                validator: function (value) {
+                return value <= 10
+                },
+           message: "You can't add more than 10 items of this product"
+       }
+        },
+        priceAtTime: {
+          type: Number,
+          required: true,
+        },
+        discountedPriceAtTime: {
+          type: Number,
+        },
+      },
+    ],
+
+  },{ timestamps: true })
+
+
+const Cart =mongoose.model("Cart",cartSchema)
+module.exports=Cart
+

@@ -12,7 +12,7 @@ const passport=require("./config/passport")
 const expressLayouts=require("express-ejs-layouts")
 const methodOverride=require("method-override")
 const errorHandler=require("./middlewares/errorHandler")
-
+const cartCount=require("./middlewares/cartCount")
 
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
@@ -49,7 +49,7 @@ app.use((req, res, next) => {
 
 app.use(nocache()) 
 
-
+app.use(cartCount)
 app.use(methodOverride("_method"))
 
 app.use('/', landingRoutes)

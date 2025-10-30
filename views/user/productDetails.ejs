@@ -1,346 +1,313 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= pageTitle %></title>
-    <link rel="stylesheet" href="/styles/user/common.css">
-    <link rel="stylesheet" href="/styles/user/<%= pagecss %>">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= pageTitle %></title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="/styles/user/common.css" />
+  <link rel="stylesheet" href="/styles/user/<%= pagecss %>" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
 </head>
+
 <body>
-    <%- include('../partials/user/navbar') %>
+  <%- include('../partials/user/navbar') %>
 
-    <!-- Breadcrumbs -->
-    <section class="breadcrumb-section">
-        <div class="container">
-            <nav class="breadcrumb" aria-label="Breadcrumb">
-                <a href="/" class="breadcrumb-link">Home</a>
-                <span class="breadcrumb-separator">/</span>
-                <a href="/user/shop" class="breadcrumb-link">Shop</a>
-                <% if (product.category) { %>
-                    <span class="breadcrumb-separator">/</span>
-                    <a href="/user/shop?category=<%= product.category._id %>" class="breadcrumb-link"><%= product.category.name %></a>
-                <% } %>
-                <span class="breadcrumb-separator">/</span>
-                <span class="breadcrumb-current"><%= product.name %></span>
-            </nav>
+  <!-- Breadcrumb -->
+  <section class="breadcrumb-section">
+    <div class="container">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="/" class="breadcrumb-link">Home</a>
+        <span class="breadcrumb-separator">/</span>
+        <a href="/user/shop" class="breadcrumb-link">Shop</a>
+        <% if (product.category) { %>
+          <span class="breadcrumb-separator">/</span>
+          <a href="/user/shop?category=<%= product.category._id %>" class="breadcrumb-link"><%= product.category.name %></a>
+        <% } %>
+        <span class="breadcrumb-separator">/</span>
+        <span class="breadcrumb-current"><%= product.name %></span>
+      </nav>
+    </div>
+  </section>
+
+  <!-- Product Details -->
+  <main class="product-details-main">
+    <div class="container">
+
+      <% if (!selectedVariant) { %>
+        <div class="error-state">
+          <i class="fas fa-exclamation-triangle"></i>
+          <h2>Product Unavailable</h2>
+          <p>This product is currently not available.</p>
+          <a href="/user/shop" class="btn-primary">Continue Shopping</a>
         </div>
-    </section>
+      <% } else { %>
 
-    <!-- Product Details -->
-    <main class="product-details-main">
-        <div class="container">
-            <% if (!selectedVariant) { %>
-                <div class="error-state">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <h2>Product Unavailable</h2>
-                    <p>This product is currently not available.</p>
-                    <a href="/user/shop" class="btn-primary">Continue Shopping</a>
+        <div class="product-details-layout">
+
+          <!-- Product Images -->
+          <div class="product-images-section">
+            <div class="main-image-container" id="zoom-container">
+              <img 
+                id="main-product-image" 
+                src="<%= selectedVariant.images && selectedVariant.images[0] ? selectedVariant.images[0] : '/images/placeholder.jpg' %>" 
+                alt="<%= product.name %>"
+                class="zoom-image"
+              />
+              <% if (selectedVariant.stock === 0) { %>
+                <div class="stock-badge out-of-stock">Out of Stock</div>
+              <% } else if (selectedVariant.stock < 10) { %>
+                <div class="stock-badge low-stock">Only <%= selectedVariant.stock %> Left</div>
+              <% } %>
+            </div>
+
+            <div class="image-thumbnails">
+              <% if (selectedVariant.images && selectedVariant.images.length > 0) { %>
+                <% selectedVariant.images.forEach((image, index) => { %>
+                  <div class="thumbnail <%= index === 0 ? 'active' : '' %>" data-image="<%= image %>">
+                    <img src="<%= image %>" alt="<%= product.name %> <%= index + 1 %>">
+                  </div>
+                <% }) %>
+              <% } else { %>
+                <div class="thumbnail active" data-image="/images/placeholder.jpg">
+                  <img src="/images/placeholder.jpg" alt="No image available">
                 </div>
-            <% } else { %>
-                <div class="product-details-layout">
-                    <!-- Product Images -->
-                    <div class="product-images-section">
-                        <div class="main-image-container" id="zoom-container">
-                            <img 
-                                id="main-product-image" 
-                                src="<%= selectedVariant.images && selectedVariant.images[0] ? selectedVariant.images[0] : '/images/placeholder.jpg' %>" 
-                                alt="<%= product.name %>"
-                                class="zoom-image"
-                            >
-                            <% if (selectedVariant.stock === 0) { %>
-                                <div class="stock-badge out-of-stock">Out of Stock</div>
-                            <% } else if (selectedVariant.stock < 10) { %>
-                                <div class="stock-badge low-stock">Only <%= selectedVariant.stock %> Left</div>
-                            <% } %>
-                        </div>
-                        
-                        <div class="image-thumbnails">
-                            <% if (selectedVariant.images && selectedVariant.images.length > 0) { %>
-                                <% selectedVariant.images.forEach((image, index) => { %>
-                                    <div class="thumbnail <%= index === 0 ? 'active' : '' %>" data-image="<%= image %>">
-                                        <img src="<%= image %>" alt="<%= product.name %> <%= index + 1 %>">
-                                    </div>
-                                <% }) %>
-                            <% } else { %>
-                                <div class="thumbnail active" data-image="/images/placeholder.jpg">
-                                    <img src="/images/placeholder.jpg" alt="No image available">
-                                </div>
-                            <% } %>
-                        </div>
-                    </div>
+              <% } %>
+            </div>
+          </div>
 
-                    <!-- Product Info -->
-                    <div class="product-info-section">
-                        <h1 class="product-title"><%= product.name %></h1>
-                        
-                        <!-- Ratings -->
-                        <div class="product-ratings">
-                            <div class="rating-stars">
-                                <% for (let i = 1; i <= 5; i++) { %>
-                                    <i class="fas fa-star <%= i <= averageRating ? 'active' : '' %>"></i>
-                                <% } %>
-                            </div>
-                            <span class="rating-value"><%= averageRating %></span>
-                            <span class="rating-count">(<%= totalReviews %> reviews)</span>
-                        </div>
+          <!-- Product Info -->
+          <div class="product-info-section">
+            <h1 class="product-title"><%= product.name %></h1>
 
-                        <!-- Price -->
-                        <div class="product-pricing">
-                            <% if (selectedVariant.discountedPrice && selectedVariant.discountedPrice < selectedVariant.price) { %>
-                                <span class="current-price">₹<%= selectedVariant.discountedPrice %></span>
-                                <span class="original-price">₹<%= selectedVariant.price %></span>
-                                <span class="discount-percent">
-                                    Save <%= Math.round((1 - selectedVariant.discountedPrice / selectedVariant.price) * 100) %>%
-                                </span>
-                            <% } else { %>
-                                <span class="current-price">₹<%= selectedVariant.price %></span>
-                            <% } %>
-                        </div>
-                        
-
-                        <!-- Stock Status -->
-                        <div class="stock-status">
-                            <% if (selectedVariant.stock === 0) { %>
-                                <div class="stock-out">
-                                    <i class="fas fa-times-circle"></i>
-                                    <span>Out of Stock</span>
-                                </div>
-                            <% } else if (selectedVariant.stock < 10) { %>
-                                <div class="stock-low">
-                                    <i class="fas fa-exclamation-triangle"></i>
-                                    <span>Only <%= selectedVariant.stock %> left in stock</span>
-                                </div>
-                            <% } else { %>
-                                <div class="stock-in">
-                                    <i class="fas fa-check-circle"></i>
-                                    <span>In Stock</span>
-                                </div>
-                            <% } %>
-                        </div>
-                                                
-                        <!-- Simple Highlights -->
-                        <% if (product.highlights && product.highlights.length > 0) { %>
-                            <div class="product-highlights">
-                                <h3> Highlights</h3>
-                                <ul>
-                                    <% product.highlights.forEach(highlight => { %>
-                                        <li><i class="fas fa-check"></i> <%= highlight %></li>
-                                    <% }) %>
-                                </ul>
-                            </div>
-                        <% } %>
-
-                        <!-- Variants -->
-                        <% if (variants.length > 1) { %>
-                            <div class="variant-selector">
-                                <label class="variant-label">Color:</label>
-                                <div class="variant-options">
-                                    <% variants.forEach(variant => { %>
-                                        <div class="variant-option <%= variant._id.toString() === selectedVariant._id.toString() ? 'active' : '' %> 
-                                            <%= variant.stock === 0 ? 'out-of-stock' : '' %>"
-                                             data-variant-id="<%= variant._id %>">
-                                            <span class="variant-color"><%= variant.color %></span>
-                                            <% if (variant.stock === 0) { %>
-                                                <span class="variant-stock-label">Out of Stock</span>
-                                            <% } %>
-                                        </div>
-                                    <% }) %>
-                                </div>
-                            </div>
-                        <% } %>
-                          
-                        
-                        <!-- Product Description -->
-                        <div class="product-description">
-                            <h3>Description</h3>
-                            <p><%= product.description %></p>
-                        </div>
-
-                        <!-- Add to Cart -->
-                        <div class="add-to-cart-section">
-                            <div class="quantity-selector">
-                                <button class="quantity-btn minus-btn" <%= selectedVariant.stock === 0 ? 'disabled' : '' %>>-</button>
-                                <input type="number" class="quantity-input" value="1" min="1" max="<%= selectedVariant.stock %>" 
-                                    <%= selectedVariant.stock === 0 ? 'disabled' : '' %>>
-                                <button class="quantity-btn plus-btn" <%= selectedVariant.stock === 0 ? 'disabled' : '' %>>+</button>
-                            </div>
-                            
-                            <div class="action-buttons">
-                                <button class="add-to-cart-btn <%= selectedVariant.stock === 0 ? 'disabled' : '' %>" 
-                                    <%= selectedVariant.stock === 0 ? 'disabled' : '' %>>
-                                    <% if (selectedVariant.stock === 0) { %>
-                                        <i class="fas fa-times"></i> Out of Stock
-                                    <% } else { %>
-                                        <i class="fas fa-shopping-bag"></i> Add to Cart
-                                    <% } %>
-                                </button>
-                                
-                                <button class="wishlist-btn" title="Add to Wishlist">
-                                    <i class="far fa-heart"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Additional Info -->
-                        <div class="product-meta">
-                            <div class="meta-item">
-                                <i class="fas fa-shield-alt"></i>
-                                <span>COD available</span>
-                            </div>
-                            <div class="meta-item">
-                                <i class="fas fa-truck"></i>
-                                <span>Free Shipping</span>
-                            </div>
-                            <div class="meta-item">
-                                <i class="fas fa-undo"></i>
-                                <span>10 Days Returnable</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Reviews Section -->
-                <section class="reviews-section">
-                    <div class="section-header">
-                        <h2>Customer Reviews</h2>
-                    </div>
-
-                    <!-- Add Review Form - Only show if user is logged in -->
-                    <% if (user) { %>
-                        <div class="add-review-section">
-                            <h3>Write a Review</h3>
-                            <form id="review-form" class="review-form">
-                                <input type="hidden" id="product-id" value="<%= product._id %>">
-                                
-                                <div class="rating-input">
-                                    <label>Your Rating:</label>
-                                    <div class="star-rating">
-                                        <% for (let i = 1; i <= 5; i++) { %>
-                                            <i class="fas fa-star" data-rating="<%= i %>"></i>
-                                        <% } %>
-                                    </div>
-                                    <input type="hidden" id="rating-value" name="rating" required>
-                                </div>
-
-                                <div class="comment-input">
-                                    <label for="review-comment">Your Review:</label>
-                                    <textarea 
-                                        id="review-comment" 
-                                        name="comment" 
-                                        placeholder="Share your experience with this product..." 
-                                        rows="4" 
-                                        required
-                                    ></textarea>
-                                </div>
-
-                                <button type="submit" class="submit-review-btn">
-                                    <i class="fas fa-paper-plane"></i> Submit Review
-                                </button>
-                            </form>
-                        </div>
-                    <% } else { %>
-                        <div class="login-prompt">
-                            <p>
-                                <a href="/user/login" class="login-link">Login</a> to write a review
-                            </p>
-                        </div>
-                    <% } %>
-
-                    <!-- Existing Reviews Display -->
-                    <% if (reviews.length > 0) { %>
-                        <div class="reviews-grid">
-                            <% reviews.forEach(review => { %>
-                                <div class="review-card">
-                                    <div class="review-header">
-                                        <div class="reviewer-info">
-                                                        <span class="reviewer-name">
-                                                        <%= review.user ? review.user.name : 'Anonymous' %>
-                                                        </span>
-                                            <div class="review-rating">
-                                                <% for (let i = 1; i <= 5; i++) { %>
-                                                    <i class="fas fa-star <%= i <= review.rating ? 'active' : '' %>"></i>
-                                                <% } %>
-                                            </div>
-                                        </div>
-                                        <span class="review-date"><%= new Date(review.createdAt).toLocaleDateString() %></span>
-                                    </div>
-                                    <p class="review-content"><%= review.comment %></p>
-                                </div>
-                            <% }) %>
-                        </div>
-                    <% } else { %>
-                        <div class="no-reviews">
-                            <i class="fas fa-comment"></i>
-                            <p>No reviews yet. Be the first to review this product!</p>
-                        </div>
-                    <% } %>
-                </section>
-
-                <!-- Related Products -->
-                <% if (relatedProducts.length > 0) { %>
-                    <section class="related-products">
-                        <div class="section-header">
-                            <h2>Similar Products</h2>
-                        </div>
-                        <div class="related-products-grid">
-                            <% relatedProducts.forEach(relatedProduct => { 
-                                const relatedVariant = relatedProduct.variants[0];
-                            %>
-                                <div class="related-product-card">
-                                    <a href="/user/product/<%= relatedProduct._id %>" class="related-product-link">
-                                        <div class="related-product-image">
-                                            <img src="<%= relatedVariant.images && relatedVariant.images[0] ? relatedVariant.images[0] : '/images/placeholder.jpg' %>" 
-                                                 alt="<%= relatedProduct.name %>">
-                                            <% if (relatedVariant.stock === 0) { %>
-                                                <div class="stock-badge out-of-stock">Out of Stock</div>
-                                            <% } else if (relatedVariant.stock < 10) { %>
-                                                <div class="stock-badge low-stock">Only <%= relatedVariant.stock %> Left</div>
-                                            <% } %>
-                                        </div>
-                                        <div class="related-product-info">
-                                            <h4 class="related-product-name"><%= relatedProduct.name %></h4>
-                                            <div class="related-product-rating">
-                                                <div class="rating-stars small">
-                                                    <% for (let i = 1; i <= 5; i++) { %>
-                                                        <i class="fas fa-star <%= i <= (relatedProduct.averageRating || 0) ? 'active' : '' %>"></i>
-                                                    <% } %>
-                                                </div>
-                                                <span class="rating-value small">(<%= relatedProduct.totalReviews || 0 %>)</span>
-                                            </div>
-                                            <div class="related-product-pricing">
-                                                <% if (relatedVariant.discountedPrice && relatedVariant.discountedPrice < relatedVariant.price) { %>
-                                                    <span class="current-price small">₹<%= relatedVariant.discountedPrice %></span>
-                                                    <span class="original-price small">₹<%= relatedVariant.price %></span>
-                                                    <span class="discount-percent small">
-                                                        Save <%= Math.round((1 - relatedVariant.discountedPrice / relatedVariant.price) * 100) %>% 
-                                                    </span>
-                                                <% } else { %>
-                                                    <span class="current-price small">₹<%= relatedVariant.price %></span>
-                                                <% } %>
-                                            </div>
-                                            <button class="add-to-cart-btn small" title="Quick Add to Cart">
-                                                <i class="fas fa-shopping-bag"></i> Add
-                                            </button>
-                                        </div>
-                                    </a>
-                                </div>
-                            <% }) %>
-                        </div>
-                    </section>
+            <!-- Ratings -->
+            <div class="product-ratings">
+              <div class="rating-stars">
+                <% for (let i = 1; i <= 5; i++) { %>
+                  <i class="fas fa-star <%= i <= averageRating ? 'active' : '' %>"></i>
                 <% } %>
+              </div>
+              <span class="rating-value"><%= averageRating %></span>
+              <span class="rating-count">(<%= totalReviews %> reviews)</span>
+            </div>
+
+            <!-- Price -->
+            <div class="product-pricing">
+              <% if (selectedVariant.discountedPrice && selectedVariant.discountedPrice < selectedVariant.price) { %>
+                <span class="current-price">₹<%= selectedVariant.discountedPrice %></span>
+                <span class="original-price">₹<%= selectedVariant.price %></span>
+                <span class="discount-percent">
+                  Save <%= Math.round((1 - selectedVariant.discountedPrice / selectedVariant.price) * 100) %>%
+                </span>
+              <% } else { %>
+                <span class="current-price">₹<%= selectedVariant.price %></span>
+              <% } %>
+            </div>
+
+            <!-- Stock Status -->
+            <div class="stock-status">
+              <% if (selectedVariant.stock === 0) { %>
+                <div class="stock-out">
+                  <i class="fas fa-times-circle"></i> Out of Stock
+                </div>
+              <% } else if (selectedVariant.stock < 10) { %>
+                <div class="stock-low">
+                  <i class="fas fa-exclamation-triangle"></i> Only <%= selectedVariant.stock %> left
+                </div>
+              <% } else { %>
+                <div class="stock-in">
+                  <i class="fas fa-check-circle"></i> In Stock
+                </div>
+              <% } %>
+            </div>
+
+            <!-- Highlights -->
+            <% if (product.highlights && product.highlights.length > 0) { %>
+              <div class="product-highlights">
+                <h3>Highlights</h3>
+                <ul>
+                  <% product.highlights.forEach(highlight => { %>
+                    <li><i class="fas fa-check"></i> <%= highlight %></li>
+                  <% }) %>
+                </ul>
+              </div>
             <% } %>
+
+            <!-- Variants -->
+            <% if (variants.length > 1) { %>
+              <div class="variant-selector">
+                <label>Color:</label>
+                <div class="variant-options">
+                  <% variants.forEach(variant => { %>
+                    <div 
+                      class="variant-option <%= variant._id.toString() === selectedVariant._id.toString() ? 'active' : '' %> <%= variant.stock === 0 ? 'out-of-stock' : '' %>" 
+                      data-variant-id="<%= variant._id %>">
+                      <span><%= variant.color %></span>
+                      <% if (variant.stock === 0) { %>
+                        <span class="variant-stock-label">Out of Stock</span>
+                      <% } %>
+                    </div>
+                  <% }) %>
+                </div>
+              </div>
+            <% } %>
+
+            <!-- Description -->
+            <div class="product-description">
+              <h3>Description</h3>
+              <p><%= product.description %></p>
+            </div>
+
+            <!-- Add to Cart Section -->
+            <div class="add-to-cart-section">
+              <div class="quantity-selector">
+                <button class="quantity-btn minus-btn">-</button>
+                <input type="number" class="quantity-input" value="1" min="1" max="<%= selectedVariant.stock %>" />
+                <button class="quantity-btn plus-btn">+</button>
+              </div>
+
+              <div class="action-buttons">
+                <button 
+                  class="add-to-cart-btn <%= selectedVariant.stock === 0 ? 'disabled' : '' %>" 
+                  data-product-id="<%= product._id %>" 
+                  data-variant-id="<%= selectedVariant._id %>"
+                  <%= selectedVariant.stock === 0 ? 'disabled' : '' %>>
+                  <% if (selectedVariant.stock === 0) { %>
+                    <i class="fas fa-times"></i> Out of Stock
+                  <% } else { %>
+                    <i class="fas fa-shopping-bag"></i> Add to Cart
+                  <% } %>
+                </button>
+
+                <button class="wishlist-btn" title="Add to Wishlist">
+                  <i class="far fa-heart"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Additional Info -->
+            <div class="product-meta">
+              <div class="meta-item"><i class="fas fa-shield-alt"></i> COD available</div>
+              <div class="meta-item"><i class="fas fa-truck"></i> Free Shipping</div>
+              <div class="meta-item"><i class="fas fa-undo"></i> 10 Days Returnable</div>
+            </div>
+          </div>
         </div>
-    </main>
 
-    <%- include('../partials/user/footer') %>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <!-- Reviews Section -->
+        <section class="reviews-section">
+          <div class="section-header"><h2>Customer Reviews</h2></div>
 
-    <script src="/js/productDetails.js"></script>
-    <script src="/js/reviewSub.js"></script>
+          <% if (user) { %>
+            <div class="add-review-section">
+              <h3>Write a Review</h3>
+              <form id="review-form">
+                <input type="hidden" id="product-id" value="<%= product._id %>" />
+                <div class="rating-input">
+                  <label>Your Rating:</label>
+                  <div class="star-rating">
+                    <% for (let i = 1; i <= 5; i++) { %>
+                      <i class="fas fa-star" data-rating="<%= i %>"></i>
+                    <% } %>
+                  </div>
+                  <input type="hidden" id="rating-value" name="rating"  />
+                </div>
+                <div class="comment-input">
+                  <label for="review-comment">Your Review:</label>
+                  <textarea id="review-comment" name="comment" rows="4" placeholder="Share your experience..." ></textarea>
+                </div>
+                <button type="submit" class="submit-review-btn">
+                  <i class="fas fa-paper-plane"></i> Submit Review
+                </button>
+              </form>
+            </div>
+          <% } else { %>
+            <div class="login-prompt">
+              <p><a href="/user/login" class="login-link">Login</a> to write a review</p>
+            </div>
+          <% } %>
+
+          <% if (reviews.length > 0) { %>
+            <div class="reviews-grid">
+              <% reviews.forEach(review => { %>
+                <div class="review-card">
+                  <div class="review-header">
+                    <div class="reviewer-info">
+                      <span class="reviewer-name"><%= review.user ? review.user.name : 'Anonymous' %></span>
+                      <div class="review-rating">
+                        <% for (let i = 1; i <= 5; i++) { %>
+                          <i class="fas fa-star <%= i <= review.rating ? 'active' : '' %>"></i>
+                        <% } %>
+                      </div>
+                    </div>
+                    <span class="review-date"><%= new Date(review.createdAt).toLocaleDateString() %></span>
+                  </div>
+                  <p class="review-content"><%= review.comment %></p>
+                </div>
+              <% }) %>
+            </div>
+          <% } else { %>
+            <div class="no-reviews">
+              <i class="fas fa-comment"></i>
+              <p>No reviews yet. Be the first to review this product!</p>
+            </div>
+          <% } %>
+        </section>
+
+        <!-- Related Products -->
+        <% if (relatedProducts.length > 0) { %>
+          <section class="related-products">
+            <div class="section-header"><h2>Similar Products</h2></div>
+            <div class="related-products-grid">
+              <% relatedProducts.forEach(relatedProduct => { 
+                const relatedVariant = relatedProduct.variants[0];
+              %>
+                <div class="related-product-card">
+                  <a href="/user/product/<%= relatedProduct._id %>" class="related-product-link">
+                    <div class="related-product-image">
+                      <img src="<%= relatedVariant.images && relatedVariant.images[0] ? relatedVariant.images[0] : '/images/placeholder.jpg' %>" alt="<%= relatedProduct.name %>" />
+                    </div>
+                    <div class="related-product-info">
+                      <h4><%= relatedProduct.name %></h4>
+                      <div class="related-product-pricing">
+                        <% if (relatedVariant.discountedPrice && relatedVariant.discountedPrice < relatedVariant.price) { %>
+                          <span class="current-price small">₹<%= relatedVariant.discountedPrice %></span>
+                          <span class="original-price small">₹<%= relatedVariant.price %></span>
+                          <span class="discount-percent small">
+                            Save <%= Math.round((1 - relatedVariant.discountedPrice / relatedVariant.price) * 100) %>%
+                          </span>
+                        <% } else { %>
+                          <span class="current-price small">₹<%= relatedVariant.price %></span>
+                        <% } %>
+                      </div>
+                    </div>
+                  </a>
+                  <a href="/user/shop" class="add-to-cart-btn shop-now-btn">
+                    <i class="fas fa-store"></i> Shop Now
+                  </a>
+                </div>
+              <% }) %>
+            </div>
+          </section>
+        <% } %>
+      <% } %>
+    </div>
+  </main>
+
+  <%- include('../partials/user/footer') %>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+  <script src="/js/productDetails.js"></script>
+  <script src="/js/reviewSub.js"></script>
+    <script src="/js/cartAction.js"></script>
+
 </body>
 </html>

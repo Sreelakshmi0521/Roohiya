@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="/styles/user/common.css">
   <link rel="stylesheet" href="/styles/user/<%= pagecss %>">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 </head>
 <body>
   <%- include('../partials/user/navbar') %>
@@ -48,10 +49,7 @@
             <img src="<%= category.image || '/images/placeholder-category.jpg' %>" 
                  alt="<%= category.name || 'Category' %>">
             <div class="category-overlay">
-              <h3 class="category-title">
-                <%= category.name %>
-              </h3>
-              
+              <h3 class="category-title"><%= category.name %></h3>
               <a href="/user/shop?category=<%= category._id %>" class="category-link">
                 Explore <i class="fas fa-arrow-right"></i>
               </a>
@@ -91,9 +89,20 @@
                           : '/images/placeholder.jpg' %>" 
                   alt="<%= product.name %>">
               </a>
-              <div class="product-actions">
-                <button class="wishlist-btn"><i class="far fa-heart"></i></button>
-              </div>
+             <div class="product-actions">
+  <!-- Wishlist Button -->
+  <button class="wishlist-btn" title="Add to Wishlist">
+    <i class="far fa-heart"></i>
+  </button>
+
+  <!-- Quick View Button -->
+  <button class="quick-view-btn" 
+          title="Quick View"
+          onclick="window.location.href='/user/product/<%= product._id %>'">
+    <i class="fas fa-eye"></i>
+  </button>
+</div>
+
 
               <% if (!product.isAvailable) { %>
                 <span class="out-of-stock">Out of Stock</span>
@@ -113,7 +122,9 @@
                   <% } %>
                 </div>
                 <p class="product-color">Color: <%= displayVariant.color || '-' %></p>
-                <button class="add-to-cart-btn">Add to Cart</button>
+
+              
+
               <% } else { %>
                 <p class="product-price">Unavailable</p>
                 <p class="product-color">Color: -</p>
@@ -131,6 +142,10 @@
       <% } %>
     </div>
   </section>
+
   <%- include('../partials/user/footer') %>
+  
+  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </body>
 </html>
