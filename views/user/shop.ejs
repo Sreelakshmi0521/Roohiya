@@ -147,13 +147,35 @@
           <i class="far fa-heart"></i>
         </button>
       </div>
+<%
+  let badgeLabel = "";
+  let badgeClass = "";
 
-    <% if (hasDiscount && !isOutOfStock) { %>
-  <span class="discount-badge">Sale</span>
-<% } %>
+  const categoryIsUnlisted =
+    product.category &&
+    typeof product.category === "object" &&
+    product.category.isListed === false;
 
-<% if (isOutOfStock) { %>
-  <span class="out-of-stock-badge">Out of Stock</span>
+  if (categoryIsUnlisted) {
+    badgeLabel = "Unavailable";
+    badgeClass = "unavailable-badge";
+  } else if (!displayVariant || !displayVariant.isListed) {
+    badgeLabel = "Unavailable";
+    badgeClass = "unavailable-badge";
+  } else if (isOutOfStock) {
+    badgeLabel = "Out of Stock";
+    badgeClass = "out-of-stock-badge";
+  } else if (displayVariant.stock <= 5) {
+    badgeLabel = "Limited Stock";
+    badgeClass = "limited-stock-badge";
+  } else if (hasDiscount) {
+    badgeLabel = "Sale";
+    badgeClass = "discount-badge";
+  }
+%>
+
+<% if (badgeLabel) { %>
+  <span class="product-badge <%= badgeClass %>"><%= badgeLabel %></span>
 <% } %>
 
     </div>
@@ -177,9 +199,14 @@
 
   <!-- Action Buttons (Wishlist + Quick View) -->
   <div class="product-actions">
-    <button class="wishlist-btn" title="Add to Wishlist">
-      <i class="far fa-heart"></i>
-    </button>
+   <button 
+  class="wishlist-btn"
+  data-product-id="<%= product._id %>" 
+  data-variant-id="<%= displayVariant ? displayVariant._id : '' %>"
+  title="Add to Wishlist">
+  <i class="far fa-heart"></i>
+</button>
+
     <button class="quick-view-btn" 
             title="Quick View"
             onclick="window.location.href='/user/product/<%= product._id %>'">
@@ -261,6 +288,8 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
       <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+          <script src="/js/wishlist.js"></script>
+
 
 
 </body>

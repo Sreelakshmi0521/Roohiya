@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= pageTitle || "Roohiya" %></title>
+  <title><%= pageTitle %></title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="/styles/user/common.css">
@@ -90,9 +90,13 @@
               </a>
               <div class="product-actions">
   <!-- Wishlist Button -->
-  <button class="wishlist-btn" title="Add to Wishlist">
-    <i class="far fa-heart"></i>
-  </button>
+ <button 
+  class="wishlist-btn" 
+  data-product-id="<%= product._id %>" 
+  data-variant-id="<%= displayVariant ? displayVariant._id : '' %>"
+  title="Add to Wishlist">
+  <i class="far fa-heart"></i>
+</button>
 
   <!-- Quick View Button -->
   <button class="quick-view-btn" 
@@ -102,10 +106,10 @@
   </button>
 </div>
 
-
+<!-- 
               <% if (!product.isAvailable) { %>
                 <span class="out-of-stock">Out of Stock</span>
-              <% } %>
+              <% } %> -->
             </div>
 
             <div class="product-info">
@@ -127,7 +131,6 @@
               <% } else { %>
                 <p class="product-price">Unavailable</p>
                 <p class="product-color">Color: -</p>
-                <button class="add-to-cart-btn" disabled>Out of Stock</button>
               <% } %>
             </div>
           </div>

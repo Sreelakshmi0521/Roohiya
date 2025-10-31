@@ -14,10 +14,13 @@ const isLogin=(req,res,next)=>{
 
 const requireLogin=(req,res,next)=>{
     if(!req.session.user){
-        return  res.redirect("/user/login")
+     if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+      return res.status(401).json({ success: false, message: "Please login first!" });
     }
-    next()
-}
+    return  res.redirect("/user/login")
+  }
+  next()
+  }
 const requireTempuser=(req,res,next)=>{
     if(!req.session.tempUser){
         return res.redirect("/user/signup")

@@ -46,7 +46,7 @@ const loadShop=async(req,res)=>{
         }
       
 
-        let products=await Product.find(prdFilter).lean()
+        let products=await Product.find(prdFilter).populate("category", "name isListed").lean()
 
         products=await Promise.all(
             products.map(async(product)=>{
@@ -64,7 +64,8 @@ const loadShop=async(req,res)=>{
              })
         )
 
-        products =products.filter(p=>p.variants.length>0)
+       products = products.filter((p) => p.category && p.variants.length > 0);
+
        const getDisplayPrice = (product) => {
             if(!product.variants || product.variants.length===0) return Infinity
             const variant = product.variants[0]

@@ -13,6 +13,8 @@ const expressLayouts=require("express-ejs-layouts")
 const methodOverride=require("method-override")
 const errorHandler=require("./middlewares/errorHandler")
 const cartCount=require("./middlewares/cartCount")
+const wishlistCount=require("./middlewares/wishlistCount");
+
 
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
@@ -50,6 +52,7 @@ app.use((req, res, next) => {
 app.use(nocache()) 
 
 app.use(cartCount)
+app.use(wishlistCount)
 app.use(methodOverride("_method"))
 
 app.use('/', landingRoutes)

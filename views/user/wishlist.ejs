@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= pageTitle %></title>
+    <link rel="stylesheet" href="wishlist.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <link rel="stylesheet" href="/styles/user/common.css">
+  <link rel="stylesheet" href="/styles/user/<%= pagecss %>">
+</head>
+<body>
+        <%- include('../partials/user/navbar') %>
+    <!-- Wishlist Container -->
+    <div class="wishlist-container">
+        <h1>My Wishlist</h1>
+        
+        <!-- Wishlist Header -->
+        <div class="wishlist-header">
+            <div class="wishlist-count">
+                <span id="wishlist-count">0</span> items
+            </div>
+            <div class="wishlist-actions">
+                <button class="clear-wishlist-btn" id="clear-wishlist">
+                    <i class="fas fa-trash-alt"></i> Clear All
+                </button>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" id="empty-wishlist">
+            <i class="far fa-heart"></i>
+            <p>Your wishlist is empty</p>
+            <p class="empty-subtext">Start adding items you love!</p>
+            <button class="btn btn-primary" onclick="window.location.href='/user/products'">
+                <i class="fas fa-shopping-bag"></i> Browse Products
+            </button>
+        </div>
+
+        <!-- Wishlist Items -->
+        <div class="wishlist-items" id="wishlist-items">
+            <!-- Wishlist items will be dynamically populated here -->
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal" id="confirmation-modal">
+        <div class="modal-content confirmation-modal">
+            <div class="confirmation-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3>Clear Wishlist</h3>
+            <p>Are you sure you want to remove all items from your wishlist? This action cannot be undone.</p>
+            <div class="confirmation-actions">
+                <button class="btn btn-secondary" id="cancel-clear">Cancel</button>
+                <button class="btn btn-danger" id="confirm-clear">Clear All</button>
+            </div>
+        </div>
+    </div>
+  <%- include('../partials/user/footer') %>
+    <script src="/js/wishlist.js"></script>
+</body>
+</html>

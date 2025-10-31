@@ -10,7 +10,7 @@ const addressRoutes=require("./addressRoutes")
 const productRoutes=require("./productRoutes")
 const reviewRoutes=require("./reviewRoutes")
 const cartRoutes=require("./cartRoutes")
-
+const wishlistRoutes=require("./wishlistRoutes")
 
 
 router.use("/",authRoutes)
@@ -19,5 +19,6 @@ router.use("/",reviewRoutes)
 router.use("/",profileRoutes)
 router.use("/",addressRoutes)
 router.use("/",cartRoutes)
+router.use("/",wishlistRoutes)
 
 module.exports=router

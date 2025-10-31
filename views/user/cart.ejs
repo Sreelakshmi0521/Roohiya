@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
   <link rel="stylesheet" href="/styles/user/common.css">
   <link rel="stylesheet" href="/styles/user/<%= pagecss %>">
 </head>
@@ -60,14 +59,14 @@
 
                                             <% if (item.productVariantId.stock > 0) { %>
                                               <p class="product-stock">
-                                                <span class="in-stock">In Stock (<%= item.productVariantId.stock %> available)</span>
+                                                <span class="in-stock">In Stock <%= item.productVariantId.stock %></span>
                                               </p>
                                             <% } else { %>
                                               <p class="product-stock">
                                                 <span class="out-of-stock">Out of Stock</span>
                                               </p>
                                               <p class="stock-warning">
-                                              This item is currently unavailable. Please remove it before checkout.
+                                             Please remove it before checkout.
                                               </p>
                                             <% } %>
                                           </div>
@@ -82,23 +81,37 @@
                                     <div class="current-price">₹<%= item.priceAtTime.toFixed(2) %></div>
                                         <% } %>
                                     </div>
-                                    
-                                    <div class="item-quantity">
-                                        <div class="quantity-controls">
-                                            <button class="quantity-btn minus" data-id="<%= item._id %>" <%= item.quantity <= 1 ? 'disabled' : '' %>>
-                                                <i class="fas fa-minus"></i>
-                                            </button>
-                                            <input type="number" class="quantity-input" value="<%= item.quantity %>" min="1" max="10" data-id="<%= item._id %>" data-stock="<%= item.productVariantId.stock %>">
-                                            <button class="quantity-btn plus" data-id="<%= item._id %>" <%= item.quantity >= 10 || item.quantity >= item.productVariantId.stock ? 'disabled' : '' %>>
-                                                <i class="fas fa-plus"></i>
-                                            </button>
-                                        </div>
-                                        <% if (item.quantity >= 10) { %>
-                                            <p class="quantity-warning">Max 10 items allowed</p>
-                                        <% } else if (item.quantity >= item.productVariantId.stock) { %>
-                                            <p class="quantity-warning">Only <%= item.productVariantId.stock %> items available</p>
-                                        <% } %>
-                                    </div>
+                                  <div class="item-quantity">
+  <div class="quantity-controls">
+
+    <!-- Minus -->
+    <button class="quantity-btn minus"
+      data-product-id="<%= item.productId._id || item.productId %>"
+      data-variant-id="<%= item.productVariantId._id || item.productVariantId %>">
+      <i class="fas fa-minus"></i>
+    </button>
+
+    <!-- Number input -->
+    <input type="number" class="quantity-input"
+      value="<%= item.quantity %>"
+      min="1"
+      max="10"
+      data-product-id="<%= item.productId._id || item.productId %>"
+      data-variant-id="<%= item.productVariantId._id || item.productVariantId %>"
+      data-stock="<%= item.productVariantId.stock %>">
+
+    <!-- Plus -->
+    <button class="quantity-btn plus"
+      data-product-id="<%= item.productId._id || item.productId %>"
+      data-variant-id="<%= item.productVariantId._id || item.productVariantId %>">
+      <i class="fas fa-plus"></i>
+    </button>
+
+  </div>
+
+ 
+</div>
+
                                     
                                     <div class="item-total">
                                         <% 
@@ -166,16 +179,13 @@
                         <span class="total-amount">₹<%= total.toFixed(2) %></span>
                             </div>
                             
-                            <div class="promo-code">
-                                <input type="text" placeholder="Promo Code" id="promo-code-input">
-                                <button class="apply-btn" id="apply-promo">Apply</button>
-                            </div>
+                  
                                         <% if (outOfStockItems.length > 0) { %>
-  <p class="warning-text">
-    Some items are out of stock and will not be included in your checkout.
-  </p>
-<% } %>
-                      
+                                            <p class="warning-text" style="color: brown;">
+                                              Some items are out of stock and will not be included in your checkout.
+                                            </p>
+                                          <% } %>
+                                                                
                                                                       
                                       <button 
                                         class="checkout-btn" 
@@ -226,10 +236,32 @@
     </div>
 
 
-    
+    <!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="modal">
+  <div class="modal-content confirmation-modal">
+    <div class="confirmation-icon">
+      <i class="fas fa-exclamation-triangle"></i>
+    </div>
+    <h3>Remove Item</h3>
+    <p>Are you sure you want to remove this item from your cart?</p>
+    <div class="confirmation-actions">
+      <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()">
+        <i class="fas fa-times"></i>
+        Cancel
+      </button>
+      <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+        <i class="fas fa-trash"></i>
+        Remove
+      </button>
+    </div>
+  </div>
+</div>
+
   <%- include('../partials/user/footer') %>
 
+  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="/js/cart.js"></script>
+    <script src="/js/incrementDecrementCart.js"></script>
 </body>
 </html>

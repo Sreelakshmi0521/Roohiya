@@ -283,33 +283,46 @@
   margin-bottom: 1rem;
 }
 
-.add-to-cart-btn {
-  width: 100%;
-  background: transparent;
-  color: var(--primary-color);
-  border: 1px solid var(--primary-color);
-  padding: 0.8rem;
-  border-radius: var(--border-radius);
-  font-size: 0.95rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: var(--transition);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
+.product-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 6px 10px;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: bold;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  z-index: 10;
 }
 
-.add-to-cart-btn:hover {
-  background: var(--primary-color);
-  color: var(--white);
+.discount-badge {
+  background-color: #e63946; /* red */
 }
 
-.add-to-cart-btn.added {
-  background: #2ecc71;
-  border-color: #2ecc71;
-  color: white;
+.out-of-stock-badge {
+  background-color: #6c757d; /* grey */
 }
+
+.limited-stock-badge {
+  background-color: #ffa500; /* orange */
+}
+
+.unavailable-badge {
+  background-color: #333; /* dark grey */
+}
+
+.product-card.out-of-stock img,
+.product-card.unavailable img {
+  opacity: 0.5;
+  filter: grayscale(0.4);
+}
+.product-card.unavailable img {
+  opacity: 0.5;
+  filter: grayscale(0.5);
+}
+
 
 /* Pagination */
 .pagination {
