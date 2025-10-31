@@ -552,8 +552,13 @@ const loadEditProduct=async(req,res)=>{
 const updateProduct=async(req,res)=>{
     try {
          const productId=req.params.id
-    const highlightsArray=JSON.parse(req.body.highlights||"[]")
-
+ let highlightsArray = [];
+    if (req.body.highlights && typeof req.body.highlights === "string") {
+      highlightsArray = req.body.highlights
+        .split(",")
+        .map(item => item.trim())
+        .filter(item => item.length > 0);
+    }
      const productData={
         name:req.body.name,
         category:req.body.category,

@@ -34,7 +34,7 @@ const userSchema=new mongoose.Schema({
   },
   profileImage: {
   type: String,
-  required:false
+    default: "https://res.cloudinary.com/dqcd6e4ux/image/upload/v1761935135/free-user-icon-3296-thumb_rsdnow.png"
 },
 
     isBlocked:{

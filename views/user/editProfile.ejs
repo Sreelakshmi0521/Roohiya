@@ -25,7 +25,12 @@
                     <h2>Profile Image</h2>
                     <div class="profile-image-edit">
                         <div class="current-image">
-                            <img src="<%= user.profileImage || '/images/default-profile.png' %>" alt="Current Profile Image" id="currentProfileImg">
+                                            <img 
+                                            src="<%= user.profileImage ? user.profileImage : 'https://res.cloudinary.com/dqcd6e4ux/image/upload/v1761935135/free-user-icon-3296-thumb_rsdnow.png' %>" 
+                                            alt="Current Profile Image" 
+                                            id="currentProfileImg"
+                                            onerror="this.onerror=null; this.src='https://res.cloudinary.com/dqcd6e4ux/image/upload/v1761935135/free-user-icon-3296-thumb_rsdnow.png';"
+                                            />
                         </div>
                         <div class="image-upload">
                             <label for="profileImage">Upload New Image</label>

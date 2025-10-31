@@ -1,7 +1,11 @@
 <div class="profile-sidebar">
   <div class="profile-image-section">
     <div class="profile-image">
-        <img src="<%= user.profileImage || '/images/default-profile.png' %>" alt="Profile Image">
+         <img 
+      src="<%= user.profileImage %>"
+      alt="Profile Image"
+      onerror="this.onerror=null; this.src='https://res.cloudinary.com/dqcd6e4ux/image/upload/v1761935135/free-user-icon-3296-thumb_rsdnow.png';"
+    />
     </div>
     <h2><%= user.name %></h2>
   </div>
