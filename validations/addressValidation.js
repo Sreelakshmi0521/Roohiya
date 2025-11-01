@@ -1,6 +1,8 @@
 const joi = require("joi");
 
 const addAddressValidation = joi.object({
+  addressId: joi.string().allow("").optional(),
+
   name: joi.string()
     .trim()
     .pattern(/^[A-Za-z\s]+$/)
@@ -83,6 +85,7 @@ const addAddressValidation = joi.object({
 
 // EDIT VALIDATION
 const editAddressValidation = joi.object({
+   addressId: joi.string().allow("").optional(),
   name: joi.string()
     .trim()
     .pattern(/^[A-Za-z\s]+$/)

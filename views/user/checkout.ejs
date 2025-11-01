@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title><%= pageTitle %></title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <link rel="stylesheet" href="/styles/user/common.css">
+    <link rel="stylesheet" href="/styles/user/<%= pagecss %>">
+</head>
+<body>
+    <%- include('../partials/user/navbar') %>
+
+    <div class="container">
+        <h1>Checkout</h1>
+        
+        <div class="checkout-layout">
+            <!-- Left Column - Address & Payment -->
+            <div class="checkout-left">
+                <!-- Address Section -->
+                <section class="address-section">
+                    <h2>Shipping Address</h2>
+                    
+                    <div class="address-list">
+                        <% if (addresses && addresses.length > 0) { %>
+                            <% addresses.forEach((address, index) => { %>
+                                <div class="address-card <%= address.isDefault ? 'default-address' : '' %>">
+                                    <input 
+                                        type="radio" 
+                                        name="selectedAddress" 
+                                        value="<%= address._id %>" 
+                                        id="address-<%= address._id %>"
+                                        <%= address.isDefault ? 'checked' : '' %>
+                                        
+                                    >
+                                    <label for="address-<%= address._id %>" class="address-label">
+                                        <div class="address-content">
+                                            <div class="address-header">
+                                                <h4><%= address.name %></h4>
+                                                <span class="address-type-badge"><%= address.addressType %></span>
+                                            </div>
+                                            <p><%= address.houseName %>, <%= address.locality %></p>
+                                            <p><%= address.city %>, <%= address.state %> - <%= address.pincode %></p>
+                                            <p><%= address.country %></p>
+                                            <p><i class="fas fa-phone"></i> <%= address.phone %></p>
+                                            <% if (address.landmark) { %>
+                                                <p class="address-landmark">
+                                                    <i class="fas fa-map-marker-alt"></i> <%= address.landmark %>
+                                                </p>
+                                            <% } %>
+                                            <% if (address.isDefault) { %>
+                                                <span class="default-badge">
+                                                    <i class="fas fa-star"></i> Default Address
+                                                </span>
+                                            <% } %>
+                                        </div>
+                                        <div class="address-actions">
+                                            <button type="button" class="btn-edit" onclick="editAddress('<%= address._id %>')">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </button>
+                                        </div>
+                                    </label>
+                                </div>
+                            <% }); %>
+                        <% } else { %>
+                            <div class="empty-state">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <p>No addresses saved yet.</p>
+                                <p class="empty-subtext">Add an address to continue with your order</p>
+                            </div>
+                        <% } %>
+                    </div>
+                    
+                    <button type="button" class="btn-add-address" onclick="showAddressForm()">
+                        <i class="fas fa-plus"></i> Add New Address
+                    </button>
+                </section>
+
+                <!-- Payment Method -->
+                <section class="payment-section">
+                    <h2>Payment Method</h2>
+                    <div class="payment-option">
+                        <input type="radio" name="paymentMethod" id="cod" value="cod" checked >
+                        <label for="cod">
+                            <i class="fas fa-money-bill-wave"></i> Cash on Delivery
+                        </label>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Right Column - Order Summary -->
+            <div class="checkout-right">
+                <section class="order-summary">
+                    <h2>Order Summary</h2>
+                    
+                    <div class="order-items">
+                        <% if (cartItems && cartItems.length > 0) { %>
+                            <% cartItems.forEach((item, index) => { %>
+                                <div class="order-item">
+                                    <div class="item-image">
+                                        <img src="<%= item.image %>" alt="<%= item.name %>">
+                                    </div>
+                                    <div class="item-details">
+                                        <h4><%= item.name %></h4>
+                                        <p class="item-quantity">Quantity: <%= item.quantity %></p>
+                                        <p class="item-price">₹<%= (item.price * item.quantity).toFixed(2) %></p>
+                                        <% if (item.discount > 0) { %>
+                                            <p class="item-discount">Discount: -₹<%= item.discount.toFixed(2) %></p>
+                                        <% } %>
+                                    </div>
+                                </div>
+                            <% }); %>
+                        <% } else { %>
+                            <p class="no-items">No items in cart</p>
+                        <% } %>
+                    </div>
+
+                    <div class="price-breakdown">
+                        <div class="price-row">
+                            <span>Subtotal:</span>
+                            <span>₹<%= (summary.subtotal || 0).toFixed(2) %></span>
+                        </div>
+                        <div class="price-row">
+                            <span>Shipping:</span>
+                            <span>₹<%= (summary.shipping || 0).toFixed(2) %></span>
+                        </div>
+                        <div class="price-row">
+                            <span>Tax:</span>
+                            <span>₹<%= (summary.tax || 0).toFixed(2) %></span>
+                        </div>
+                        <% if (summary.youSave > 0) { %>
+<div class="price-row you-save">
+    <span class="text-success">You Save:</span>
+    <span class="text-success">₹<%= (summary.youSave || 0).toFixed(2) %></span>
+</div>
+<% } %>
+
+                        <div class="price-row total">
+                            <span>Total:</span>
+                            <span>₹<%= (summary.total || 0).toFixed(2) %></span>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn-place-order" onclick="placeOrder()">
+                        <i class="fas fa-shopping-bag"></i> Place Order
+                    </button>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- Address Modal -->
+    <div id="addressModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span id="modalTitleText">Add New Address</span>
+                </h2>
+                <button type="button" class="close-btn" onclick="closeAddressForm()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form id="addressForm" class="address-form">
+                <input type="hidden" id="addressId" name="addressId">
+                
+                <div class="form-grid">
+                    <!-- Full Name -->
+                    <div class="form-group">
+                        <label for="name" class="form-label">
+                            <i class="fas fa-user"></i> Full Name
+                        </label>
+                        <input type="text" id="name" name="name"  
+                               placeholder="Enter your full name">
+                        <span class="error-message" id="nameError"></span>
+                    </div>
+
+                    <!-- Phone Number -->
+                    <div class="form-group">
+                        <label for="phone" class="form-label">
+                            <i class="fas fa-phone"></i> Phone Number
+                        </label>
+                        <input type="tel" id="phone" name="phone"  
+                               placeholder="10-digit mobile number">
+                        <span class="error-message" id="phoneError"></span>
+                    </div>
+
+                    <!-- House/Building Name -->
+                    <div class="form-group">
+                        <label for="houseName" class="form-label">
+                            <i class="fas fa-home"></i> House/Building Name
+                        </label>
+                        <input type="text" id="houseName" name="houseName"  
+                               placeholder="House no. and building name">
+                        <span class="error-message" id="houseNameError"></span>
+                    </div>
+
+                    <!-- Locality -->
+                    <div class="form-group">
+                        <label for="locality" class="form-label">
+                            <i class="fas fa-road"></i> Locality/Area
+                        </label>
+                        <input type="text" id="locality" name="locality"  
+                               placeholder="Locality or area name">
+                        <span class="error-message" id="localityError"></span>
+                    </div>
+
+                    <!-- City -->
+                    <div class="form-group">
+                        <label for="city" class="form-label">
+                            <i class="fas fa-city"></i> City
+                        </label>
+                        <input type="text" id="city" name="city"  
+                               placeholder="Enter your city">
+                        <span class="error-message" id="cityError"></span>
+                    </div>
+
+                    <!-- State -->
+                    <div class="form-group">
+                        <label for="state" class="form-label">
+                            <i class="fas fa-map"></i> State
+                        </label>
+                        <input type="text" id="state" name="state"  
+                               placeholder="Enter your state">
+                        <span class="error-message" id="stateError"></span>
+                    </div>
+
+                    <!-- Pincode -->
+                    <div class="form-group">
+                        <label for="pincode" class="form-label">
+                            <i class="fas fa-map-pin"></i> Pincode
+                        </label>
+                        <div class="pincode-wrapper">
+                            <input type="text" id="pincode" name="pincode"  
+                                   placeholder="6-digit pincode">
+                        </div>
+                        <span class="error-message" id="pincodeError"></span>
+                    </div>
+
+                    <!-- Country -->
+                    <div class="form-group">
+                        <label for="country" class="form-label">
+                            <i class="fas fa-globe"></i> Country
+                        </label>
+                        <input type="text" id="country" name="country"  
+                               value="India" readonly
+                               class="readonly-field">
+                        <span class="error-message" id="countryError"></span>
+                    </div>
+
+                    <!-- Landmark -->
+                    <div class="form-group full-width">
+                        <label for="landmark" class="form-label">
+                            <i class="fas fa-landmark"></i> Landmark (Optional)
+                        </label>
+                        <input type="text" id="landmark" name="landmark" 
+                               placeholder="Nearby landmark for easy location">
+                        <span class="error-message" id="landmarkError"></span>
+                    </div>
+
+                    <!-- Address Type -->
+                    <div class="form-group full-width">
+                        <label class="form-label">
+                            <i class="fas fa-tag"></i> Address Type
+                        </label>
+                        <div class="address-type-options">
+                            <label class="radio-label">
+                                <input type="radio" name="addressType" value="Home" checked>
+                                <span class="radio-custom"></span>
+                                <i class="fas fa-home"></i> Home
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="addressType" value="Work">
+                                <span class="radio-custom"></span>
+                                <i class="fas fa-briefcase"></i> Work
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="addressType" value="Other">
+                                <span class="radio-custom"></span>
+                                <i class="fas fa-map-marker-alt"></i> Other
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Set as Default -->
+                    <div class="form-group full-width">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="isDefault" name="isDefault">
+                            <span class="checkmark"></span>
+                            <i class="fas fa-star"></i> Set as default address
+                        </label>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeAddressForm()">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="saveAddressBtn">
+                        <i class="fas fa-save"></i> Save Address
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <%- include('../partials/user/footer') %>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/js/checkout.js"></script>
+    
+  
+</body>
+</html>

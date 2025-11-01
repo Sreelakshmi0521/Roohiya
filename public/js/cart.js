@@ -83,3 +83,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+  const proceedBtn = document.getElementById("proceed-checkout");
+
+  if (proceedBtn) {
+    proceedBtn.addEventListener("click", () => {
+      window.location.href = "/user/checkout";
+    });
+  }
+});
+
