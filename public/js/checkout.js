@@ -17,6 +17,9 @@ function initializeCheckout() {
     if (addressModal) {
         addressModal.addEventListener('click', handleModalOutsideClick);
     }
+    
+    initializeErrorClearOnInput();
+
 }
 
 // Address Management Functions
@@ -203,67 +206,6 @@ function saveAddress() {
     });
 }
 
-// Place Order Function
-function placeOrder() {
-    const selectedAddress = document.querySelector('input[name="selectedAddress"]:checked');
-    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked');
-    
-    if (!selectedAddress) {
-        Toastify({
-            text: "Please select a shipping address",
-            duration: 3000,
-            gravity: "top",
-            position: "right",
-            backgroundColor: "var(--warning-color)",
-        }).showToast();
-        return;
-    }
-    
-    if (!paymentMethod) {
-        Toastify({
-            text: "Please select a payment method",
-            duration: 3000,
-            gravity: "top",
-            position: "right",
-            backgroundColor: "var(--warning-color)",
-        }).showToast();
-        return;
-    }
-    
-    const orderData = {
-        addressId: selectedAddress.value,
-        paymentMethod: paymentMethod.value
-    };
-    
-    // Show loading state
-    const placeOrderBtn = document.querySelector('.btn-place-order');
-    if (!placeOrderBtn) return;
-
-    const originalText = placeOrderBtn.innerHTML;
-    placeOrderBtn.innerHTML = '<div class="btn-spinner"></div> Placing Order...';
-    placeOrderBtn.disabled = true;
-
-    axios.post('/api/orders', orderData)
-        .then(response => {
-            window.location.href = `/order-success/${response.data.orderId}`;
-        })
-        .catch(error => {
-            console.error('Error placing order:', error);
-            const errorMessage = error.response?.data?.message || "There was an error placing your order. Please try again.";
-            Toastify({
-                text: errorMessage,
-                duration: 3000,
-                gravity: "top",
-                position: "right",
-                backgroundColor: "var(--error-color)",
-            }).showToast();
-        })
-        .finally(() => {
-            placeOrderBtn.innerHTML = originalText;
-            placeOrderBtn.disabled = false;
-        });
-}
-
 function handleModalOutsideClick(e) {
     if (e.target === this) {
         closeAddressForm();
@@ -276,87 +218,15 @@ window.closeAddressForm = closeAddressForm;
 window.editAddress = editAddress;
 window.placeOrder = placeOrder;
 
+function initializeErrorClearOnInput() {
+    const inputs = document.querySelectorAll('#addressForm input, #addressForm select, #addressForm textarea');
 
-document.addEventListener("DOMContentLoaded", () => {
-    const pincodeInput = document.getElementById('pincode');
-    const cityInput = document.getElementById('city');
-    const stateInput = document.getElementById('state');
-    const countryInput = document.getElementById('country');
-    const pincodeWrapper = document.querySelector('.pincode-wrapper');
-    const pincodeError = document.getElementById('pincodeError');
-
-    // If elements don't exist (modal not open), return early
-    if (!pincodeInput || !cityInput || !stateInput || !pincodeWrapper) {
-        return;
-    }
-
-    let lastFetchedPincode = "";
-
-    pincodeInput.addEventListener("input", async () => {
-        const pincode = pincodeInput.value.trim();
-        if (pincodeError) pincodeError.textContent = '';
-
-        if (/^[1-9][0-9]{5}$/.test(pincode) && pincode !== lastFetchedPincode) {
-            lastFetchedPincode = pincode;
-            
-            // Show CSS spinner
-            pincodeWrapper.classList.add('loading');
-
-            try {
-                const response = await fetch(`https://api.postalpincode.in/pincode/${pincode}`);
-                const data = await response.json();
-
-                // Hide CSS spinner
-                pincodeWrapper.classList.remove('loading');
-
-                if (data[0].Status === "Success") {
-                    const info = data[0].PostOffice[0];
-                    cityInput.value = info.District || "";
-                    stateInput.value = info.State || "";
-                    if (countryInput) countryInput.value = "India";
-
-                    Toastify({
-                        text: `Address auto-filled successfully!`,
-                        duration: 3000,
-                        gravity: "top",
-                        position: "right",
-                        backgroundColor: "#4CAF50",
-                    }).showToast();
-                } else {
-                    if (pincodeError) pincodeError.textContent = "Invalid pincode! Please check and try again.";
-                    Toastify({
-                        text: "Invalid Pincode!",
-                        duration: 3000,
-                        gravity: "top",
-                        position: "right",
-                        backgroundColor: "#ff5f6d",
-                    }).showToast();
-
-                    cityInput.value = "";
-                    stateInput.value = "";
-                    if (countryInput) countryInput.value = "India";
-                }
-            } catch (error) {
-                // Hide CSS spinner
-                pincodeWrapper.classList.remove('loading');
-                console.error(error);
-                if (pincodeError) pincodeError.textContent = "Error fetching pincode information. Please try again.";
-                Toastify({
-                    text: "Error fetching pincode info!",
-                    duration: 3000,
-                    gravity: "top",
-                    position: "right",
-                    backgroundColor: "#ff5f6d",
-                }).showToast();
+    inputs.forEach(input => {
+        input.addEventListener('input', () => {
+            const errorElement = document.getElementById(`${input.name}Error`);
+            if (errorElement) {
+                errorElement.textContent = '';
             }
-        }
-
-        // Reset if user clears or edits pincode
-        if (pincode.length < 6) {
-            pincodeWrapper.classList.remove('loading');
-            cityInput.value = "";
-            stateInput.value = "";
-            if (countryInput) countryInput.value = "India";
-        }
+        });
     });
-});
+}

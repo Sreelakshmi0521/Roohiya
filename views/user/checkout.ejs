@@ -233,10 +233,13 @@
                         <label for="pincode" class="form-label">
                             <i class="fas fa-map-pin"></i> Pincode
                         </label>
-                        <div class="pincode-wrapper">
-                            <input type="text" id="pincode" name="pincode"  
-                                   placeholder="6-digit pincode">
-                        </div>
+                                    <div class="pincode-wrapper">
+                                    <input type="text" id="pincode" name="pincode" placeholder="6-digit pincode">
+                                    <span id="spinner" style="display:none;">
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                    </span>
+                                    </div>
+
                         <span class="error-message" id="pincodeError"></span>
                     </div>
 
@@ -311,6 +314,8 @@
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="/js/checkout.js"></script>
+       <script src="/js/pincodeAutofill.js"></script>
+
     
   
 </body>

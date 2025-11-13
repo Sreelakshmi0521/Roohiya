@@ -63,13 +63,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const originalText = submitBtn.textContent
     submitBtn.textContent = "Saving..." 
 
-    Toastify({
-      text: "Uploading your changes...",
-      duration: 2000,
-      gravity: "top",
-      position: "right",
-      backgroundColor: "#2196F3",
-    }).showToast()
+    // Toastify({
+    //   text: "Uploading your changes...",
+    //   duration: 2000,
+    //   gravity: "top",
+    //   position: "right",
+    //   backgroundColor: "#2196F3",
+    // }).showToast()
 
     const formData = new FormData(form)
 
@@ -121,20 +121,35 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     } catch (err) {
       console.error("Axios error:", err.response?.data || err.message)
-      Toastify({
-        text:
-          err.response?.data?.message ||
-          "Server error. Please try again later!",
-        duration: 3000,
-        gravity: "top",
-        position: "right",
-        backgroundColor: "#FF0000",
-      }).showToast()
-      submitBtn.disabled = false
-      submitBtn.textContent = originalText
-      isProcessing = false
+      
+       if (err.response && err.response.data && err.response.data.errors) {
+        const errors = err.response.data.errors;
+        for (const field in errors) {
+          Toastify({
+            text: `${errors[field]}`,
+            duration: 3000,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#FF0000",
+          }).showToast();
+        }
+      } else {
+        Toastify({
+          text:
+            err.response?.data?.message ||
+            "Server error. Please try again later!",
+          duration: 3000,
+          gravity: "top",
+          position: "right",
+          backgroundColor: "#FF0000",
+        }).showToast();
+      }
+
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalText;
+      isProcessing = false;
     }
-  })
+  });
 
 
   const cancelBtn = document.getElementById("cancelBtn")

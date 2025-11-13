@@ -8,7 +8,7 @@
     const pincodeError = document.getElementById('pincodeError');
 
     let lastFetchedPincode = "";
-
+console.log("hai")
     pincodeInput.addEventListener("input", async () => {
       const pincode = pincodeInput.value.trim();
       pincodeError.textContent = '';

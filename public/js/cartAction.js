@@ -1,7 +1,6 @@
 document.addEventListener("DOMContentLoaded", async () => {
   const addToCartButtons = document.querySelectorAll(".add-to-cart-btn");
 
-  // 🟢 1️⃣ Fetch user's cart items if logged in
   let userCartItems = [];
   try {
     const res = await axios.get("/user/cart/items");
@@ -9,11 +8,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       userCartItems = res.data.items;
     }
   } catch (err) {
-    // User not logged in or no cart
     userCartItems = [];
   }
 
-  // 🟢 2️⃣ Loop through all add-to-cart buttons
   addToCartButtons.forEach((btn) => {
     const productId = btn.dataset.productId;
     const variantId = btn.dataset.variantId;
@@ -29,10 +26,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // 🟢 3️⃣ Click event
     btn.addEventListener("click", async () => {
-      // If unavailable, do nothing
       if (btn.classList.contains("disabled")) return;
 
-      // If already in cart → go to cart directly
       if (btn.classList.contains("go-to-cart")) {
         window.location.href = "/user/cart";
         return;

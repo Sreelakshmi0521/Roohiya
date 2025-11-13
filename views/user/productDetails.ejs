@@ -168,11 +168,7 @@
 
             <!-- Add to Cart Section -->
             <div class="add-to-cart-section">
-              <div class="quantity-selector">
-                <button class="quantity-btn minus-btn">-</button>
-                <input type="number" class="quantity-input" value="1" min="1" max="<%= selectedVariant.stock %>" />
-                <button class="quantity-btn plus-btn">+</button>
-              </div>
+
 
               <div class="action-buttons">
                 <% if (!product.isListed || !product.category.isListed || !selectedVariant.isListed || selectedVariant.stock < 1) { %>

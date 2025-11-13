@@ -6,6 +6,8 @@ const {requireLogin,checkUserBlocked}=require("../../middlewares/userAuth")
 const setPagetitle=require("../../middlewares/setpagetitle")
 const upload = require("../../middlewares/upload")
 const profileController=require("../../controllers/user/profileController")
+const validate=require("../../middlewares/validate")
+const editProfileValidation = require("../../validations/editProfileValidation")
 
 
 
@@ -13,7 +15,7 @@ const profileController=require("../../controllers/user/profileController")
 
 router.get("/profile",requireLogin,checkUserBlocked,nocache,setPagetitle("profile","profile.css"),profileController.loadProfile)
 router.get("/editProfile",requireLogin,nocache,setPagetitle("editProfile","editProfile.css"),profileController.loadEditProfile)
-router.post("/editProfile",requireLogin,upload.single("profileImage"),setPagetitle("editProfile","editProfile.css"),profileController.editProfile)
+router.post("/editProfile",requireLogin,upload.single("profileImage"),validate(editProfileValidation),setPagetitle("editProfile","editProfile.css"),profileController.editProfile)
 
 //email change
 router.get("/verifyEmailOtp", requireLogin, nocache, profileController.loadVerifyEmailOtpPage);
