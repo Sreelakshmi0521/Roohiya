@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= pageTitle %></title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/user/common.css">
+    <link rel="stylesheet" href="/styles/user/<%= pagecss %>">
+</head>
+<body>
+    <%- include('../partials/user/navbar') %>
+
+    <div class="container">
+        <div class="order-success-container">
+            <!-- Success Illustration -->
+            <div class="success-illustration">
+                <div class="success-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+            </div>
+
+            <!-- Success Message -->
+            <div class="success-content">
+                <h1>Order Placed Successfully!</h1>
+                <p class="thank-you-message">
+                    Thank you for your order! We're excited to get your items ready for you.
+                </p>
+                
+                <!-- Order Summary Card -->
+                <div class="order-summary-card">
+                    <div class="summary-header">
+                        <h3>Order Summary</h3>
+                        <span class="order-id">Order #<%= order.orderId %></span>
+                    </div>
+                    
+                    <div class="summary-details">
+                        <div class="detail-row">
+                            <span>Order Date:</span>
+                            <span><%= new Date(order.createdAt).toLocaleDateString() %></span>
+                        </div>
+                        <div class="detail-row">
+                            <span>Payment Method:</span>
+                            <span class="payment-method">
+                                <i class="fas fa-money-bill-wave"></i>
+                                Cash on Delivery
+                            </span>
+                        </div>
+                        <div class="detail-row">
+                            <span>Total Amount:</span>
+                            <span class="total-amount">₹<%= order.totalAmount.toFixed(2) %></span>
+                        </div>
+                        <div class="detail-row">
+                            <span>Expected Delivery:</span>
+                            <span class="delivery-date">
+                                <%= new Date(order.expectedDelivery).toLocaleDateString() %>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Items -->
+                <div class="order-items-preview">
+                    <h4>Order Items</h4>
+                    <% order.products.forEach((product, index) => { %>
+                        <div class="order-item-preview">
+                            <div class="item-info">
+                                <h5><%= product.name %></h5>
+                                <p>Color: <%= product.color %></p>
+                                <p>Quantity: <%= product.quantity %></p>
+                            </div>
+                            <div class="item-price">
+                                ₹<%= product.subtotal.toFixed(2) %>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+
+                <!-- Shipping Address -->
+                <div class="shipping-info">
+                    <h4>Shipping Address</h4>
+                    <div class="address-card">
+                        <p><strong><%= order.shippingAddress.name %></strong></p>
+                        <p><%= order.shippingAddress.houseName %>, <%= order.shippingAddress.locality %></p>
+                        <p><%= order.shippingAddress.city %>, <%= order.shippingAddress.state %> - <%= order.shippingAddress.pincode %></p>
+                        <p><%= order.shippingAddress.country %></p>
+                        <p><i class="fas fa-phone"></i> <%= order.shippingAddress.phone %></p>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <a href="/user/order/details/<%= order._id %>" class="btn btn-primary">
+                        <i class="fas fa-list-alt"></i> View Order Details
+                    </a>
+                    <a href="/user/shop" class="btn btn-secondary">
+                        <i class="fas fa-shopping-bag"></i> Continue Shopping
+                    </a>
+                </div>
+
+                <!-- Next Steps -->
+                <div class="next-steps">
+                    <h4>What's Next?</h4>
+                    <div class="steps">
+                        <div class="step">
+                            <div class="step-icon">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <div class="step-content">
+                                <h5>Order Confirmed</h5>
+                                <p>We've received your order and are preparing it for shipment.</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-icon">
+                                <i class="fas fa-shipping-fast"></i>
+                            </div>
+                            <div class="step-content">
+                                <h5>Out for Delivery</h5>
+                                <p>Your order will be delivered by <%= new Date(order.expectedDelivery).toLocaleDateString() %>.</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-icon">
+                                <i class="fas fa-money-bill-wave"></i>
+                            </div>
+                            <div class="step-content">
+                                <h5>Cash on Delivery</h5>
+                                <p>Please keep the exact amount ready for our delivery executive.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('../partials/user/footer') %>
+</body>
+</html>

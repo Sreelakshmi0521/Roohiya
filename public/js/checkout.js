@@ -1,12 +1,10 @@
-// Checkout Page JavaScript
 document.addEventListener('DOMContentLoaded', function() {
     initializeCheckout();
 });
 
-console.log("hai")
+// console.log("hai")
 
 function initializeCheckout() {
-    // Set up event listeners when DOM is ready
     const addressForm = document.getElementById('addressForm');
     const addressModal = document.getElementById('addressModal');
     
@@ -67,7 +65,6 @@ function fetchAddressData(addressId) {
     const saveBtn = document.getElementById('saveAddressBtn');
     if (!saveBtn) return;
 
-    // Show loading state
     saveBtn.innerHTML = '<div class="btn-spinner"></div> Loading...';
     saveBtn.disabled = true;
 
@@ -104,11 +101,9 @@ function populateAddressForm(address) {
     document.getElementById('country').value = address.country || 'India';
     document.getElementById('landmark').value = address.landmark || '';
     
-    // Set address type
     const addressType = document.querySelector(`input[name="addressType"][value="${address.addressType}"]`);
     if (addressType) addressType.checked = true;
     
-    // Set default address
     document.getElementById('isDefault').checked = address.isDefault || false;
 }
 
@@ -132,10 +127,8 @@ function saveAddress() {
     console.log("Address Data being sent:", addressData);
 
     
-    // Convert isDefault to boolean
     addressData.isDefault = addressData.isDefault === 'on';
     
-    // Show loading state
     saveBtn.innerHTML = '<div class="btn-spinner"></div> Saving...';
     saveBtn.disabled = true;
 
@@ -161,7 +154,6 @@ function saveAddress() {
         }).showToast();
         
         closeAddressForm();
-        // Reload the page to reflect changes
         setTimeout(() => {
             window.location.reload();
         }, 1000);
@@ -173,7 +165,6 @@ function saveAddress() {
     const errors = error.response?.data?.errors;
 
     if (errors && typeof errors === 'object') {
-        // Loop through object keys and show messages below inputs
         Object.keys(errors).forEach(key => {
             const errorElement = document.getElementById(`${key}Error`);
             if (errorElement) {
@@ -212,7 +203,6 @@ function handleModalOutsideClick(e) {
     }
 }
 
-// Make functions globally available for onclick attributes
 window.showAddressForm = showAddressForm;
 window.closeAddressForm = closeAddressForm;
 window.editAddress = editAddress;
@@ -230,3 +220,82 @@ function initializeErrorClearOnInput() {
         });
     });
 }
+function placeOrder() {
+    const selectedAddress = document.querySelector('input[name="selectedAddress"]:checked');
+    const placeOrderBtn = document.querySelector('.btn-place-order');
+
+    if (!selectedAddress) {
+        Toastify({
+            text: "Please select a shipping address",
+            duration: 3000,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#ffc107",
+            style: {
+                background: "#ffc107",
+                color: "#000"
+            }
+        }).showToast();
+        return;
+    }
+
+    const originalText = placeOrderBtn.innerHTML;
+    placeOrderBtn.innerHTML = '<div class="btn-spinner"></div> Placing Order...';
+    placeOrderBtn.disabled = true;
+
+    const orderData = {
+        selectedAddress: selectedAddress.value
+    };
+
+    axios.post('/user/checkout/placeOrder', orderData)
+        .then(response => {
+            if (response.data.success) {
+                Toastify({
+                    text: "Order placed successfully!",
+                    duration: 3000,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "#28a745",
+                }).showToast();
+                
+                setTimeout(() => {
+                    window.location.href = `/user/order/success/${response.data.orderId}`;
+                }, 1500);
+            }
+        })
+        .catch(error => {
+            console.error('Error placing order:', error);
+            const errorMessage = error.response?.data?.message || "Failed to place order";
+            
+            Toastify({
+                text: errorMessage,
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#dc3545",
+            }).showToast();
+        })
+        .finally(() => {
+            placeOrderBtn.innerHTML = originalText;
+            placeOrderBtn.disabled = false;
+        });
+}
+
+const spinnerStyle = document.createElement('style');
+spinnerStyle.textContent = `
+    .btn-spinner {
+        width: 16px;
+        height: 16px;
+        border: 2px solid transparent;
+        border-top: 2px solid currentColor;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        display: inline-block;
+        margin-right: 8px;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+`;
+document.head.appendChild(spinnerStyle);

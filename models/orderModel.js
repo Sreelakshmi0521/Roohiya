@@ -1,0 +1,101 @@
+const mongoose = require("mongoose");
+const { nanoid } = require("nanoid");
+
+const orderSchema = new mongoose.Schema(
+  {
+    orderId: {
+      type: String,
+      required: true,
+      unique: true,
+      default: () => "ORD-" + nanoid(10)
+    },
+
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+
+    products: [
+      {
+        productId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Product",
+          required: true,
+        },
+        variantId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "ProductVariant",
+          required: true,
+        },
+        name: String,
+        color: String,
+        price: Number,
+        quantity: Number,
+        subtotal: Number,
+        status: {
+          type: String,
+          enum: ["placed", "cancelled", "returned"],
+          default: "placed",
+        },
+        cancelReason: {
+          type: String,
+          default: "",
+        },
+        returnReason: {
+          type: String,
+          default: "",
+        },
+      },
+    ],
+
+    totalAmount: {
+      type: Number,
+      required: true,
+    },
+
+    shippingAddress: {
+      name: String,
+      phone: String,
+      houseName: String,
+      locality: String,
+      city: String,
+      state: String,
+      pincode: String,
+      country: String,
+    },
+
+    status: {
+      type: String,
+      enum: [
+        "pending",
+        "shipped",
+        "out for delivery",
+        "delivered",
+        "cancelled",
+      ],
+      default: "pending",
+    },
+
+    paymentMethod: {
+      type: String,
+      enum: ["COD", "ONLINE", "WALLET"],
+      required: true,
+    },
+
+    expectedDelivery: {
+      type: Date,
+      default: () => new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
+    },
+
+    invoiceUrl: {
+      type: String,
+      default: "",
+    },
+  },
+  { timestamps: true }
+);
+
+const Order= mongoose.model("Order",orderSchema)
+
+module.exports=Order
