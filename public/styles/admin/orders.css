@@ -1,0 +1,62 @@
+
+.badge {
+    font-size: 0.85em;
+    padding: 0.35em 0.65em;
+}
+
+.table th {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.btn-group .dropdown-toggle::after {
+    margin-left: 0.3em;
+}
+
+/* Status badges */
+.bg-warning {
+    background-color: #c79f28 !important;
+}
+
+.bg-info {
+    background-color: #3a6a74 !important;
+}
+
+.bg-primary {
+    background-color: #364a63 !important;
+}
+
+.bg-success {
+    background-color: #198754 !important;
+}
+
+.bg-danger {
+    background-color: #dc3545 !important;
+}
+
+/* Pagination */
+.pagination .page-item.active .page-link {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+/* Statistics cards */
+.card {
+    border: 1px solid #e3e6f0;
+    border-radius: 0.35rem;
+}
+
+.card-header {
+    background-color: #f8f9fc;
+    border-bottom: 1px solid #e3e6f0;
+}
+
+/* Search and filter */
+#filterForm .form-label {
+    font-weight: 600;
+    color: #5a5c69;
+}

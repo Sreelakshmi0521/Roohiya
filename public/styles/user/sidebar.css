@@ -1,105 +1,165 @@
+/* === Profile Wrapper === */
+.profile-wrapper {
+    display: flex;
+    align-items: flex-start;
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 20px;
+}
+
 /* === Sidebar Section === */
 .profile-sidebar {
-  width: 280px;
-  background-color: #fff;
-  border-radius: 15px;
-  padding: 20px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  flex-shrink: 0;
+    width: 280px;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    flex-shrink: 0;
+    border: 1px solid #e8e8e8;
+    position: sticky;
+    top: 100px;
 }
 
 /* === Profile Image Section === */
 .profile-image-section {
-  text-align: center;
-  margin-bottom: 25px;
+    text-align: center;
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #f0f0f0;
 }
 
 .profile-image {
-  width: 110px;
-  height: 110px;
-  border-radius: 50%;
-  overflow: hidden;
-  margin: 0 auto;
-  border: 3px solid #d4af37; /* gold border */
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 0 auto 15px;
+    border: 3px solid #d4af37;
+    box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+    transition: all 0.3s ease;
+}
+
+.profile-image:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4);
 }
 
 .profile-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .profile-image-section h2 {
-  font-size: 18px;
-  margin-top: 10px;
-  color: #333;
-  font-weight: 600;
-}
-.profile-wrapper {
-  display: flex;
-  align-items: flex-start;
-  gap: 30px;
-  padding: 30px 80px;
-}
-
-.profile-sidebar {
-  flex: 0 0 250px;
-}
-
-.address-container {
-  flex: 1;
-  background: #fff;
-  border-radius: 10px;
-  padding: 25px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    font-size: 1.2rem;
+    margin: 0;
+    color: #2c3e50;
+    font-weight: 600;
+    font-family: 'Playfair Display', serif;
 }
 
 /* === Navigation Section === */
 .profile-nav ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
 .profile-nav li {
-  margin-bottom: 12px;
+    margin-bottom: 8px;
 }
 
 .profile-nav a {
-  display: block;
-  padding: 12px 16px;
-  text-decoration: none;
-  color: #444;
-  font-weight: 500;
-  border-radius: 10px;
-  transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    text-decoration: none;
+    color: #5a6c7d;
+    font-weight: 500;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    font-size: 15px;
+    position: relative;
+    overflow: hidden;
+}
+
+.profile-nav a::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 0;
+    background: linear-gradient(90deg, rgba(212, 175, 55, 0.1) 0%, transparent 100%);
+    transition: width 0.3s ease;
+}
+
+.profile-nav a:hover::before {
+    width: 100%;
 }
 
 /* === Active Link === */
 .profile-nav a.active {
-  background-color: #d4af37;
-  color: #fff;
+    background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+    transform: translateX(5px);
+}
+
+.profile-nav a.active::before {
+    display: none;
 }
 
 /* === Hover Effect === */
-.profile-nav a:hover {
-  background-color: #f7e8b7;
-  color: #000;
+.profile-nav a:hover:not(.active) {
+    background: #f8f9fa;
+    color: #2c3e50;
+    transform: translateX(5px);
+}
+
+/* === Icons in Navigation */
+.profile-nav a i {
+    width: 18px;
+    text-align: center;
+    font-size: 14px;
 }
 
 /* === Responsive Sidebar === */
+@media (max-width: 1024px) {
+    .profile-wrapper {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .profile-sidebar {
+        width: 100%;
+        position: static;
+    }
+}
+
 @media (max-width: 768px) {
-  .profile-sidebar {
-    width: 100%;
-    margin-bottom: 20px;
-  }
-
-  .profile-image-section h2 {
-    font-size: 16px;
-  }
-
-  .profile-nav a {
-    padding: 10px 14px;
-    font-size: 15px;
-  }
+    .profile-wrapper {
+        padding: 15px;
+        gap: 15px;
+    }
+    
+    .profile-sidebar {
+        padding: 20px;
+    }
+    
+    .profile-image {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .profile-image-section h2 {
+        font-size: 1.1rem;
+    }
+    
+    .profile-nav a {
+        padding: 12px 15px;
+        font-size: 14px;
+    }
 }

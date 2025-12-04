@@ -12,6 +12,8 @@ const reviewRoutes=require("./reviewRoutes")
 const cartRoutes=require("./cartRoutes")
 const wishlistRoutes=require("./wishlistRoutes")
 const checkoutRoutes=require("./checkoutRoutes")
+const orderRoutes=require("./orderRoutes")
+
 
 router.use("/",authRoutes)
 router.use("/",productRoutes)
@@ -21,5 +23,6 @@ router.use("/",addressRoutes)
 router.use("/",cartRoutes)
 router.use("/",wishlistRoutes)
 router.use("/",checkoutRoutes)
+router.use("/",orderRoutes)
 
 module.exports=router

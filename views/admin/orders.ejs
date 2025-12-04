@@ -1,0 +1,273 @@
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">Order Management</h1>
+        <button class="btn btn-primary" id="refreshOrders">
+            <i class="fas fa-sync-alt me-2"></i>Refresh
+        </button>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total Orders</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"><%= orderStats.total %></div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-shopping-cart fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Pending Orders</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"><%= orderStats.pending %></div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clock fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Delivered</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"><%= orderStats.delivered %></div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-danger shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                Cancelled</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"><%= orderStats.cancelled %></div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-times-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Filter Section -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form id="filterForm" method="GET" action="/admin/orders">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label for="search" class="form-label">Search</label>
+                        <input type="text" class="form-control" id="search" name="search" 
+                               value="<%= search %>" placeholder="Order ID, Customer Name, Phone...">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="status" class="form-label">Status</label>
+                        <select class="form-select" id="status" name="status">
+                            <option value="">All Status</option>
+                            <% statuses.forEach(status => { %>
+                                <option value="<%= status %>" <%= statusFilter === status ? 'selected' : '' %>>
+                                    <%= status.charAt(0).toUpperCase() + status.slice(1) %>
+                                </option>
+                            <% }); %>
+                        </select>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="sortBy" class="form-label">Sort By</label>
+                        <select class="form-select" id="sortBy" name="sortBy">
+                            <option value="createdAt" <%= sortBy === 'createdAt' ? 'selected' : '' %>>Order Date</option>
+                            <option value="totalAmount" <%= sortBy === 'totalAmount' ? 'selected' : '' %>>Total Amount</option>
+                            <option value="orderId" <%= sortBy === 'orderId' ? 'selected' : '' %>>Order ID</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="sortOrder" class="form-label">Sort Order</label>
+                        <select class="form-select" id="sortOrder" name="sortOrder">
+                            <option value="desc" <%= sortOrder === 'desc' ? 'selected' : '' %>>Descending</option>
+                            <option value="asc" <%= sortOrder === 'asc' ? 'selected' : '' %>>Ascending</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary me-2">
+                            <i class="fas fa-filter me-1"></i> Apply Filters
+                        </button>
+                        <a href="/admin/orders" class="btn btn-secondary">
+                            <i class="fas fa-times me-1"></i> Clear
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Orders Table -->
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Date</th>
+                            <th>Customer</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Payment</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (orders.length === 0) { %>
+                            <tr>
+                                <td colspan="7" class="text-center py-4">No orders found</td>
+                            </tr>
+                        <% } else { %>
+                            <% orders.forEach(order => { 
+                                const orderDate = new Date(order.createdAt);
+                                const formattedDate = orderDate.toLocaleDateString('en-US', {
+                                    year: 'numeric',
+                                    month: 'short',
+                                    day: 'numeric'
+                                });
+                                const formattedTime = orderDate.toLocaleTimeString('en-IN', {
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                });
+                            %>
+                            <tr>
+                                <td>
+                                    <strong><%= order.orderId %></strong>
+                                </td>
+                                <td>
+                                    <div><%= formattedDate %></div>
+                                    <small class="text-muted"><%= formattedTime %></small>
+                                </td>
+                                <td>
+                                    <% if (order.userId) { %>
+                                        <div><strong><%= order.userId.name %></strong></div>
+                                    <% } else { %>
+                                        <div>Guest User</div>
+                                    <% } %>
+                                </td>
+                                <td>₹<%= order.totalAmount.toFixed(2) %></td>
+                                <td>
+                                    <span class="badge bg-<%= 
+                                        order.status === 'pending' ? 'warning' :
+                                        order.status === 'shipped' ? 'info' :
+                                        order.status === 'out for delivery' ? 'primary' :
+                                        order.status === 'delivered' ? 'success' :
+                                        order.status === 'cancelled' ? 'danger' : 'secondary'
+                                    %>">
+                                        <%= order.status.charAt(0).toUpperCase() + order.status.slice(1) %>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-<%= 
+                                        order.paymentMethod === 'COD' ? 'warning' : 'success'
+                                    %>">
+                                        <%= order.paymentMethod %>
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="/admin/orders/<%= order._id %>" 
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" 
+                                                data-bs-toggle="dropdown" aria-expanded="false">
+                                            Status
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><h6 class="dropdown-header">Update Status</h6></li>
+                                            <li><a class="dropdown-item status-update" href="#" 
+                                                   data-order-id="<%= order._id %>" data-status="pending">
+                                                   Pending</a></li>
+                                            <li><a class="dropdown-item status-update" href="#" 
+                                                   data-order-id="<%= order._id %>" data-status="shipped">
+                                                   Shipped</a></li>
+                                            <li><a class="dropdown-item status-update" href="#" 
+                                                   data-order-id="<%= order._id %>" data-status="out for delivery">
+                                                   Out for Delivery</a></li>
+                                            <li><a class="dropdown-item status-update" href="#" 
+                                                   data-order-id="<%= order._id %>" data-status="delivered">
+                                                   Delivered</a></li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li><a class="dropdown-item status-update text-danger" href="#" 
+                                                   data-order-id="<%= order._id %>" data-status="cancelled">
+                                                   Cancel Order</a></li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                            <% }); %>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <% if (totalPages > 1) { %>
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <% if (currentPage > 1) { %>
+                            <li class="page-item">
+                                <a class="page-link" 
+                                   href="/admin/orders?page=<%= currentPage - 1 %><%= search ? '&search=' + search : '' %><%= statusFilter ? '&status=' + statusFilter : '' %>">
+                                    Previous
+                                </a>
+                            </li>
+                        <% } %>
+
+                        <% for (let i = 1; i <= totalPages; i++) { %>
+                            <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                                <a class="page-link" 
+                                   href="/admin/orders?page=<%= i %><%= search ? '&search=' + search : '' %><%= statusFilter ? '&status=' + statusFilter : '' %>">
+                                    <%= i %>
+                                </a>
+                            </li>
+                        <% } %>
+
+                        <% if (currentPage < totalPages) { %>
+                            <li class="page-item">
+                                <a class="page-link" 
+                                   href="/admin/orders?page=<%= currentPage + 1 %><%= search ? '&search=' + search : '' %><%= statusFilter ? '&status=' + statusFilter : '' %>">
+                                    Next
+                                </a>
+                            </li>
+                        <% } %>
+                    </ul>
+                </nav>
+            <% } %>
+
+            <div class="text-muted text-center mt-3">
+                Showing <%= orders.length %> of <%= totalOrders %> orders
+            </div>
+        </div>
+    </div>
+</div>

@@ -34,17 +34,27 @@ const orderSchema = new mongoose.Schema(
         quantity: Number,
         subtotal: Number,
         status: {
-          type: String,
-          enum: ["placed", "cancelled", "returned"],
-          default: "placed",
-        },
+      type: String,
+      enum: [
+        "placed",
+        "shipped",
+        "out for delivery",
+        "delivered",
+        "cancelled",
+        "returned"
+      ],
+      default: "placed",
+    },
+
         cancelReason: {
           type: String,
           default: "",
+           trim: true,
         },
         returnReason: {
           type: String,
           default: "",
+           trim: true,
         },
       },
     ],
@@ -73,6 +83,9 @@ const orderSchema = new mongoose.Schema(
         "out for delivery",
         "delivered",
         "cancelled",
+        "returned",
+          "partially cancelled", 
+        "partially returned" 
       ],
       default: "pending",
     },

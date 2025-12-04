@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title><%= pageTitle %></title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
+  <link rel="stylesheet" href="/styles/user/common.css">
+  <link rel="stylesheet" href="/styles/user/sidebar.css">
+  <link rel="stylesheet" href="/styles/user/<%= pagecss %>">
+</head>
+<body>
+    <%- include('../partials/user/navbar') %>
+
+    <main class="profile-main-container">
+        <div class="profile-wrapper">
+            <!-- Sidebar -->
+            <%- include('../partials/user/sidebar', { user, activePage: 'orders' }) %>
+            
+            <!-- Main Content -->
+            <div class="orders-main-content">
+                <div class="orders-header">
+                    <h1>My Orders</h1>
+                    
+                    <!-- Search Bar -->
+                    <div class="search-container">
+                        <form method="GET" action="/user/orders" class="search-form" id="searchForm">
+                            <div class="search-input-wrapper">
+                                <i class="fas fa-search search-icon"></i>
+                                <input type="text" name="search" placeholder="Search by Order ID or Product Name..." 
+                                       value="<%= search %>" id="searchInput">
+                                <% if (search) { %>
+                                    <button type="button" class="clear-search-btn" id="clearSearch">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                <% } %>
+                            </div>
+                            <button type="submit" class="search-btn">Search</button>
+                            <% if (search) { %>
+                                <a href="/user/orders" class="clear-all-btn">
+                                    <i class="fas fa-times-circle"></i>
+                                    Clear Search
+                                </a>
+                            <% } %>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Search Results Info -->
+                <% if (search) { %>
+                <div class="search-results-info">
+                    <div class="results-count">
+                        <i class="fas fa-search"></i>
+                        Showing results for: "<strong><%= search %></strong>"
+                        <% if (orders.length > 0) { %>
+                            - <span class="results-number"><%= orders.length %> order(s) found</span>
+                        <% } %>
+                    </div>
+                </div>
+                <% } %>
+
+                <!-- Orders List -->
+                <div class="orders-list">
+                    <% if (orders.length === 0) { %>
+                        <div class="no-orders">
+                            <div class="no-orders-icon">
+                                <i class="fas fa-<%= search ? 'search' : 'shopping-bag' %>"></i>
+                            </div>
+                            <h3><%= search ? 'No orders found' : 'No orders yet' %></h3>
+                            <p><%= search ? 'Try a different search term' : 'Start shopping to see your orders here' %></p>
+                            <% if (!search) { %>
+                                <a href="/shop" class="shop-now-btn">Shop Now</a>
+                            <% } else { %>
+                                <a href="/user/orders" class="shop-now-btn">View All Orders</a>
+                            <% } %>
+                        </div>
+                    <% } %>
+
+                    <% orders.forEach(order => { %>
+                    <div class="order-card">
+                        <div class="order-header">
+                            <div class="order-info">
+                                <h3>Order #<%= order.orderId %></h3>
+                                <p class="order-date">
+                                    <i class="far fa-calendar"></i>
+                                    Placed on: <%= order.createdAt.toLocaleDateString('en-IN', { 
+                                        day: 'numeric', 
+                                        month: 'long', 
+                                        year: 'numeric' 
+                                    }) %>
+                                </p>
+                            </div>
+                            <div class="order-status-info">
+                                <span class="status-badge <%= order.status %>">
+                                    <i class="fas fa-<%= 
+                                        order.status === 'pending' ? 'clock' :
+                                        order.status === 'shipped' ? 'shipping-fast' :
+                                        order.status === 'delivered' ? 'check-circle' :
+                                        order.status === 'cancelled' ? 'times-circle' :
+                                        order.status === 'out for delivery' ? 'truck' :
+                                        'shopping-bag'
+                                    %>"></i>
+                                    <%= order.status %>
+                                </span>
+                                <p class="total-amount">₹<%= order.totalAmount.toFixed(2) %></p>
+                            </div>
+                        </div>
+
+                        <div class="order-products">
+                            <% order.products.forEach((product, index) => { %>
+                            <div class="product-item">
+                                <div class="product-info">
+                                    <h4><%= product.name %></h4>
+                                    <div class="product-details">
+                                      
+                                        <span class="color-chip" style="background-color: #d4af37"></span>
+                                        <span>Color: <%= product.color %></span>
+                                        <span class="divider">•</span>
+                                        <span>Qty: <%= product.quantity %></span>
+                                        <span class="divider">•</span>
+                                        <span class="price">₹<%= product.price %> each</span>
+                                    </div>
+                                    <span class="product-status <%= product.status %>">
+                                        <i class="fas fa-<%= 
+                                            product.status === 'placed' ? 'check' :
+                                            product.status === 'cancelled' ? 'ban' :
+                                            product.status === 'returned' ? 'undo' :
+                                            'box'
+                                        %>"></i>
+                                        <%= product.status %>
+                                    </span>
+                                </div>
+                                <div class="product-actions">
+                                    <% if (product.status === 'placed') { %>
+                                        <% if (order.status === 'delivered') { %>
+                                            <button class="action-btn return-btn" 
+                                                    data-order-id="<%= order._id %>"
+                                                    data-product-index="<%= index %>">
+                                                <i class="fas fa-undo"></i>
+                                                Return
+                                            </button>
+                                        <% } else { %>
+                                            <button class="action-btn cancel-item-btn" 
+                                                    data-order-id="<%= order._id %>"
+                                                    data-product-index="<%= index %>">
+                                                <i class="fas fa-times"></i>
+                                                Cancel Item
+                                            </button>
+                                        <% } %>
+                                    <% } %>
+                                </div>
+                            </div>
+                            <% }) %>
+                        </div>
+
+                        <div class="order-actions">
+                            <a href="/user/orders/<%= order._id %>" class="action-btn view-details-btn">
+                                <i class="fas fa-eye"></i>
+                                View Details
+                            </a>
+                            <a href="/user/orders/invoice/<%= order._id %>" class="action-btn invoice-btn">
+                                <i class="fas fa-download"></i>
+                                Download Invoice
+                            </a>
+                            
+                            <% if (['pending', 'shipped'].includes(order.status)) { %>
+                                <button class="action-btn cancel-order-btn" data-order-db-id="<%= order._id %>">
+                                    <i class="fas fa-ban"></i>
+                                    Cancel Entire Order
+                                </button>
+                            <% } %>
+                            
+                            <% if (order.status === 'delivered') { %>
+                                <button class="action-btn return-order-btn" data-order-db-id="<%= order._id %>">
+                                    <i class="fas fa-undo-alt"></i>
+                                    Return Entire Order
+                                </button>
+                            <% } %>
+                        </div>
+                    </div>
+                    <% }) %>
+                </div>
+
+                <!-- Pagination -->
+                <% if (totalPages > 1) { %>
+                <div class="pagination">
+                    <% for (let i = 1; i <= totalPages; i++) { %>
+                        <a href="/user/orders?page=<%= i %><%= search ? `&search=${search}` : '' %>" 
+                           class="page-link <%= i == currentPage ? 'active' : '' %>">
+                            <%= i %>
+                        </a>
+                    <% } %>
+                </div>
+                <% } %>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modals -->
+    <div id="cancelModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Cancel Order</h3>
+            <textarea id="cancelReason" placeholder="Reason for cancellation (optional)"></textarea>
+            <div class="modal-actions">
+                <button id="closeCancel" class="btn-secondary">Close</button>
+                <button id="confirmCancel" class="btn-primary">Confirm Cancellation</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="returnModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Return Order</h3>
+            <textarea id="returnReason" placeholder="Reason for return (required)" required></textarea>
+            <div class="modal-actions">
+                <button id="closeReturn" class="btn-secondary">Close</button>
+                <button id="confirmReturn" class="btn-primary">Submit Return Request</button>
+            </div>
+        </div>
+    </div>
+
+    <%- include('../partials/user/footer') %>
+    
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="/js/orders.js"></script>
+    <script src="/js/searchClear.js"></script>
+</body>
+</html>

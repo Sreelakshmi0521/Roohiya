@@ -1,0 +1,235 @@
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">Order Details</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <!-- <li class="breadcrumb-item"><a href="/admin/orders">Orders</a></li> -->
+                    <li class="breadcrumb-item active" aria-current="page"><%= order.orderId %></li>
+                </ol>
+            </nav>
+        </div>
+        <a href="/admin/orders" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Back to Orders
+        </a>
+    </div>
+
+    <div class="row">
+        <!-- Order Summary -->
+        <div class="col-lg-8 mb-4">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Order Summary</h5>
+                    <div>
+                        <span class="badge bg-<%= 
+                            order.status === 'pending' ? 'warning' :
+                            order.status === 'shipped' ? 'info' :
+                            order.status === 'out for delivery' ? 'primary' :
+                            order.status === 'delivered' ? 'success' :
+                            order.status === 'cancelled' ? 'danger' : 'secondary'
+                        %> fs-6">
+                            <%= order.status.charAt(0).toUpperCase() + order.status.slice(1) %>
+                        </span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Order Information</h6>
+                            <p class="mb-1"><strong>Order ID:</strong> <%= order.orderId %></p>
+                            <p class="mb-1"><strong>Order Date:</strong> <%= order.formattedDate %></p>
+                            <p class="mb-1"><strong>Expected Delivery:</strong> <%= order.expectedDeliveryFormatted %></p>
+                            <p class="mb-1"><strong>Payment Method:</strong> 
+                                <span class="badge bg-<%= order.paymentMethod === 'COD' ? 'warning' : 'success' %>">
+                                    <%= order.paymentMethod %>
+                                </span>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Customer Information</h6>
+                            <% if (order.userId) { %>
+                                <p class="mb-1"><strong>Name:</strong> <%= order.userId.name %></p>
+                                <p class="mb-1"><strong>Email:</strong> <%= order.userId.email %></p>
+                                <p class="mb-1"><strong>Phone:</strong> <%= order.userId.phone %></p>
+                            <% } else { %>
+                                <p class="mb-1">Guest Customer</p>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Items -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Order Items (<%= order.products.length %>)</h5>
+                </div>
+                <div class="card-body">
+                    <% order.products.forEach((item, index) => { %>
+                        <div class="row mb-3 pb-3 border-bottom <%= 
+                            item.status === 'cancelled' ? 'bg-light' : 
+                            item.status === 'returned' ? 'bg-light' : '' 
+                        %>">
+                            <div class="col-md-2">
+                                <% if (item.variantId && item.variantId.images && item.variantId.images[0]) { %>
+                                    <img src="<%= item.variantId.images[0] %>" 
+                                         alt="<%= item.name %>" 
+                                         class="img-fluid rounded" 
+                                         style="max-height: 80px;">
+                                <% } else { %>
+                                    <div class="bg-secondary rounded d-flex align-items-center justify-content-center" 
+                                         style="width: 80px; height: 80px;">
+                                        <i class="fas fa-image text-white"></i>
+                                    </div>
+                                <% } %>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="mb-1"><%= item.name %></h6>
+                                <p class="mb-1 text-muted">
+                                    Color: <%= item.color.charAt(0).toUpperCase() + item.color.slice(1) %>
+                                </p>
+                                <p class="mb-1">Quantity: <%= item.quantity %></p>
+                                <p class="mb-1">Price: ₹<%= item.price.toFixed(2) %></p>
+                                
+                                <% if (item.status === 'cancelled' && item.cancelReason) { %>
+                                    <p class="mb-1 text-danger">
+                                        <strong>Cancelled:</strong> <%= item.cancelReason %>
+                                    </p>
+                                <% } %>
+                                
+                                <% if (item.status === 'returned' && item.returnReason) { %>
+                                    <p class="mb-1 text-warning">
+                                        <strong>Returned:</strong> <%= item.returnReason %>
+                                    </p>
+                                <% } %>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6>₹<%= (item.price * item.quantity).toFixed(2) %></h6>
+                                        <span class="badge bg-<%= 
+                                            item.status === 'placed' ? 'success' :
+                                            item.status === 'cancelled' ? 'danger' :
+                                            item.status === 'returned' ? 'warning' : 'secondary'
+                                        %>">
+                                            <%= item.status.charAt(0).toUpperCase() + item.status.slice(1) %>
+                                        </span>
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" 
+                                                type="button" data-bs-toggle="dropdown">
+                                            Actions
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><h6 class="dropdown-header">Update Item Status</h6></li>
+                                            <% if (item.status === 'placed') { %>
+                                                <li><a class="dropdown-item update-item-status" href="#"
+                                                       data-order-id="<%= order._id %>"
+                                                       data-product-index="<%= index %>"
+                                                       data-status="cancelled">
+                                                       Mark as Cancelled</a></li>
+                                            <% } %>
+                                            <% if (order.status === 'delivered' && item.status === 'placed') { %>
+                                                <li><a class="dropdown-item update-item-status" href="#"
+                                                       data-order-id="<%= order._id %>"
+                                                       data-product-index="<%= index %>"
+                                                       data-status="returned">
+                                                       Mark as Returned</a></li>
+                                            <% } %>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Actions & Shipping -->
+        <div class="col-lg-4 mb-4">
+            <!-- Order Actions -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Order Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Update Order Status</label>
+                        <div class="d-grid gap-2">
+                            <% const statusOptions = ['pending', 'shipped', 'out for delivery', 'delivered']; %>
+                            <% statusOptions.forEach(status => { 
+                                if (status !== order.status) { %>
+                                    <button type="button" 
+                                            class="btn btn-outline-<%= 
+                                                status === 'pending' ? 'warning' :
+                                                status === 'shipped' ? 'info' :
+                                                status === 'out for delivery' ? 'primary' :
+                                                status === 'delivered' ? 'success' : 'secondary'
+                                            %> status-update"
+                                            data-order-id="<%= order._id %>"
+                                            data-status="<%= status %>">
+                                        Mark as <%= status.charAt(0).toUpperCase() + status.slice(1) %>
+                                    </button>
+                                <% }
+                            }); %>
+                            
+                            <% if (order.status !== 'cancelled') { %>
+                                <button type="button" 
+                                        class="btn btn-outline-danger status-update mt-2"
+                                        data-order-id="<%= order._id %>"
+                                        data-status="cancelled">
+                                    Cancel Order
+                                </button>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shipping Address -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Shipping Address</h5>
+                </div>
+                <div class="card-body">
+                    <address class="mb-0">
+                        <strong><%= order.shippingAddress.name %></strong><br>
+                        <%= order.shippingAddress.houseName %><br>
+                        <%= order.shippingAddress.locality %><br>
+                        <%= order.shippingAddress.city %>, <%= order.shippingAddress.state %><br>
+                        <%= order.shippingAddress.pincode %><br>
+                        <%= order.shippingAddress.country %><br>
+                        <abbr title="Phone">P:</abbr> <%= order.shippingAddress.phone %>
+                    </address>
+                </div>
+            </div>
+
+            <!-- Order Totals -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Order Totals</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal</span>
+                        <span>₹<%= order.totalAmount.toFixed(2) %></span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Shipping</span>
+                        <span>₹0.00</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Tax</span>
+                        <span>₹0.00</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-0">
+                        <strong>Total</strong>
+                        <strong>₹<%= order.totalAmount.toFixed(2) %></strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
