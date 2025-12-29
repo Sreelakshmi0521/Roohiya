@@ -516,7 +516,7 @@
     border-radius: 8px;
     cursor: pointer;
     transition: var(--transition);
-    color: var(--text-light);
+    color: #bb0d0d;
     width: 54px;
     height: 54px;
     display: flex;
@@ -527,7 +527,7 @@
 
 .wishlist-btn:hover {
     border-color: var(--primary-color);
-    color: var(--primary-color);
+    color: #bb0d0d;
     transform: translateY(-2px);
 }
 

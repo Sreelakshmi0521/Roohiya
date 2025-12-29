@@ -11,8 +11,7 @@
 
     <link rel="stylesheet" href="/styles/user/common.css">
     <link rel="stylesheet" href="/styles/user/sidebar.css">
-    <link rel="stylesheet" href="/styles/user/orderDetails.css">
-</head>
+<link rel="stylesheet" href="/styles/user/<%= pagecss %>"></head>
 <body>
     <%- include('../partials/user/navbar') %>
 
@@ -87,6 +86,192 @@
                         </div>
                     </div>
                 </div>
+                <!-- Order Tracker Timeline -->
+<div class="order-tracker-section">
+    <div class="timeline-card">
+        <div class="section-header">
+            <h3>
+                <i class="fas fa-map-marker-alt"></i>
+                Order Tracking
+                <span class="tracking-id">Order #<%= order.orderId %></span>
+            </h3>
+        </div>
+        
+        <div class="timeline-container">
+            <% 
+            // Define timeline steps with their status
+            const timelineSteps = [
+                { 
+                    id: 'ordered', 
+                    title: 'Order Placed', 
+                    icon: 'shopping-bag',
+                    date: order.createdAt
+                },
+                { 
+                    id: 'confirmed', 
+                    title: 'Order Confirmed', 
+                    icon: 'check-circle',
+                    date: order.confirmedAt || (order.status !== 'pending' ? order.createdAt : null)
+                },
+                { 
+                    id: 'shipped', 
+                    title: 'Shipped', 
+                    icon: 'shipping-fast',
+                    date: order.shippedAt || (['shipped', 'out for delivery', 'delivered'].includes(order.status) ? new Date(order.createdAt.getTime() + 24*60*60*1000) : null)
+                },
+                { 
+                    id: 'out_for_delivery', 
+                    title: 'Out for Delivery', 
+                    icon: 'truck',
+                    date: order.outForDeliveryAt || (['out for delivery', 'delivered'].includes(order.status) ? new Date(order.createdAt.getTime() + 48*60*60*1000) : null)
+                },
+                { 
+                    id: 'delivered', 
+                    title: 'Delivered', 
+                    icon: 'home',
+                    date: order.deliveredAt || (order.status === 'delivered' ? new Date() : null)
+                }
+            ];
+            
+            // Determine current step based on order status
+            let currentStep = 0;
+            switch(order.status) {
+                case 'pending':
+                    currentStep = 0;
+                    break;
+                case 'confirmed':
+                case 'processing':
+                    currentStep = 1;
+                    break;
+                case 'shipped':
+                    currentStep = 2;
+                    break;
+                case 'out for delivery':
+                    currentStep = 3;
+                    break;
+                case 'delivered':
+                    currentStep = 4;
+                    break;
+                case 'cancelled':
+                    currentStep = -1; // Special case for cancelled
+                    break;
+                default:
+                    currentStep = 0;
+            }
+            
+            // Special handling for partially cancelled/returned
+            if (order.status === 'partially cancelled' || order.status === 'partially returned') {
+                currentStep = Math.max(0, currentStep);
+            }
+            %>
+            
+            <% if (order.status === 'cancelled') { %>
+                <div class="cancelled-timeline">
+                    <div class="cancelled-icon">
+                        <i class="fas fa-times-circle"></i>
+                    </div>
+                    <div class="cancelled-info">
+                        <h4>Order Cancelled</h4>
+                        <p>Your order was cancelled on <%= order.cancelledAt ? order.cancelledAt.toLocaleDateString('en-IN', { 
+                            day: 'numeric', 
+                            month: 'short', 
+                            year: 'numeric' 
+                        }) : 'N/A' %></p>
+                        <% if (order.cancelReason) { %>
+                            <p class="cancelled-reason"><strong>Reason:</strong> <%= order.cancelReason %></p>
+                        <% } %>
+                    </div>
+                </div>
+            <% } else { %>
+                <div class="timeline">
+                    <% timelineSteps.forEach((step, index) => { 
+                        const isCompleted = index <= currentStep;
+                        const isCurrent = index === currentStep;
+                        const isLast = index === timelineSteps.length - 1;
+                    %>
+                        <div class="timeline-step <%= isCompleted ? 'completed' : '' %> <%= isCurrent ? 'current' : '' %>">
+                            <div class="step-icon">
+                                <i class="fas fa-<%= step.icon %>"></i>
+                            </div>
+                            <div class="step-content">
+                                <h4 class="step-title"><%= step.title %></h4>
+                                <% if (step.date) { %>
+                                    <p class="step-date">
+                                        <%= step.date.toLocaleDateString('en-IN', { 
+                                            weekday: 'short',
+                                            day: 'numeric', 
+                                            month: 'short', 
+                                            year: 'numeric' 
+                                        }) %>
+                                        at 
+                                        <%= step.date.toLocaleTimeString('en-IN', { 
+                                            hour: '2-digit', 
+                                            minute: '2-digit',
+                                            hour12: true 
+                                        }) %>
+                                    </p>
+                                <% } else { %>
+                                    <p class="step-date pending">Pending</p>
+                                <% } %>
+                            </div>
+                            <% if (!isLast) { %>
+                                <div class="step-connector <%= isCompleted ? 'completed' : '' %>"></div>
+                            <% } %>
+                        </div>
+                    <% }) %>
+                </div>
+                
+                <!-- Delivery Status -->
+                <div class="delivery-status">
+                    <div class="status-info">
+                        <h4>
+                            <i class="fas fa-<%= order.status === 'delivered' ? 'check-circle' : 'clock' %>"></i>
+                            <% if (order.status === 'delivered') { %>
+                                Delivered on <%= order.deliveredAt ? order.deliveredAt.toLocaleDateString('en-IN', { 
+                                    weekday: 'long',
+                                    day: 'numeric', 
+                                    month: 'long', 
+                                    year: 'numeric' 
+                                }) : 'N/A' %>
+                            <% } else if (order.status === 'out for delivery') { %>
+                                Out for Delivery
+                            <% } else if (order.status === 'shipped') { %>
+                                Shipped
+                            <% } else { %>
+                                <%= order.status.charAt(0).toUpperCase() + order.status.slice(1) %>
+                            <% } %>
+                        </h4>
+                        <% if (order.expectedDelivery && order.status !== 'delivered') { %>
+                            <p class="expected-delivery">
+                                Expected delivery: 
+                                <strong>
+                                    <%= order.expectedDelivery.toLocaleDateString('en-IN', { 
+                                        weekday: 'long',
+                                        day: 'numeric', 
+                                        month: 'long', 
+                                        year: 'numeric' 
+                                    }) %>
+                                </strong>
+                            </p>
+                        <% } %>
+                    </div>
+                    
+                    <% if (order.trackingNumber) { %>
+                        <div class="tracking-info">
+                            <p><strong>Tracking Number:</strong> <%= order.trackingNumber %></p>
+                            <% if (order.trackingUrl) { %>
+                                <a href="<%= order.trackingUrl %>" target="_blank" class="tracking-link">
+                                    <i class="fas fa-external-link-alt"></i>
+                                    Track Package
+                                </a>
+                            <% } %>
+                        </div>
+                    <% } %>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>
 
                 <!-- Order Details Grid -->
                 <div class="order-details-grid">
@@ -131,7 +316,7 @@
                                     <div class="product-meta">
                                         <% if (product.color) { %>
                                         <span class="color-info">
-                      <span class="color-chip" style="background-color:<%= getColorCode(product.color) %>"></span>
+                      <!-- <span class="color-chip" style="background-color:<%= getColorCode(product.color) %>"></span> -->
                                             <%= product.color %>
                                         </span>
                                         <% } %>

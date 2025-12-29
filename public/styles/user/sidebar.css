@@ -1,27 +1,29 @@
-/* === Profile Wrapper === */
+/* === PROFILE SIDEBAR - FIXED ===== */
 .profile-wrapper {
     display: flex;
-    align-items: flex-start;
     gap: 30px;
     max-width: 1200px;
-    margin: 0 auto;
-    padding: 30px 20px;
+    margin: 30px auto;
+    padding: 0 20px;
+    align-items: flex-start;
+    position: relative;
 }
 
-/* === Sidebar Section === */
+/* Sidebar - Fixed position */
 .profile-sidebar {
     width: 280px;
     background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
     border-radius: 15px;
     padding: 25px;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-    flex-shrink: 0;
     border: 1px solid #e8e8e8;
     position: sticky;
-    top: 100px;
+    top: 120px; /* Adjust based on your navbar height */
+    flex-shrink: 0;
+    height: fit-content;
 }
 
-/* === Profile Image Section === */
+/* Profile Image Section */
 .profile-image-section {
     text-align: center;
     margin-bottom: 25px;
@@ -52,14 +54,21 @@
 }
 
 .profile-image-section h2 {
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     margin: 0;
     color: #2c3e50;
     font-weight: 600;
     font-family: 'Playfair Display', serif;
 }
 
-/* === Navigation Section === */
+.user-email {
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin: 5px 0 0 0;
+    word-break: break-word;
+}
+
+/* Navigation */
 .profile-nav ul {
     list-style: none;
     padding: 0;
@@ -70,7 +79,7 @@
     margin-bottom: 8px;
 }
 
-.profile-nav a {
+.nav-link {
     display: flex;
     align-items: center;
     gap: 12px;
@@ -81,52 +90,58 @@
     border-radius: 10px;
     transition: all 0.3s ease;
     font-size: 15px;
-    position: relative;
-    overflow: hidden;
+    border: 1px solid transparent;
 }
 
-.profile-nav a::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    height: 100%;
-    width: 0;
-    background: linear-gradient(90deg, rgba(212, 175, 55, 0.1) 0%, transparent 100%);
-    transition: width 0.3s ease;
-}
-
-.profile-nav a:hover::before {
-    width: 100%;
-}
-
-/* === Active Link === */
-.profile-nav a.active {
-    background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
-    color: white;
-    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
-    transform: translateX(5px);
-}
-
-.profile-nav a.active::before {
-    display: none;
-}
-
-/* === Hover Effect === */
-.profile-nav a:hover:not(.active) {
+.nav-link:hover {
     background: #f8f9fa;
     color: #2c3e50;
     transform: translateX(5px);
+    border-color: #e8e8e8;
 }
 
-/* === Icons in Navigation */
-.profile-nav a i {
+.nav-link.active {
+    background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+    border-color: #d4af37;
+}
+
+.nav-link i {
     width: 18px;
     text-align: center;
     font-size: 14px;
 }
 
-/* === Responsive Sidebar === */
+.logout-item {
+    margin-top: 20px;
+    border-top: 1px solid #f0f0f0;
+    padding-top: 20px;
+}
+
+.logout-btn {
+    color: #dc3545;
+    border-color: #ffbaba;
+}
+
+.logout-btn:hover {
+    background: #ffe4e4;
+    color: #c00000;
+    border-color: #ffbaba;
+}
+
+/* Content Area - Consistent across all pages */
+.content-area {
+    flex: 1;
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e8e8e8;
+    min-height: 500px;
+}
+
+/* Responsive */
 @media (max-width: 1024px) {
     .profile-wrapper {
         flex-direction: column;
@@ -136,30 +151,22 @@
     .profile-sidebar {
         width: 100%;
         position: static;
+        top: auto;
     }
 }
 
 @media (max-width: 768px) {
     .profile-wrapper {
-        padding: 15px;
+        padding: 0 15px;
         gap: 15px;
+        margin: 15px auto;
+    }
+    
+    .content-area {
+        padding: 20px;
     }
     
     .profile-sidebar {
         padding: 20px;
-    }
-    
-    .profile-image {
-        width: 80px;
-        height: 80px;
-    }
-    
-    .profile-image-section h2 {
-        font-size: 1.1rem;
-    }
-    
-    .profile-nav a {
-        padding: 12px 15px;
-        font-size: 14px;
     }
 }

@@ -9,12 +9,20 @@ body, html {
             display: flex;
         }
         .left-panel {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.left-panel img {
+  width: 90%;           /* beautiful safe size */
+  height: auto;
+  object-fit: cover;
+  border-radius: 18px;  /* 🔥 smooth curved edges */
+  box-shadow: 0 15px 35px rgba(0,0,0,0.2); /* premium look */
+}
+
         .right-panel {
-            background: #fff;
+            background: #ffffff;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -55,9 +63,9 @@ body, html {
             box-shadow: 0 0 0 0.2rem rgba(247, 147, 30, 0.25);
         }
         .create-btn {
-            background: #d4af37;
+            background: rgb(246, 194, 194);;
             border: none;
-            color: #fff;
+            color: #000000;
             padding: 12px 20px;
             border-radius: 8px;
             width: 100%;
@@ -65,7 +73,7 @@ body, html {
             margin-bottom: 1.5rem;
         }
         .create-btn:hover {
-            background: #d4af37;
+            background: rgb(246, 194, 194);;
         }
         .login-link {
             text-align: center;

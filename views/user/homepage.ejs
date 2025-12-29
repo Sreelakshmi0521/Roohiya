@@ -3,150 +3,150 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= pageTitle %></title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <title><%= pageTitle || 'Roohiya - Timeless Jewelry' %></title>
+
   <link rel="stylesheet" href="/styles/user/common.css">
-  <link rel="stylesheet" href="/styles/user/<%= pagecss %>">
+  <link rel="stylesheet" href="/styles/user/homepage.css">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <!-- Toastify -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+  <!-- SweetAlert2 (optional) -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
   <%- include('../partials/user/navbar') %>
 
-  <!-- HERO -->
-  <section class="hero">
-    <% if (hero) { %>
-      <div class="hero-content">
-        <h1><%= hero.title %></h1>
-        <p><%= hero.description %></p>
-        <a href="<%= hero.shopLink || '/shop' %>" class="shop-now-btn">Shop Now</a>
+  <!-- Hero Carousel -->
+  <section class="hero-section">
+    <div class="carousel">
+      <% heroSlides.forEach((slide, index) => { %>
+        <div class="carousel-slide <%= index === 0 ? 'active' : '' %>"
+             style="background-image: url('<%= slide.image %>');"></div>
+      <% }) %>
+
+      <% heroSlides.forEach((slide, index) => { %>
+        <div class="hero-overlay <%= index === 0 ? 'active' : '' %>">
+          <h1><%= slide.title %></h1>
+          <p><%= slide.description %></p>
+          <a href="<%= slide.shopLink %>" class="btn-primary">Explore Collection</a>
+        </div>
+      <% }) %>
+
+      <div class="carousel-indicators">
+        <% heroSlides.forEach((slide, index) => { %>
+          <div class="indicator <%= index === 0 ? 'active' : '' %>" data-slide-index="<%= index %>"></div>
+        <% }) %>
       </div>
-      <div class="hero-image">
-        <img src="<%= hero.image %>" alt="<%= hero.alt || 'Hero Image' %>">
+    </div>
+  </section>
+
+  <!-- Categories -->
+  <section class="categories-section">
+    <h2 class="section-title">Shop by Category</h2>
+    <div class="categories-grid">
+      <a href="/user/shop?category=casual" class="category-card">
+        <img src="https://res.cloudinary.com/dqcd6e4ux/image/upload/v1766914666/casual_wear_siy2ua.jpg" alt="Casual Wear">
+        <div class="category-overlay"><h3>Casual Wear</h3></div>
+      </a>
+      <a href="/user/shop?category=office" class="category-card">
+        <img src="https://res.cloudinary.com/dqcd6e4ux/image/upload/v1766914777/office_wear_blhqqe.jpg" alt="Office Wear">
+        <div class="category-overlay"><h3>Office Wear</h3></div>
+      </a>
+      <a href="/user/shop?category=traditional" class="category-card">
+        <img src="https://res.cloudinary.com/dqcd6e4ux/image/upload/v1766914872/tradition_wear_wjajg5.jpg" alt="Traditional Wear">
+        <div class="category-overlay"><h3>Traditional Wear</h3></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- New Arrivals -->
+  <section class="new-arrivals">
+    <h2 class="section-title">New Arrivals</h2>
+
+    <% if (products && products.length > 0) { %>
+      <div class="products-grid">
+        <% products.forEach(product => { %>
+          <div class="product-card">
+            <a href="/user/product/<%= product._id %>" class="product-image-wrapper">
+              <% 
+                let displayImage = '';
+                if (product.variants && product.variants.length > 0) {
+                  const variantWithImage = product.variants.find(v => v.images && v.images.length > 0);
+                  if (variantWithImage && variantWithImage.images[0]) {
+                    displayImage = variantWithImage.images[0];
+                  }
+                }
+              %>
+              <img src="<%= displayImage || '/images/placeholder.jpg' %>" alt="<%= product.name %>">
+            </a>
+
+
+            <div class="product-info">
+              <h4><%= product.name %></h4>
+
+              <% 
+                let originalPrice = null;
+                let discountedPrice = null;
+                let hasDiscount = false;
+
+                if (product.variants && product.variants.length > 0) {
+                  const validVariants = product.variants.filter(v => v.isListed !== false);
+                  if (validVariants.length > 0) {
+                    originalPrice = Math.max(...validVariants.map(v => v.price));
+                    const discountedVariants = validVariants.filter(v => v.discountedPrice && v.discountedPrice < v.price);
+                    if (discountedVariants.length > 0) {
+                      discountedPrice = Math.min(...discountedVariants.map(v => v.discountedPrice));
+                      hasDiscount = true;
+                    } else {
+                      discountedPrice = Math.min(...validVariants.map(v => v.price));
+                    }
+                  }
+                }
+              %>
+
+              <div class="price-display">
+                <% if (hasDiscount) { %>
+                  <span class="discounted-price">₹<%= discountedPrice.toLocaleString('en-IN') %></span>
+                  <span class="original-price">₹<%= originalPrice.toLocaleString('en-IN') %></span>
+                <% } else { %>
+                  <span class="regular-price">₹<%= (discountedPrice || originalPrice || 0).toLocaleString('en-IN') %></span>
+                <% } %>
+              </div>
+            </div>
+
+            <% if (hasDiscount) { %>
+              <div class="sale-badge">SALE</div>
+            <% } %>
+          </div>
+        <% }) %>
       </div>
     <% } else { %>
-      <div class="hero-content">
-        <h1>Adorn your soul with timeless beauty</h1>
-        <p>Discover exquisite jewelry that complements every moment.</p>
-        <a href="/user/shop" class="shop-now-btn">Shop Now</a>
-      </div>
-      <div class="hero-image">
-        <img src="/images/hero-woman.jpg" alt="Woman wearing earrings">
-      </div>
+      <p style="text-align:center; color:var(--text-light); font-size:1.3rem; padding: 3rem 0;">
+        No new arrivals yet. Check back soon!
+      </p>
     <% } %>
   </section>
 
-  <!-- CATEGORIES -->
-  <section class="section">
-    <div class="section-header">
-      <h2>Browse Categories</h2>
-      <p>Find the perfect jewelry for every occasion</p>
-    </div>
-    <div class="categories-grid">
-      <% if (categories && categories.length > 0) { %>
-        <% categories.forEach(category => { %>
-          <div class="category-card">
-            <img src="<%= category.image || '/images/placeholder-category.jpg' %>" 
-                 alt="<%= category.name || 'Category' %>">
-            <div class="category-overlay">
-              <h3 class="category-title"><%= category.name %></h3>
-              <a href="/user/shop?category=<%= category._id %>" class="category-link">
-                Explore <i class="fas fa-arrow-right"></i>
-              </a>
-            </div>
-          </div>
-        <% }) %>
-      <% } else { %>
-        <div class="empty-state">
-          <i class="fas fa-gem"></i>
-          <h3>No categories available</h3>
-          <p>Check back soon for new collections</p>
-        </div>
-      <% } %>
-    </div>
-  </section>
-
-  <!-- NEW ARRIVALS -->
-  <section class="section new-arrivals-section">
-    <div class="section-header">
-      <h2>New Arrivals</h2>
-      <p>Discover our latest jewelry collections</p>
-    </div>
-
-    <div class="new-arrivals-grid">
-      <% if (products && products.length > 0) { %>
-        <% products.forEach(product => { 
-             const displayVariant = product.variants && product.variants.length > 0 
-               ? (product.variants.find(v => v.isListed && v.stock > 0) || product.variants[0])
-               : null;
-        %>
-          <div class="product-card">
-            <div class="product-image-container">
-              <a href="/user/product/<%= product._id %>" class="product-image-link">
-                <img 
-                  src="<%= (displayVariant && displayVariant.images && displayVariant.images.length > 0) 
-                          ? displayVariant.images[0] 
-                          : '/images/placeholder.jpg' %>" 
-                  alt="<%= product.name %>">
-              </a>
-             <div class="product-actions">
-  <!-- Wishlist Button -->
-  <button 
-  class="wishlist-btn" 
-  data-product-id="<%= product._id %>" 
-  data-variant-id="<%= displayVariant ? displayVariant._id : '' %>"
-  title="Add to Wishlist">
-  <i class="far fa-heart"></i>
-</button>
-
-
-  <!-- Quick View Button -->
-  <button class="quick-view-btn" 
-          title="Quick View"
-          onclick="window.location.href='/user/product/<%= product._id %>'">
-    <i class="fas fa-eye"></i>
-  </button>
-</div>
-            </div>
-
-            <div class="product-info">
-              <a href="/user/product/<%= product._id %>" class="product-name-link">
-                <h3><%= product.name %></h3>
-              </a>
-
-              <% if (product.isAvailable) { %>
-                <div class="price-container">
-                  <p class="product-price">₹<%= displayVariant.discountedPrice || displayVariant.price %></p>
-                  <% if (displayVariant.discountedPrice && displayVariant.discountedPrice < displayVariant.price) { %>
-                    <p class="original-price">₹<%= displayVariant.price %></p>
-                  <% } %>
-                </div>
-                <p class="product-color">Color: <%= displayVariant.color || '-' %></p>
-
-              
-
-              <% } else { %>
-                <p class="product-price">Unavailable</p>
-                <p class="product-color">Color: -</p>
-              <% } %>
-            </div>
-          </div>
-        <% }) %>
-      <% } else { %>
-        <div class="empty-state">
-          <i class="fas fa-box-open"></i>
-          <h3>No new arrivals</h3>
-          <p>Check back soon for our latest collections</p>
-        </div>
-      <% } %>
+  <!-- Features -->
+  <section class="features-section">
+    <div class="features-container">
+      <div class="features-grid">
+        <div class="feature"><i class="fas fa-shipping-fast"></i><h3>Free Shipping</h3><p>On orders above ₹599</p></div>
+        <div class="feature"><i class="fas fa-shield-alt"></i><h3>Quality Assured</h3><p>100% Authentic Materials</p></div>
+        <div class="feature"><i class="fas fa-exchange-alt"></i><h3>Easy Returns</h3><p>10-Day Return Policy</p></div>
+        <div class="feature"><i class="fas fa-headset"></i><h3>24/7 Support</h3><p>Dedicated Customer Care</p></div>
+      </div>
     </div>
   </section>
 
   <%- include('../partials/user/footer') %>
-  
-  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-      <script src="/js/wishlist.js"></script>
-
+  <script src="/js/carousel.js"></script>
+   <script src="/js/wishlist.js"></script>
 </body>
 </html>

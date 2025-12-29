@@ -73,7 +73,7 @@
                             <h3><%= search ? 'No orders found' : 'No orders yet' %></h3>
                             <p><%= search ? 'Try a different search term' : 'Start shopping to see your orders here' %></p>
                             <% if (!search) { %>
-                                <a href="/shop" class="shop-now-btn">Shop Now</a>
+                                <a href="/user/shop" class="shop-now-btn">Shop Now</a>
                             <% } else { %>
                                 <a href="/user/orders" class="shop-now-btn">View All Orders</a>
                             <% } %>

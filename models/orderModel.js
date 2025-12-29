@@ -45,6 +45,34 @@ const orderSchema = new mongoose.Schema(
       ],
       default: "placed",
     },
+     confirmedAt: {
+      type: Date,
+      default: null
+    },
+    shippedAt: {
+      type: Date,
+      default: null
+    },
+    outForDeliveryAt: {
+      type: Date,
+      default: null
+    },
+    deliveredAt: {
+      type: Date,
+      default: null
+    },
+    cancelledAt: {
+      type: Date,
+      default: null
+    },
+    trackingNumber: {
+      type: String,
+      default: ""
+    },
+    trackingUrl: {
+      type: String,
+      default: ""
+    },
 
         cancelReason: {
           type: String,

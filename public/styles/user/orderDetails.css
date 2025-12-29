@@ -147,7 +147,651 @@
     font-size: 1.2rem;
     font-weight: 700;
 }
+/* ===== ORDER TRACKER TIMELINE ===== */
+.order-tracker-section {
+    margin-bottom: 30px;
+}
 
+.timeline-card {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 1px solid #e8e8e8;
+    border-radius: 12px;
+    padding: 25px;
+    position: relative;
+    overflow: hidden;
+}
+
+.timeline-card .section-header {
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #e8e8e8;
+}
+
+.timeline-card .section-header h3 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #2c3e50;
+    font-size: 1.3rem;
+    margin: 0;
+}
+
+.tracking-id {
+    margin-left: auto;
+    font-size: 0.9rem;
+    color: #6c757d;
+    font-weight: 600;
+    background: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid #e8e8e8;
+}
+
+/* Timeline */
+.timeline {
+    position: relative;
+    padding: 20px 0;
+}
+
+.timeline-step {
+    display: flex;
+    align-items: flex-start;
+    position: relative;
+    margin-bottom: 30px;
+    opacity: 0.6;
+    transition: all 0.3s ease;
+}
+
+.timeline-step:last-child {
+    margin-bottom: 0;
+}
+
+.timeline-step.completed {
+    opacity: 1;
+}
+
+.timeline-step.current {
+    opacity: 1;
+    transform: scale(1.02);
+}
+
+.step-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 20px;
+    flex-shrink: 0;
+    border: 3px solid #e8e8e8;
+    color: #6c757d;
+    font-size: 1.2rem;
+    z-index: 2;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.timeline-step.completed .step-icon {
+    background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
+    border-color: #d4af37;
+    color: white;
+    box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.2);
+}
+
+.timeline-step.current .step-icon {
+    background: white;
+    border-color: #d4af37;
+    color: #d4af37;
+    box-shadow: 0 0 0 6px rgba(212, 175, 55, 0.15);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(212, 175, 55, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(212, 175, 55, 0);
+    }
+}
+
+.step-content {
+    flex: 1;
+    padding-top: 8px;
+}
+
+.step-title {
+    color: #2c3e50;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    font-family: 'Roboto', sans-serif;
+}
+
+.step-date {
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin: 0;
+    font-weight: 500;
+}
+
+.step-date.pending {
+    color: #adb5bd;
+    font-style: italic;
+}
+
+.step-connector {
+    position: absolute;
+    left: 24px;
+    top: 50px;
+    width: 2px;
+    height: calc(100% + 30px);
+    background: #e8e8e8;
+    z-index: 1;
+}
+
+.step-connector.completed {
+    background: linear-gradient(to bottom, #d4af37 0%, #b8941f 100%);
+}
+
+/* Cancelled Timeline */
+.cancelled-timeline {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 30px;
+    background: linear-gradient(135deg, #fff5f5 0%, #ffe3e3 100%);
+    border-radius: 10px;
+    border: 2px solid #f8d7da;
+}
+
+.cancelled-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 2rem;
+    flex-shrink: 0;
+}
+
+.cancelled-info h4 {
+    color: #c0392b;
+    font-size: 1.3rem;
+    margin: 0 0 10px 0;
+    font-weight: 700;
+}
+
+.cancelled-info p {
+    color: #721c24;
+    margin: 5px 0;
+}
+
+.cancelled-reason {
+    background: white;
+    padding: 10px 15px;
+    border-radius: 6px;
+    border-left: 4px solid #e74c3c;
+    margin-top: 10px !important;
+}
+
+/* Delivery Status */
+.delivery-status {
+    margin-top: 30px;
+    padding: 25px;
+    background: white;
+    border-radius: 10px;
+    border: 1px solid #e8e8e8;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.status-info h4 {
+    color: #2c3e50;
+    font-size: 1.2rem;
+    margin: 0 0 10px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.status-info h4 i {
+    color: #d4af37;
+    font-size: 1.4rem;
+}
+
+.expected-delivery {
+    color: #6c757d;
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.expected-delivery strong {
+    color: #2c3e50;
+}
+
+.tracking-info {
+    text-align: right;
+}
+
+.tracking-info p {
+    color: #2c3e50;
+    margin: 0 0 10px 0;
+    font-size: 0.95rem;
+}
+
+.tracking-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.tracking-link:hover {
+    background: linear-gradient(135deg, #138496 0%, #117a8b 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(23, 162, 184, 0.4);
+}
+
+/* Responsive Design for Timeline */
+@media (max-width: 768px) {
+    .timeline-step {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .step-icon {
+        margin-bottom: 15px;
+        margin-right: 0;
+    }
+    
+    .step-connector {
+        left: 24px;
+        top: 50px;
+        height: calc(100% + 15px);
+    }
+    
+    .delivery-status {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .tracking-info {
+        text-align: left;
+        width: 100%;
+    }
+    
+    .cancelled-timeline {
+        flex-direction: column;
+        text-align: center;
+        padding: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .timeline-card {
+        padding: 15px;
+    }
+    
+    .step-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+    
+    .step-title {
+        font-size: 1rem;
+    }
+    
+    .step-date {
+        font-size: 0.85rem;
+    }
+    
+    .delivery-status {
+        padding: 15px;
+    }
+}/* ===== ORDER TRACKER TIMELINE ===== */
+.order-tracker-section {
+    margin-bottom: 30px;
+}
+
+.timeline-card {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 1px solid #e8e8e8;
+    border-radius: 12px;
+    padding: 25px;
+    position: relative;
+    overflow: hidden;
+}
+
+.timeline-card .section-header {
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #e8e8e8;
+}
+
+.timeline-card .section-header h3 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #2c3e50;
+    font-size: 1.3rem;
+    margin: 0;
+}
+
+.tracking-id {
+    margin-left: auto;
+    font-size: 0.9rem;
+    color: #6c757d;
+    font-weight: 600;
+    background: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid #e8e8e8;
+}
+
+/* Timeline */
+.timeline {
+    position: relative;
+    padding: 20px 0;
+}
+
+.timeline-step {
+    display: flex;
+    align-items: flex-start;
+    position: relative;
+    margin-bottom: 30px;
+    opacity: 0.6;
+    transition: all 0.3s ease;
+}
+
+.timeline-step:last-child {
+    margin-bottom: 0;
+}
+
+.timeline-step.completed {
+    opacity: 1;
+}
+
+.timeline-step.current {
+    opacity: 1;
+    transform: scale(1.02);
+}
+
+.step-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 20px;
+    flex-shrink: 0;
+    border: 3px solid #e8e8e8;
+    color: #6c757d;
+    font-size: 1.2rem;
+    z-index: 2;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.timeline-step.completed .step-icon {
+    background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
+    border-color: #d4af37;
+    color: white;
+    box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.2);
+}
+
+.timeline-step.current .step-icon {
+    background: white;
+    border-color: #d4af37;
+    color: #d4af37;
+    box-shadow: 0 0 0 6px rgba(212, 175, 55, 0.15);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(212, 175, 55, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(212, 175, 55, 0);
+    }
+}
+
+.step-content {
+    flex: 1;
+    padding-top: 8px;
+}
+
+.step-title {
+    color: #2c3e50;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    font-family: 'Roboto', sans-serif;
+}
+
+.step-date {
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin: 0;
+    font-weight: 500;
+}
+
+.step-date.pending {
+    color: #adb5bd;
+    font-style: italic;
+}
+
+.step-connector {
+    position: absolute;
+    left: 24px;
+    top: 50px;
+    width: 2px;
+    height: calc(100% + 30px);
+    background: #e8e8e8;
+    z-index: 1;
+}
+
+.step-connector.completed {
+    background: linear-gradient(to bottom, #d4af37 0%, #b8941f 100%);
+}
+
+/* Cancelled Timeline */
+.cancelled-timeline {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 30px;
+    background: linear-gradient(135deg, #fff5f5 0%, #ffe3e3 100%);
+    border-radius: 10px;
+    border: 2px solid #f8d7da;
+}
+
+.cancelled-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 2rem;
+    flex-shrink: 0;
+}
+
+.cancelled-info h4 {
+    color: #c0392b;
+    font-size: 1.3rem;
+    margin: 0 0 10px 0;
+    font-weight: 700;
+}
+
+.cancelled-info p {
+    color: #721c24;
+    margin: 5px 0;
+}
+
+.cancelled-reason {
+    background: white;
+    padding: 10px 15px;
+    border-radius: 6px;
+    border-left: 4px solid #e74c3c;
+    margin-top: 10px !important;
+}
+
+/* Delivery Status */
+.delivery-status {
+    margin-top: 30px;
+    padding: 25px;
+    background: white;
+    border-radius: 10px;
+    border: 1px solid #e8e8e8;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.status-info h4 {
+    color: #2c3e50;
+    font-size: 1.2rem;
+    margin: 0 0 10px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.status-info h4 i {
+    color: #d4af37;
+    font-size: 1.4rem;
+}
+
+.expected-delivery {
+    color: #6c757d;
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.expected-delivery strong {
+    color: #2c3e50;
+}
+
+.tracking-info {
+    text-align: right;
+}
+
+.tracking-info p {
+    color: #2c3e50;
+    margin: 0 0 10px 0;
+    font-size: 0.95rem;
+}
+
+.tracking-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.tracking-link:hover {
+    background: linear-gradient(135deg, #138496 0%, #117a8b 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(23, 162, 184, 0.4);
+}
+
+/* Responsive Design for Timeline */
+@media (max-width: 768px) {
+    .timeline-step {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .step-icon {
+        margin-bottom: 15px;
+        margin-right: 0;
+    }
+    
+    .step-connector {
+        left: 24px;
+        top: 50px;
+        height: calc(100% + 15px);
+    }
+    
+    .delivery-status {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .tracking-info {
+        text-align: left;
+        width: 100%;
+    }
+    
+    .cancelled-timeline {
+        flex-direction: column;
+        text-align: center;
+        padding: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .timeline-card {
+        padding: 15px;
+    }
+    
+    .step-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+    
+    .step-title {
+        font-size: 1rem;
+    }
+    
+    .step-date {
+        font-size: 0.85rem;
+    }
+    
+    .delivery-status {
+        padding: 15px;
+    }
+}
 /* ===== ORDER DETAILS GRID ===== */
 .order-details-grid {
     display: grid;

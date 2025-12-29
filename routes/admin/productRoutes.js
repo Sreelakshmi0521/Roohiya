@@ -22,7 +22,11 @@ router.get("/products/variants/:id/add",nocache,checkSession,setPagetitle("produ
 router.post("/products/variants/:id/add",nocache,checkSession,setPagetitle("products", "addVariant.css"),upload.array('variantImages',3),productController.addVariant)
 
 router.get("/products/variants/edit/:id",nocache, checkSession, setPagetitle("products", "editvariants.css"),productController.loadEditVariant)
-router.post("/products/variants/edit/:id",nocache, checkSession, setPagetitle("products", "editvariants.css"),upload.array("images",3),productController.updateVariant)
+router.post("/products/variants/edit/:id",nocache, checkSession, setPagetitle("products", "editvariants.css"),upload.fields([
+        { name: 'images[0]', maxCount: 1 },
+        { name: 'images[1]', maxCount: 1 },
+        { name: 'images[2]', maxCount: 1 }
+    ]),productController.updateVariant)
 
 router.patch("/products/variants/toggle/:id", nocache, checkSession, setPagetitle("products", "productvariants.css"),productController.toggleVariantStatus)
 

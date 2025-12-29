@@ -21,7 +21,7 @@ const loadProduct=async(req,res)=>{
    if(req.query.page){
     page=parseInt(req.query.page)
    }
-    let limit=3
+    let limit=4
     
       let productData={}
 

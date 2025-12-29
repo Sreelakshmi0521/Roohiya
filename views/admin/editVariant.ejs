@@ -1,60 +1,84 @@
 <div class="admin-container">
   <div class="page-header">
     <h1>Edit Variant</h1>
-  
+  </div>
 
-  <form action="/admin/products/variants/edit/<%= variant._id %>" method="POST" enctype="multipart/form-data">
-  
+  <form action="/admin/products/variants/edit/<%= variant._id %>" method="POST" enctype="multipart/form-data" id="editVariantForm">
+    <input type="hidden" name="variantId" value="<%= variant._id %>">
+    <input type="hidden" name="productId" value="<%= variant.productId ? variant.productId._id : productId %>">
 
+    <!-- Color -->
     <div class="form-group">
       <label for="color">Color</label>
-      <input type="text" id="color" name="color" value="<%= variant.color %>" >
+      <input type="text" id="color" name="color" class="form-control" value="<%= variant.color %>" placeholder="e.g. Gold, Silver, Rose Gold, Black">
     </div>
 
+    <!-- Price -->
     <div class="form-group">
-      <label for="price">Price</label>
-      <input type="number" id="price" name="price" value="<%= variant.price %>" step="0.01" >
+      <label for="price">Price (₹)</label>
+      <input type="number" id="price" name="price" class="form-control" value="<%= variant.price %>" step="0.01" placeholder="0.00" required>
     </div>
 
+    <!-- Discounted Price -->
     <div class="form-group">
-      <label for="discountedPrice">Discounted Price</label>
-      <input type="number" id="discountedPrice" name="discountedPrice" value="<%= variant.discountedPrice %>" step="0.01">
+      <label for="discountedPrice">Discounted Price (₹) <small>(optional)</small></label>
+      <input type="number" id="discountedPrice" name="discountedPrice" class="form-control" value="<%= variant.discountedPrice || '' %>" step="0.01" placeholder="0.00">
     </div>
 
+    <!-- Stock -->
     <div class="form-group">
-      <label for="stock">Stock</label>
-      <input type="number" id="stock" name="stock" value="<%= variant.stock %>" min="0" >
+      <label for="stock">Stock Quantity</label>
+      <input type="number" id="stock" name="stock" class="form-control" value="<%= variant.stock %>" min="0" placeholder="0" required>
     </div>
 
+    <!-- Advanced 3 Images Upload -->
     <div class="form-group">
-      <label for="images">Images (Upload to replace existing images)</label>
-      <input type="file" id="images" name="images" multiple accept="image/*">
-      <div class="images-preview" id="imagesPreview">
-        <% if (variant.images && variant.images.length > 0) { %>
-          <% variant.images.forEach(function(img, i) { %>
-            <img src="<%= img %>" class="preview-image" alt="Existing Image <%= i+1 %>">
-          <% }) %>
-        <% } else { %>
-          <p class="no-images">No images selected.</p>
+      <label class="form-label">Product Images (Exactly 3 images recommended)</label>
+      <p class="text-muted small">Upload clear photos: front, side, and close-up if possible.</p>
+      <div class="variant-images" id="variantImagesContainer">
+        <% for (let i = 0; i < 3; i++) { %>
+          <% 
+            const imageUrl = variant.images && variant.images[i] 
+              ? (typeof variant.images[i] === 'object' ? variant.images[i].url : variant.images[i]) 
+              : ''; 
+          %>
+          <div class="image-upload" data-image="<%= i %>">
+            <div class="upload-icon"><i class="fas fa-image"></i></div>
+            <div class="upload-text">Image <%= i + 1 %></div>
+
+            <!-- Preview Container -->
+            <div class="image-preview-container <%= imageUrl ? '' : 'hidden' %>">
+              <img class="image-preview" src="<%= imageUrl %>" alt="Earring Image <%= i + 1 %>">
+              <button type="button" class="delete-image-btn" aria-label="Remove image">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+
+            <!-- Hidden file input for new image -->
+            <input type="file" name="images[<%= i %>]" accept="image/*" style="display: none;" id="variantImage-<%= i %>">
+
+            <!-- Keep existing image if not replaced -->
+            <input type="hidden" name="existingImages[<%= i %>]" class="existing-image-data" value="<%= imageUrl %>">
+
+            <!-- Browse/Change Button -->
+            <button type="button" class="upload-btn" onclick="document.getElementById('variantImage-<%= i %>').click()">
+              <%= imageUrl ? 'CHANGE IMAGE' : 'BROWSE IMAGE' %>
+            </button>
+          </div>
         <% } %>
       </div>
     </div>
 
+    <!-- Submit Buttons -->
     <div class="form-actions">
       <button type="submit" class="btn btn-primary">Update Variant</button>
-      <a href="/admin/products/variants/<%= productId || product._id %>" class="btn btn-secondary">Cancel</a>
+      <a href="/admin/products/variants/<%= variant.productId ? variant.productId._id : productId %>" class="btn btn-secondary">Cancel</a>
     </div>
   </form>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const imagesInput = document.getElementById('images');
-    const imagesPreview = document.getElementById('imagesPreview');
-    const form = document.querySelector('form');
-    const updateButton = form.querySelector('button[type="submit"]');
-    const MAX_IMAGES = 3;
-
+document.addEventListener('DOMContentLoaded', function () {
     function showToast(message, type = 'warning') {
         const bgColor = type === 'success' ? '#4CAF50' : '#FF6B6B';
         Toastify({
@@ -66,60 +90,58 @@ document.addEventListener('DOMContentLoaded', function() {
             backgroundColor: bgColor
         }).showToast();
     }
-    function resetPreview() {
-        imagesPreview.innerHTML = '<p class="no-images">No images selected. Please upload 3 images.</p>';
-    }
-    if (imagesInput) {
-        imagesInput.addEventListener('change', function() {
-            const files = this.files;
 
-            if (!files || files.length === 0) {
-                if (!imagesPreview.querySelector('img')) resetPreview();
-                return;
-            }
+    // Handle each of the 3 image slots
+    for (let i = 0; i < 3; i++) {
+        const fileInput = document.getElementById('variantImage-' + i);
+        const container = fileInput.parentElement;
+        const previewContainer = container.querySelector('.image-preview-container');
+        const previewImg = previewContainer.querySelector('.image-preview');
+        const uploadBtn = container.querySelector('.upload-btn');
+        const deleteBtn = previewContainer.querySelector('.delete-image-btn');
+        const existingInput = container.querySelector('.existing-image-data');
 
-            if (files.length > MAX_IMAGES) {
-                showToast(`You can only upload exactly ${MAX_IMAGES} images.`);
+        // When user selects a new image
+        fileInput.addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            if (!file.type.match('image.*')) {
+                showToast('Please select a valid image file.', 'warning');
                 this.value = '';
                 return;
             }
 
-            if (files.length < MAX_IMAGES) {
-                showToast(`You must upload exactly ${MAX_IMAGES} images.`);
-                this.value = '';
-                return;
-            }
-
-
-            imagesPreview.innerHTML = '';
-
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-
-                if (!file.type.match('image.*')) {
-                    showToast('Only image files (jpg, jpeg, png) are allowed.');
-                    this.value = '';
-                    return;
-                }
-
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    img.className = 'preview-image';
-                    img.alt = 'Preview Image ' + (i + 1);
-                    imagesPreview.appendChild(img);
-                }
-                reader.readAsDataURL(file);
-            }
+            const reader = new FileReader();
+            reader.onload = function (ev) {
+                previewImg.src = ev.target.result;
+                previewContainer.classList.remove('hidden');
+                uploadBtn.textContent = 'CHANGE IMAGE';
+                existingInput.value = ''; // New image replaces old one
+            };
+            reader.readAsDataURL(file);
         });
+
+        // Remove image (clear preview and mark for deletion)
+        if (deleteBtn) {
+            deleteBtn.addEventListener('click', function () {
+                fileInput.value = '';
+                previewImg.src = '';
+                previewContainer.classList.add('hidden');
+                uploadBtn.textContent = 'BROWSE IMAGE';
+                existingInput.value = ''; // Tells server to delete this image
+            });
+        }
     }
 
-  
-    form.addEventListener('submit', function(e) {
-        updateButton.disabled = true;
-        updateButton.innerHTML = 'Updating Variant... <span class="spinner"></span>';
-        showToast('Updating variant, please wait...', 'success');
-    })
-})
+    // Form submit feedback
+    const form = document.getElementById('editVariantForm');
+    const submitBtn = form.querySelector('button[type="submit"]');
+
+    form.addEventListener('submit', function () {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = 'Updating Variant...';
+        showToast('Updating earring variant, please wait...', 'success');
+    });
+});
 </script>

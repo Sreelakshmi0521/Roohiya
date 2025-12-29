@@ -9,7 +9,7 @@ const userController=require("../../controllers/user/userController")
 
 
 
-router.get("/homepage",requireLogin,checkUserBlocked,nocache,setPagetitle("homepage","homepage.css"),userController.loadHomepage)
+router.get("/homepage",nocache,requireLogin,checkUserBlocked,nocache,setPagetitle("homepage","homepage.css"),userController.loadHomepage)
 router.get("/shop",checkUserBlocked,nocache,setPagetitle("shop","shop.css"),productController.loadShop)
 router.get("/product/:id",checkUserBlocked,nocache,productController.loadProductDetails)
 

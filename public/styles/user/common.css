@@ -77,19 +77,19 @@ h1, h2, h3, h4 {
 }
 
 .nav-links a:hover {
-  color: #d4af37;
+  color: rgb(0, 0, 0);
 }
 
 .signin-btn {
-  background: #d4af37;
-  color: white !important;
+ background:#dcc062;
+   color: rgb(0, 0, 0) !important;
   padding: 0.5rem 1.5rem;
   border-radius: 20px;
   transition: background 0.3s;
 }
 
 .signin-btn:hover {
-  background: #b8942f !important;
+  background: #dcc062!important;
 }
 
 .nav-actions {
@@ -118,6 +118,7 @@ h1, h2, h3, h4 {
   color: #999;
 }
 
+
 .action-icons {
   display: flex;
   gap: 1rem;
@@ -133,15 +134,15 @@ h1, h2, h3, h4 {
 }
 
 .wishlist-icon:hover, .cart-icon:hover {
-  color: #d4af37;
+  color: #dcc062;
 }
 
 .icon-badge {
   position: absolute;
   top: -8px;
   right: -8px;
-  background: #d4af37;
-  color: white;
+  background: #dcc062;
+  color: rgb(11, 11, 11);
   border-radius: 50%;
   width: 18px;
   height: 18px;

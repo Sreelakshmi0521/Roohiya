@@ -1,64 +1,134 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= pageTitle %></title>
-    <link rel="stylesheet" href="wishlist.css">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= pageTitle || 'My Wishlist - Roohiya' %></title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
   <link rel="stylesheet" href="/styles/user/common.css">
-  <link rel="stylesheet" href="/styles/user/<%= pagecss %>">
+  <link rel="stylesheet" href="/styles/user/wishlist.css">
 </head>
 <body>
-        <%- include('../partials/user/navbar') %>
-    <!-- Wishlist Container -->
-    <div class="wishlist-container">
-        <h1>My Wishlist</h1>
-        
-        <!-- Wishlist Header -->
+  <%- include('../partials/user/navbar') %>
+
+  <main class="wishlist-main">
+    <% if (!wishlist || !wishlist.items || wishlist.items.length === 0) { %>
+      <section class="empty-state">
+        <svg class="heart-icon" viewBox="0 0 100 100">
+          <path d="M50 85 C50 85 20 65 20 40 Q20 25 30 20 Q40 15 50 25 Q60 15 70 20 Q80 25 80 40 C80 65 50 85 50 85 Z"
+                stroke="#a50101" stroke-width="3" fill="none" />
+        </svg>
+        <h2>Your wishlist is empty</h2>
+        <p>Save your favorite jewelry pieces here for later!</p>
+        <a href="/user/shop" class="btn btn-secondary">Start Shopping</a>
+      </section>
+    <% } else { %>
+      <section class="populated-wishlist">
         <div class="wishlist-header">
-            <div class="wishlist-count">
-                <span id="wishlist-count">0</span> items
-            </div>
-            <div class="wishlist-actions">
-                <button class="clear-wishlist-btn" id="clear-wishlist">
-                    <i class="fas fa-trash-alt"></i> Clear All
+          <h2>My Wishlist (<%= wishlist.items.length %> items)</h2>
+          <a href="/user/shop" class="btn btn-continue-shopping">Continue Shopping</a>
+        </div>
+
+        <div class="wishlist-items">
+          <% wishlist.items.forEach(item => { %>
+            <%
+              const product = item.productId;
+              const variant = item.productVariantId;
+
+              const displayPrice = variant.discountedPrice > 0 ? variant.discountedPrice : variant.price;
+              const originalPrice = variant.discountedPrice > 0 ? variant.price : null;
+              const hasDiscount = originalPrice !== null;
+
+              const isOutOfStock = variant.stock === 0;
+              const isLowStock = variant.stock > 0 && variant.stock < 5;
+              const isAvailable = product.isListed && variant.isListed && !isOutOfStock;
+            %>
+
+            <div class="wishlist-item <%= !isAvailable ? 'unavailable' : '' %>"
+                 data-product-id="<%= product._id %>"
+                 data-variant-id="<%= variant._id %>">
+
+              <!-- Product Image with Unavailable Badge -->
+              <a href="/user/product/<%= product._id %>" class="product-link">
+                <img src="<%= variant.images?.[0] || '/images/placeholder.jpg' %>"
+                     alt="<%= product.name %>"
+                     class="product-img <%= !isAvailable ? 'out-of-stock' : '' %>"
+                     onerror="this.src='/images/placeholder.jpg'">
+
+                <% if (!isAvailable) { %>
+                  <div class="unavailable-badge">Unavailable</div>
+                <% } %>
+              </a>
+
+              <!-- Details -->
+              <div class="item-details">
+                <h3>
+                  <% if (isAvailable) { %>
+                    <a href="/user/product/<%= product._id %>"><%= product.name %></a>
+                  <% } else { %>
+                    <span class="disabled-name"><%= product.name %></span>
+                  <% } %>
+                </h3>
+
+                <div class="variant-info">
+                  Color: <strong><%= variant.color.charAt(0).toUpperCase() + variant.color.slice(1) %></strong>
+                </div>
+
+                <!-- Price Section -->
+                <div class="price-section">
+                  <span class="current-price">₹<%= Math.round(displayPrice).toLocaleString('en-IN') %></span>
+                  <% if (hasDiscount) { %>
+                    <span class="old-price">₹<%= Math.round(originalPrice).toLocaleString('en-IN') %></span>
+                    <span class="discount">
+                      <%= Math.round(((originalPrice - displayPrice) / originalPrice) * 100) %>% OFF
+                    </span>
+                  <% } %>
+                </div>
+
+                <!-- Stock Status - Only show if available -->
+                <% if (isAvailable) { %>
+                  <% if (isOutOfStock) { %>
+                    <div class="stock-badge out-of-stock">Out of Stock</div>
+                  <% } else if (isLowStock) { %>
+                    <div class="stock-badge low-stock">Only <%= variant.stock %> left!</div>
+                  <% } else { %>
+                    <div class="stock-badge in-stock">In Stock</div>
+                  <% } %>
+                <% } %>
+              </div>
+              <!-- End of item-details -->
+
+              <!-- Actions -->
+              <div class="item-actions">
+                <button class="btn-move-to-cart <%= !isAvailable ? 'disabled' : '' %>"
+                        data-variant-id="<%= variant._id %>"
+                        data-product-id="<%= product._id %>"
+                        <%= !isAvailable ? 'disabled' : '' %>>
+                  <i class="fas fa-shopping-cart"></i> Move to Cart
                 </button>
-            </div>
-        </div>
 
-        <!-- Empty State -->
-        <div class="empty-state" id="empty-wishlist">
-            <i class="far fa-heart"></i>
-            <p>Your wishlist is empty</p>
-            <p class="empty-subtext">Start adding items you love!</p>
-            <button class="btn btn-primary" onclick="window.location.href='/user/products'">
-                <i class="fas fa-shopping-bag"></i> Browse Products
-            </button>
-        </div>
-
-        <!-- Wishlist Items -->
-        <div class="wishlist-items" id="wishlist-items">
-            <!-- Wishlist items will be dynamically populated here -->
-        </div>
-    </div>
-
-    <!-- Confirmation Modal -->
-    <div class="modal" id="confirmation-modal">
-        <div class="modal-content confirmation-modal">
-            <div class="confirmation-icon">
-                <i class="fas fa-exclamation-triangle"></i>
+                <button class="btn-remove"
+                        data-variant-id="<%= variant._id %>"
+                        data-product-id="<%= product._id %>">
+                  <i class="fas fa-trash"></i> Remove
+                </button>
+              </div>
             </div>
-            <h3>Clear Wishlist</h3>
-            <p>Are you sure you want to remove all items from your wishlist? This action cannot be undone.</p>
-            <div class="confirmation-actions">
-                <button class="btn btn-secondary" id="cancel-clear">Cancel</button>
-                <button class="btn btn-danger" id="confirm-clear">Clear All</button>
-            </div>
+          <% }) %>
         </div>
-    </div>
+      </section>
+    <% } %>
+  </main>
+
   <%- include('../partials/user/footer') %>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="/js/wishlistAction.js"></script>
 </body>
 </html>

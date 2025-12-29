@@ -36,7 +36,8 @@ app.use(session({
   cookie: { 
     maxAge: 1000 * 60 * 60 * 24, 
     httpOnly: true,
-    secure: false
+    secure: false,
+    sameSite: 'lax'
   } 
 }))
 
@@ -49,7 +50,7 @@ app.use((req, res, next) => {
   next();
 })
 
-app.use(nocache()) 
+// app.use(nocache()) 
 
 app.use(cartCount)
 app.use(wishlistCount)

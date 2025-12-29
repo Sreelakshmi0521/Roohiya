@@ -169,6 +169,26 @@ exports.getOrderDetails = async (req, res) => {
         if (!order) {
             return res.status(404).send("Order not found");
         }
+         if (!order.confirmedAt && order.status !== 'pending') {
+      order.confirmedAt = new Date(order.createdAt.getTime() + 2*60*60*1000); // 2 hours after order
+    }
+    
+    if (!order.shippedAt && ['shipped', 'out for delivery', 'delivered'].includes(order.status)) {
+      order.shippedAt = new Date(order.createdAt.getTime() + 24*60*60*1000); // 1 day after order
+    }
+    
+    if (!order.outForDeliveryAt && ['out for delivery', 'delivered'].includes(order.status)) {
+      order.outForDeliveryAt = new Date(order.createdAt.getTime() + 48*60*60*1000); // 2 days after order
+    }
+    
+    if (!order.deliveredAt && order.status === 'delivered') {
+      order.deliveredAt = new Date(order.createdAt.getTime() + 72*60*60*1000); // 3 days after order
+    }
+    
+    if (!order.cancelledAt && order.status === 'cancelled') {
+      order.cancelledAt = new Date(); // Current time for cancelled
+    }
+
 
         res.render("user/orderDetails", {
             order,
@@ -246,6 +266,7 @@ exports.cancelOrder=async(req,res)=>{
              return res.status(400).json({ message: "Order cannot be cancelled at this stage"});
         }
         order.status="cancelled"
+         order.cancelledAt = new Date();
 
         for(let product of order.products){
             if(product.status==="placed"){
@@ -317,6 +338,7 @@ exports.cancelOrderItem=async(req,res)=>{
 
    if (allCancelled) {
             order.status = "cancelled";
+             order.cancelledAt = new Date();
         } else if (!somePlaced && order.status !== "cancelled") {
             order.status = "partially cancelled";
         }

@@ -220,17 +220,17 @@
   justify-content: center;
   cursor: pointer;
   transition: var(--transition);
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(255, 255, 255, 0.1);
 }
 
 .wishlist-btn:hover,
 .quick-view-btn:hover {
-  background: var(--primary-color);
-  color: var(--white);
+  background: pink;
+  color:red;
 }
 
 .wishlist-btn.active {
-  background: var(--primary-color);
+  background: rgb(229, 0, 0);
   color: var(--white);
 }
 

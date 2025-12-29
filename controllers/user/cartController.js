@@ -116,12 +116,14 @@ exports.addToCart=async(req,res)=>{
                 discountedPriceAtTime
             })
          }
+         
 await Wishlist.updateOne(
   { userId },
   { $pull: { items: { productId, productVariantId: variantId } } }
 );
          await cart.save()
-         res.json({ success: true, message: "Item added to cart" })
+         const cartItems = cart.items; 
+         res.json({ success: true, message: "Item added to cart", cartCount: cartItems.length })
 
     } catch (error) {
         console.error(error)

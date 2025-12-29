@@ -1,6 +1,8 @@
 
 const nodemailer=require("nodemailer")
-const env=require("dotenv").config({quiet:true})
+const env=require("dotenv").config()
+
+
 
 async function sendVerificationEmail(email,otp,context="signup") {
     try {
