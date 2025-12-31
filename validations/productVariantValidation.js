@@ -3,11 +3,15 @@ const joi = require("joi");
 const addVariantValidation = joi.object({
   product: joi.string().optional().allow(null, "").messages({
     "string.empty": "Product id cannot be empty"
-  }),
-  color: joi.string().trim().lowercase().required().messages({
-    "any.required": "Color is required",
-    "string.empty": "Color cannot be empty"
-  }),
+  }),color: joi.string()
+    .trim()
+    .lowercase()
+    .required()
+    .pattern(/^[a-z][a-z\s-]*[a-z]$/i)  // Starts and ends with letter
+    .messages({
+        "any.required": "Color is required",
+        "string.empty": "Color cannot be empty",
+    }),
   stock: joi.number().integer().min(0).required().messages({
     "any.required": "Stock is required",
     "number.base": "Stock must be a number",

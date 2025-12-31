@@ -44,16 +44,20 @@ variants: joi.array().items(joi.object({
           "number.base": "Stock must be a number.",
           "number.min": "Stock cannot be negative."
         }),
-    price: joi.number().min(0).required().messages({
-          "any.required": "Price is required.",
-          "number.base": "Price must be a number.",
-          "number.min": "Price cannot be negative."
-        }),
-    discountedPrice: joi.number().min(0).optional().allow(null) .messages({
-          "number.base": "Discounted price must be a number.",
-          "number.min": "Discounted price cannot be negative.",
-          "number.max": "Discounted price cannot be more than the original price."
-        })
+   price: joi.number().min(0.01).required().messages({
+                "any.required": "Price is required",
+                "number.min": "Price must be greater than 0"
+            }),
+            discountedPrice: joi.number()
+                .min(0)
+                .less(joi.ref('price')) // < original price
+                .optional()
+                .allow(null, '')
+                .messages({
+                    "number.base": "Discounted price must be a valid number",
+                    "number.less": "Discounted price must be less than original price",
+                    "number.min": "Discounted price cannot be negative"
+                }),
 })).min(1).required().messages({
       "array.min": "At least one product variant is required."
     }),

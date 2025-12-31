@@ -9,23 +9,24 @@ const setPagetitle = require("../../middlewares/setpagetitle");
 
 // product management
 router.get("/products",nocache,checkSession,setPagetitle("products","products.css"),productController.loadProduct)
-router.get("/products/add",nocache,checkSession,setPagetitle("products","addProducts.css"),productController.loadAddProduct)
-router.post("/products/add",nocache,checkSession,setPagetitle("products","addProducts.css"),upload.array('variantImages', 50),productController.addProduct)
+router.get("/products/add",nocache,checkSession,setPagetitle("Add Product", "addProducts.css"),productController.loadAddProduct)
+router.post("/products/add",nocache,checkSession,productController.addProduct)
 router.get("/products/edit/:id", nocache, checkSession, setPagetitle("products", "editProduct.css"), productController.loadEditProduct)
-router.post("/products/edit/:id", nocache, checkSession, setPagetitle("products", "editProduct.css"), productController.updateProduct)
+router.post("/products/edit/:id", nocache, checkSession, productController.updateProduct)
 router.patch("/products/toggle/:id",nocache, checkSession, setPagetitle("products", "productvariants.css"), productController.toggleProductStatus)
 
 //varaint management
 router.get("/products/variants/:id", nocache, checkSession, setPagetitle("products", "productvariants.css"), productController.loadProductVariants)
 
-router.get("/products/variants/:id/add",nocache,checkSession,setPagetitle("products", "addVariant.css"),productController.loadAddVariant)
-router.post("/products/variants/:id/add",nocache,checkSession,setPagetitle("products", "addVariant.css"),upload.array('variantImages',3),productController.addVariant)
+router.get("/products/variants/:productId/add",nocache,checkSession,setPagetitle("products", "addVariant.css"),productController.loadAddVariant)
+router.post("/products/variants/:productId/add",nocache,checkSession,upload.array('variantImages',3),productController.addVariant)
 
 router.get("/products/variants/edit/:id",nocache, checkSession, setPagetitle("products", "editvariants.css"),productController.loadEditVariant)
-router.post("/products/variants/edit/:id",nocache, checkSession, setPagetitle("products", "editvariants.css"),upload.fields([
-        { name: 'images[0]', maxCount: 1 },
-        { name: 'images[1]', maxCount: 1 },
-        { name: 'images[2]', maxCount: 1 }
+
+router.post("/products/variants/edit/:id",nocache, checkSession,upload.fields([
+        { name: 'variantImages[0]', maxCount: 1 },
+        { name: 'variantImages[1]', maxCount: 1 },
+        { name: 'variantImages[2]', maxCount: 1 }
     ]),productController.updateVariant)
 
 router.patch("/products/variants/toggle/:id", nocache, checkSession, setPagetitle("products", "productvariants.css"),productController.toggleVariantStatus)

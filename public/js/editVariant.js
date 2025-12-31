@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const closeModal = document.querySelector(".close");
     const cancelCrop = document.getElementById("cancelCrop");
     const applyCrop = document.getElementById("applyCrop");
-    const form = document.getElementById("addVariantForm");
+    const form = document.getElementById("editVariantForm");
     const saveBtn = document.getElementById("saveVariantBtn");
     const btnText = saveBtn?.querySelector(".btn-text");
     const btnSpinner = saveBtn?.querySelector(".btn-spinner");
@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let currentFile = null;
 
     // ========================
-    // Image Cropping Logic
+    // Image Cropping & Replacement Logic
     // ========================
     imageUploads.forEach((upload, index) => {
         const fileInput = fileInputs[index];
@@ -26,8 +26,21 @@ document.addEventListener("DOMContentLoaded", function () {
         const deleteBtn = upload.querySelector(".delete-image-btn");
         const browseBtn = upload.querySelector(".upload-btn");
 
-        browseBtn.addEventListener("click", () => fileInput.click());
+        // Click on preview container (but not delete button) to replace image
+        previewContainer.addEventListener("click", (e) => {
+            if (e.target.closest(".delete-image-btn")) return; // Ignore if clicking delete
+            fileInput.click();
+        });
 
+        // Click on placeholder browse button
+        if (browseBtn) {
+            browseBtn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                fileInput.click();
+            });
+        }
+
+        // When file is selected → open cropper
         fileInput.addEventListener("change", function (e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -52,11 +65,19 @@ document.addEventListener("DOMContentLoaded", function () {
             reader.readAsDataURL(file);
         });
 
-        deleteBtn.addEventListener("click", () => {
+        // === DELETE BUTTON: Remove new image, show placeholder ===
+        deleteBtn.addEventListener("click", (e) => {
+            e.stopPropagation(); // Prevent triggering preview click
+
+            // Clear file input
             fileInput.value = "";
+
+            // Hide preview, show placeholder
             previewContainer.classList.add("hidden");
             placeholder.classList.remove("hidden");
-            previewImg.src = "#";
+
+            // Optional: Reset preview src to original (if you want to show original again)
+            // previewImg.src = variant.images[index]; // You can store original in data-attr if needed
         });
     });
 
@@ -103,7 +124,7 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     // ========================
-    // Validation Functions
+    // Validation Functions (same as before)
     // ========================
     function showError(fieldId, message) {
         const field = document.getElementById(fieldId);
@@ -112,7 +133,7 @@ document.addEventListener("DOMContentLoaded", function () {
             errorElement.textContent = message;
             errorElement.style.display = "block";
         }
-        field.classList.add("is-invalid");
+        if (field) field.classList.add("is-invalid");
     }
 
     function clearError(fieldId) {
@@ -122,7 +143,7 @@ document.addEventListener("DOMContentLoaded", function () {
             errorElement.textContent = "";
             errorElement.style.display = "none";
         }
-        field.classList.remove("is-invalid");
+        if (field) field.classList.remove("is-invalid");
     }
 
     function validateDiscountedPrice() {
@@ -142,26 +163,25 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // Real-time validation
-    // Replace your current color input listener with this improved version
-document.getElementById("color").addEventListener("input", function () {
-    const value = this.value.trim();
-    const hasLetter = /[a-zA-Z]/.test(value);
-    const isOnlyNumbers = /^\d+$/.test(value);
-    const startsAndEndsWithLetter = /^[a-z].*[a-z]$/i.test(value); // optional stricter check
+    // Real-time validation (same as addVariant)
+    document.getElementById("color").addEventListener("input", function () {
+        const value = this.value.trim();
+        const hasLetter = /[a-zA-Z]/.test(value);
+        const isOnlyNumbers = /^\d+$/.test(value);
+        const startsAndEndsWithLetter = /^[a-z].*[a-z]$/i.test(value);
 
-    if (value === "") {
-        showError("color", "Color is required");
-    } else if (isOnlyNumbers) {
-        showError("color", "Color cannot be just numbers. Use names like 'Red', 'Black'");
-    } else if (!hasLetter) {
-        showError("color", "Color must contain at least one letter");
-    } else if (!startsAndEndsWithLetter && value.length > 1) {
-        showError("color", "Invalid color name. Use words like 'Red', 'Dark Blue'");
-    } else {
-        clearError("color");
-    }
-});
+        if (value === "") {
+            showError("color", "Color is required");
+        } else if (isOnlyNumbers) {
+            showError("color", "Color cannot be just numbers. Use names like 'Red', 'Black'");
+        } else if (!hasLetter) {
+            showError("color", "Color must contain at least one letter");
+        } else if (!startsAndEndsWithLetter && value.length > 1) {
+            showError("color", "Invalid color name. Use words like 'Red', 'Dark Blue'");
+        } else {
+            clearError("color");
+        }
+    });
 
     document.getElementById("price").addEventListener("input", function () {
         const value = parseFloat(this.value);
@@ -188,7 +208,6 @@ document.getElementById("color").addEventListener("input", function () {
 
     document.getElementById("discountedPrice").addEventListener("input", validateDiscountedPrice);
 
-    // Blur validation
     ["color", "price", "stock", "discountedPrice"].forEach(id => {
         document.getElementById(id).addEventListener("blur", function () {
             if (id === "discountedPrice") validateDiscountedPrice();
@@ -197,12 +216,11 @@ document.getElementById("color").addEventListener("input", function () {
     });
 
     // ========================
-    // Single Submit Handler (Validation + Prevent Double Submit)
+    // Submit Handler
     // ========================
     form.addEventListener("submit", function (e) {
         let hasError = false;
 
-        // Text field validation
         if (document.getElementById("color").value.trim() === "") {
             showError("color", "Color is required");
             hasError = true;
@@ -220,35 +238,15 @@ document.getElementById("color").addEventListener("input", function () {
 
         validateDiscountedPrice();
 
-        // Image count validation
-        let imageCount = 0;
-        fileInputs.forEach(input => {
-            if (input.files && input.files.length > 0) imageCount++;
-        });
-
-        if (imageCount !== 3) {
-            Swal.fire({
-                icon: "warning",
-                title: "Images Required",
-                text: "You must upload and crop exactly 3 images.",
-                confirmButtonColor: "#2c3a4b"
-            });
-            hasError = true;
-        }
-
-        // If any error → prevent submission
         if (hasError) {
             e.preventDefault();
             return;
         }
 
-        // SUCCESS: No errors → disable button and show spinner
         if (saveBtn) {
             saveBtn.disabled = true;
             if (btnText) btnText.classList.add("hidden");
             if (btnSpinner) btnSpinner.classList.remove("hidden");
         }
-
-        // Form will now submit normally (no double submission possible)
     });
 });

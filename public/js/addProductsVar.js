@@ -1,420 +1,283 @@
+document.addEventListener("DOMContentLoaded", function () {
+    const variantModal = document.getElementById("variantModal");
+    const addVariantBtn = document.getElementById("addVariantBtn");
+    const closeBtns = document.querySelectorAll("#variantModal .close, #closeVariantModal");
+    const saveVariantBtn = document.getElementById("saveVariantToList");
+    const variantsContainer = document.getElementById("variantsContainer");
+    const productForm = document.getElementById("productForm");
+    const saveProductBtn = document.getElementById("saveProductBtn");
 
-const addVariantBtn = document.getElementById('addVariantBtn')
-const variantModal = document.getElementById('variantModal')
-const closeModalBtn = document.getElementById('closeModalBtn')
-const variantForm = document.getElementById('variantForm')
-const closeSpan = document.querySelector('.close')
-let cropper = null;
-let currentInput = null; // to keep track of which file input is being cropped
+    const imageUploads = document.querySelectorAll("#modalVariantImages .image-upload");
 
-const cropModal = document.getElementById('cropModal');
-const cropImage = document.getElementById('cropImage');
-const closeCropModal = document.getElementById('closeCropModal');
-const cancelCropBtn = document.getElementById('cancelCropBtn');
-const applyCropBtn = document.getElementById('applyCropBtn');
+    let currentUploadElement = null;
+    let cropper = null;
+    let currentFile = null;
 
+    // Open/Close Modal
+    addVariantBtn.onclick = () => {
+        variantModal.classList.add("show");
+        resetVariantModal();
+    };
 
-const variants = []
-
-addVariantBtn.addEventListener('click', () => {
-    variantModal.style.display = 'block'
-})
-
-closeModalBtn.addEventListener('click', () => {
-    variantModal.style.display = 'none'
-    resetVariantForm()
-})
-
-closeSpan.addEventListener('click', () => {
-    variantModal.style.display = 'none'
-    resetVariantForm()
-})
-
-window.addEventListener('click', (event) => {
-    if (event.target === variantModal) {
-        variantModal.style.display = 'none'
-        resetVariantForm()
-    }
-})
-
-function resetVariantForm() {
-    variantForm.reset()
-    document.querySelectorAll('.preview-img').forEach(img => img.remove())
-}
-
-
-['image1', 'image2', 'image3'].forEach(id => {
-    const input = document.getElementById(id);
-
-    input.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        // Save reference to current input for later
-        currentInput = input;
-
-        // Show image inside crop modal
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-            cropImage.src = evt.target.result;
-
-            // Destroy old cropper if any
+    closeBtns.forEach(btn => btn.onclick = () => variantModal.classList.remove("show"));
+    window.onclick = (e) => {
+        if (e.target === variantModal || e.target === document.getElementById("cropModal")) {
+            variantModal.classList.remove("show");
+            document.getElementById("cropModal").classList.remove("show");
             if (cropper) cropper.destroy();
+        }
+    };
 
-            // Initialize cropper
-            cropper = new Cropper(cropImage, {
-                aspectRatio: 1,   // Square crop (adjust as needed)
-                viewMode: 1,
-                autoCropArea: 1,
-                responsive: true,
-                movable: true,
-                zoomable: true,
-                rotatable: false
+    // Reset Modal
+    function resetVariantModal() {
+        document.getElementById("variantColor").value = "";
+        document.getElementById("variantPrice").value = "";
+        document.getElementById("variantDiscountedPrice").value = "";
+        document.getElementById("variantStock").value = "";
+
+        document.querySelectorAll("#variantModal .error-message").forEach(el => el.textContent = "");
+        document.querySelectorAll("#variantModal .form-control").forEach(el => el.classList.remove("is-invalid"));
+
+        imageUploads.forEach(upload => {
+            const placeholder = upload.querySelector(".upload-placeholder");
+            const preview = upload.querySelector(".image-preview-container");
+            const input = upload.querySelector(".file-input");
+            placeholder.classList.remove("hidden");
+            preview.classList.add("hidden");
+            input.value = "";
+            upload.querySelector(".image-preview").src = "#";
+        });
+    }
+
+    // Validation Functions
+    function showError(id, message) {
+        const el = document.getElementById(id + "-error");
+        if (el) el.textContent = message;
+        document.getElementById(id).classList.add("is-invalid");
+    }
+
+    function clearError(id) {
+        const el = document.getElementById(id + "-error");
+        if (el) el.textContent = "";
+        document.getElementById(id).classList.remove("is-invalid");
+    }
+
+    // Real-time validation
+    document.getElementById("variantColor").addEventListener("input", function () {
+        const v = this.value.trim();
+        if (!v) showError("variantColor", "Color is required");
+        else if (/^\d+$/.test(v)) showError("variantColor", "Color cannot be numbers only");
+        else if (!/[a-zA-Z]/.test(v)) showError("variantColor", "Color must contain letters");
+        else clearError("variantColor");
+    });
+
+    document.getElementById("variantPrice").addEventListener("input", function () {
+        const v = parseFloat(this.value);
+        if (!this.value || v <= 0) showError("variantPrice", "Valid price required");
+        else clearError("variantPrice");
+    });
+
+    document.getElementById("variantStock").addEventListener("input", function () {
+        const v = parseInt(this.value);
+        if (!this.value || v < 0) showError("variantStock", "Valid stock required");
+        else clearError("variantStock");
+    });
+
+    document.getElementById("variantDiscountedPrice").addEventListener("input", function () {
+        const discounted = parseFloat(this.value);
+        const price = parseFloat(document.getElementById("variantPrice").value);
+        clearError("variantDiscountedPrice");
+        if (this.value && !isNaN(discounted)) {
+            if (discounted <= 0) showError("variantDiscountedPrice", "Must be positive");
+            else if (!isNaN(price) && discounted >= price) showError("variantDiscountedPrice", "Must be less than price");
+        }
+    });
+
+    // Image Cropping
+    imageUploads.forEach(upload => {
+        const input = upload.querySelector(".file-input");
+        const preview = upload.querySelector(".image-preview-container");
+        const placeholder = upload.querySelector(".upload-placeholder");
+        const deleteBtn = upload.querySelector(".delete-image-btn");
+
+        preview.addEventListener("click", e => {
+            if (e.target.closest(".delete-image-btn")) return;
+            input.click();
+        });
+        placeholder.addEventListener("click", () => input.click());
+
+        input.addEventListener("change", function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            currentFile = file;
+            currentUploadElement = upload;
+
+            const reader = new FileReader();
+            reader.onload = ev => {
+                document.getElementById("cropImage").src = ev.target.result;
+                document.getElementById("cropModal").classList.add("show");
+                if (cropper) cropper.destroy();
+                cropper = new Cropper(document.getElementById("cropImage"), {
+                    aspectRatio: 1,
+                    viewMode: 1,
+                    autoCropArea: 0.8,
+                    responsive: true
+                });
+            };
+            reader.readAsDataURL(file);
+        });
+
+        deleteBtn.addEventListener("click", e => {
+            e.stopPropagation();
+            input.value = "";
+            preview.classList.add("hidden");
+            placeholder.classList.remove("hidden");
+        });
+    });
+
+    // Crop Controls
+    document.querySelectorAll("#cropModal .close, #cancelCrop").forEach(el => el.onclick = () => {
+        document.getElementById("cropModal").classList.remove("show");
+        if (cropper) cropper.destroy();
+    });
+
+    document.getElementById("applyCrop").onclick = () => {
+        if (!cropper || !currentUploadElement) return;
+
+        cropper.getCroppedCanvas({ width: 800 }).toBlob(blob => {
+            const previewImg = currentUploadElement.querySelector(".image-preview");
+            const preview = currentUploadElement.querySelector(".image-preview-container");
+            const placeholder = currentUploadElement.querySelector(".upload-placeholder");
+
+            previewImg.src = URL.createObjectURL(blob);
+            preview.classList.remove("hidden");
+            placeholder.classList.add("hidden");
+
+            const input = currentUploadElement.querySelector(".file-input");
+            const croppedFile = new File([blob], currentFile.name, { type: currentFile.type || "image/jpeg" });
+            const dt = new DataTransfer();
+            dt.items.add(croppedFile);
+            input.files = dt.files;
+
+            document.getElementById("cropModal").classList.remove("show");
+            if (cropper) cropper.destroy();
+        }, "image/jpeg", 0.95);
+    };
+
+    // Add Variant to List (with file inputs cloned)
+    saveVariantBtn.onclick = () => {
+        let hasError = false;
+
+        ["variantColor", "variantPrice", "variantStock", "variantDiscountedPrice"].forEach(id => {
+            document.getElementById(id).dispatchEvent(new Event("input"));
+        });
+        document.querySelectorAll("#variantModal .is-invalid").forEach(() => hasError = true);
+
+        let fileCount = 0;
+        imageUploads.forEach(upload => {
+            if (upload.querySelector(".file-input").files.length > 0) fileCount++;
+        });
+
+        if (fileCount !== 3) {
+            Swal.fire({
+                icon: "warning",
+                title: "Images Required",
+                text: "You must upload and crop exactly 3 images.",
+                confirmButtonColor: "#2c3a4b"
             });
+            hasError = true;
+        }
 
-            cropModal.style.display = 'block';
-        };
-        reader.readAsDataURL(file);
+        if (hasError) return;
+
+        const color = document.getElementById("variantColor").value.trim();
+        const price = document.getElementById("variantPrice").value;
+        const discounted = document.getElementById("variantDiscountedPrice").value || "";
+        const stock = document.getElementById("variantStock").value;
+
+        const card = document.createElement("div");
+        card.className = "variant-card p-4 border rounded mb-4 bg-white shadow-sm";
+
+        // Hidden inputs for data and files
+        let hiddenInputs = `<input type="hidden" name="variantDetails" value='${JSON.stringify({color, price, discountedPrice: discounted || null, stockLimit: stock})}'>`;
+        imageUploads.forEach(upload => {
+            const fileInput = upload.querySelector(".file-input");
+            if (fileInput.files[0]) {
+                const clonedInput = fileInput.cloneNode();
+                clonedInput.name = "variantImages";
+                hiddenInputs += clonedInput.outerHTML;
+            }
+        });
+
+        card.innerHTML = `
+            ${hiddenInputs}
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <strong>Color:</strong> ${color}<br>
+                    <strong>Price:</strong> ₹${price} ${discounted ? `<del>₹${discounted}</del>` : ""}<br>
+                    <strong>Stock:</strong> ${stock}
+                </div>
+                <div class="col-lg-5">
+                    <div class="d-flex gap-3 flex-wrap">
+                        ${Array.from(imageUploads).map(u => `
+                            <img src="${u.querySelector(".image-preview").src}" class="img-thumbnail" style="width:90px;height:90px;object-fit:cover;border-radius:10px;">
+                        `).join("")}
+                    </div>
+                </div>
+                <div class="col-lg-1 text-end">
+                    <button type="button" class="btn btn-danger btn-sm remove-variant">Remove</button>
+                </div>
+            </div>
+        `;
+
+        variantsContainer.appendChild(card);
+        variantModal.classList.remove("show");
+    };
+
+    // Remove variant
+    variantsContainer.addEventListener("click", e => {
+        if (e.target.classList.contains("remove-variant")) {
+            e.target.closest(".variant-card").remove();
+        }
+    });
+
+    // Highlights add/remove
+    document.getElementById("addHighlightBtn").onclick = () => {
+        const item = document.createElement("div");
+        item.className = "highlight-item mb-2 d-flex gap-2";
+        item.innerHTML = `
+            <input type="text" class="form-control highlight-input" name="highlights[]" placeholder="e.g. Handcrafted">
+            <button type="button" class="btn btn-sm btn-outline-danger remove-highlight">Remove</button>
+        `;
+        document.getElementById("highlightsContainer").appendChild(item);
+    };
+
+    document.getElementById("highlightsContainer").addEventListener("click", e => {
+        if (e.target.classList.contains("remove-highlight")) {
+            e.target.closest(".highlight-item").remove();
+        }
+    });
+
+    // Main form validation
+    function validateMainForm() {
+        let valid = true;
+        if (!document.getElementById("productName").value.trim()) { showError("productName", "Required"); valid = false; }
+        if (!document.getElementById("category").value) { showError("category", "Required"); valid = false; }
+        if (!document.getElementById("description").value.trim()) { showError("description", "Required"); valid = false; }
+        if (variantsContainer.children.length === 0) {
+            document.getElementById("variants-error").textContent = "At least one variant required";
+            valid = false;
+        }
+        return valid;
+    }
+
+    productForm.addEventListener("submit", e => {
+        if (!validateMainForm()) {
+            e.preventDefault();
+            return;
+        }
+        saveProductBtn.disabled = true;
+        saveProductBtn.querySelector(".btn-text").classList.add("hidden");
+        saveProductBtn.querySelector(".btn-spinner").classList.remove("hidden");
     });
 });
-
-closeCropModal.addEventListener('click', () => {
-    cropModal.style.display = 'none';
-    if (cropper) cropper.destroy();
-    cropper = null;
-    currentInput = null;
-});
-
-cancelCropBtn.addEventListener('click', () => {
-    cropModal.style.display = 'none';
-    if (cropper) cropper.destroy();
-    cropper = null;
-    currentInput = null;
-});
-
-applyCropBtn.addEventListener('click', () => {
-    if (!cropper || !currentInput) return;
-
-    cropper.getCroppedCanvas().toBlob((blob) => {
-        if (!blob) return;
-
-        // Create new File object from cropped blob
-        const croppedFile = new File([blob], `${currentInput.id}_cropped.jpg`, { type: 'image/jpeg' });
-
-        // Replace input's file with cropped file using DataTransfer
-        const dataTransfer = new DataTransfer();
-        dataTransfer.items.add(croppedFile);
-        currentInput.files = dataTransfer.files;
-
-        // Show cropped preview near input
-        const parent = currentInput.parentElement;
-        const existingPreview = parent.querySelector('.preview-img');
-        if (existingPreview) existingPreview.remove();
-
-        const previewImg = document.createElement('img');
-        previewImg.src = URL.createObjectURL(croppedFile);
-        previewImg.className = 'preview-img';
-        previewImg.style.width = '60px';
-        previewImg.style.height = '60px';
-        previewImg.style.marginLeft = '10px';
-        previewImg.style.objectFit = 'cover';
-        previewImg.style.borderRadius = '4px';
-        parent.appendChild(previewImg);
-
-        // Clean up cropper
-        cropModal.style.display = 'none';
-        cropper.destroy();
-        cropper = null;
-        currentInput = null;
-    }, 'image/jpeg');
-});
-
-
-document.getElementById('saveVariantBtn').addEventListener('click', () => {
-    const color = document.getElementById('color').value.trim()
-    const price = document.getElementById('price').value
-    const discountedPrice = document.getElementById('discountedPrice').value
-    const stockLimit = document.getElementById('stockLimit').value
-    const image1 = document.getElementById('image1').files[0]
-    const image2 = document.getElementById('image2').files[0]
-    const image3 = document.getElementById('image3').files[0]
-
-    if (!color || !price || !stockLimit) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Missing Fields',
-            text: 'Please fill all fields '
-        })
-        return
-    }
-    if(!image1 || !image2 || !image3){
-        Swal.fire({
-            icon: 'error',
-            title: 'Missing Fields',
-            text: 'Please add images '
-        })
-        return
-    }
-
-    if (parseFloat(price) <= 0) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Invalid Price',
-            text: 'Price must be greater than 0.'
-        })
-        return
-    }
-     if (discountedPrice && parseFloat(discountedPrice) < 0) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Invalid Discount',
-            text: 'Discount price cannot be negative.'
-        })
-        return
-    }
-
-    if (discountedPrice && parseFloat(discountedPrice) > parseFloat(price)) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Invalid Discount',
-            text: 'Discount price cannot be greater than regular price.'
-        })
-        return
-    }
-     if (parseInt(stockLimit) < 0) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Invalid Stock',
-            text: 'Stock limit cannot be negative.'
-        })
-        return
-    }
-
-    const variant = {
-        color,
-        price: parseFloat(price),
-        discountedPrice: discountedPrice ? parseFloat(discountedPrice) : null,
-        stockLimit: parseInt(stockLimit),
-        images: [image1, image2, image3]
-    }
-    variants.push(variant)
-
-   
-    const container = document.getElementById('variantsContainer')
-    const div = document.createElement('div')
-    div.className = 'variant-card'
-    div.innerHTML = `
-        <div class="variant-header">
-            <h4>${color}</h4>
-            <button type="button" class="remove-variant-btn" onclick="removeVariant(this)">×</button>
-        </div>
-        <div class="variant-details">
-            <div>Price: ₹${variant.price}</div>
-            <div>Discount: ₹${variant.discountedPrice || 'N/A'}</div>
-            <div>Stock: ${variant.stockLimit}</div>
-        </div>
-        <div class="variant-preview-images"></div>
-    `
-
-    const previewContainer = div.querySelector('.variant-preview-images')
-    variant.images.forEach(file => {
-        const img = document.createElement('img')
-        img.src = URL.createObjectURL(file)
-        img.style.width = '50px'
-        img.style.height = '50px'
-        img.style.marginRight = '5px'
-        img.style.objectFit = 'cover'
-        img.style.borderRadius = '4px'
-        previewContainer.appendChild(img)
-    })
-
-    container.appendChild(div)
-
-    resetVariantForm()
-    variantModal.style.display = 'none'
-
-    Swal.fire({
-        icon: 'success',
-        title: 'Variant Added!',
-        text: 'Variant has been added successfully.',
-        timer: 1500,
-        showConfirmButton: false
-    })
-})
-
-
-function removeVariant(button) {
-    const variantCard = button.closest('.variant-card')
-    const index = Array.from(variantCard.parentElement.children).indexOf(variantCard)
-    variants.splice(index, 1)
-    variantCard.remove()
-}
-
-// Highlight
-const highlightsContainer = document.getElementById('highlightsContainer')
-const addHighlightBtn = document.getElementById('addHighlightBtn')
-
-
-function createHighlightInput(value = '', isMain = false) {
-    const wrapper = document.createElement('div')
-    wrapper.className = 'highlight-wrapper'
-    wrapper.style.display = 'flex'
-    wrapper.style.alignItems = 'center'
-    wrapper.style.marginBottom = '5px'
-
-    const input = document.createElement('input')
-    input.type = 'text'
-    input.className = 'highlight-input'
-    input.name = 'highlights'
-    input.placeholder = 'Add highlight'
-    input.value = value
-    input.style.flex = '1'
-
-    if (!isMain) {
-        const removeBtn = document.createElement('button')
-        removeBtn.type = 'button'
-        removeBtn.textContent = 'Remove'
-        removeBtn.className = 'remove-highlight-btn'
-        removeBtn.style.marginLeft = '5px'
-        removeBtn.addEventListener('click', () => wrapper.remove())
-        wrapper.appendChild(removeBtn)
-    }
-
-    wrapper.appendChild(input)
-    return wrapper
-}
-
-
-document.querySelectorAll('#highlightsContainer .highlight-input').forEach((input, index) => {
-    const wrapper = createHighlightInput(input.value, index === 0)
-    input.replaceWith(wrapper)
-})
-
-
-addHighlightBtn.addEventListener('click', () => {
-    highlightsContainer.appendChild(createHighlightInput())
-})
-
-
-document.getElementById('productForm').addEventListener('submit', async function (e) {
-    e.preventDefault()
-
-  
-    const saveBtn = document.querySelector('.save-btn')
-    const originalText = saveBtn.textContent
-    saveBtn.disabled = true
-    saveBtn.textContent = 'Saving...'
-
-  
-    const productName = document.getElementById('productName').value.trim()
-    const category = document.getElementById('category').value
-    const description = document.getElementById('description').value.trim()
-    const highlightInputs = document.querySelectorAll('.highlight-input')
-    const highlights = Array.from(highlightInputs).map(input => input.value.trim()).filter(h => h)
-
-
-    if (!productName || !category || !description) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Missing Fields',
-            text: 'Please fill all required product fields.'
-        })
-        saveBtn.disabled = false
-        saveBtn.textContent = originalText
-        return
-    }
-
-    if (variants.length === 0) {
-        Swal.fire({
-            icon: 'error',
-            title: 'No Variants',
-            text: 'Please add at least one product variant.'
-        })
-        saveBtn.disabled = false
-        saveBtn.textContent = originalText
-        return
-    }
-
-    const formData = new FormData()
-
-    // Append basic fields
-    formData.append('name', productName)
-    formData.append('category', category)
-    formData.append('description', description)
-    formData.append('highlights', JSON.stringify(highlights))
-
-    // Append variants data
-    variants.forEach((variant) => {
-        const variantData = {
-            color: variant.color,
-            price: variant.price,
-            discountedPrice: variant.discountedPrice,
-            stockLimit: variant.stockLimit,
-        }
-        formData.append('variantDetails', JSON.stringify(variantData))
-
-        // Append all images
-        variant.images.forEach(img => {
-            formData.append('variantImages', img)
-        })
-    })
-
-    try {
-        const response = await axios.post('/admin/products/add', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            },
-            timeout: 30000
-        })
-
-        if (response.data.success) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Success!',
-                text: response.data.message,
-                showConfirmButton: false,
-                timer: 2000
-            }).then(() => {
-                window.location.href = '/admin/products'
-            })
-        } else {
-             Swal.fire('Oops!', data.message, 'warning')
-        }
-    } catch (error) {
-         console.error('Error:', error)
-
-        const msg = error?.response?.data?.message || 'Something went wrong. Please try again.'
-
-        Swal.fire({
-            icon: 'error',
-            title: 'Error!',
-            text: msg
-        })
-
-    } finally {
-        saveBtn.disabled = false
-        saveBtn.textContent = originalText
-    }
-})
-
-
-document.querySelector('.cancel-btn').addEventListener('click', () => {
-    if (variants.length > 0) {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: 'All unsaved changes will be lost.',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, cancel!',
-            cancelButtonText: 'No, keep editing'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = '/admin/products'
-            }
-        })
-    } else {
-        window.location.href = '/admin/products'
-    }
-})
