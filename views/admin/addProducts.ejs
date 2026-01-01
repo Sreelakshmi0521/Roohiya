@@ -4,149 +4,143 @@
     </div>
 
     <div class="add-product-form">
-        <form id="productForm" action="/admin/products/add" method="POST" enctype="multipart/form-data">
+        <form id="productForm">
             <!-- Product Name -->
-            <div class="form-group mb-4">
-                <label class="form-label">Product Name <span class="text-danger">*</span></label>
-                <input type="text" id="productName" name="name" class="form-control" placeholder="Enter Product Name">
-                <small class="text-danger error-message" id="productName-error"></small>
+            <div class="form-group">
+                <label for="productName">Product Name </label>
+                <input type="text" id="productName" name="name" placeholder="Enter Product Name">
+                <span class="error-message" id="productNameError"></span>
             </div>
 
-            <!-- Category -->
-            <div class="form-group mb-4">
-                <label class="form-label">Category <span class="text-danger">*</span></label>
-                <select id="category" name="category" class="form-control">
+            <!-- Category Dropdown -->
+            <div class="form-group">
+                <label for="category">Category </label>
+                <select id="category" name="category">
                     <option value="">Select Category</option>
-                    <% categories.forEach(cat => { %>
-                        <option value="<%= cat._id %>"><%= cat.name %></option>
-                    <% }) %>
+                    <% if (typeof categories !== 'undefined') { %>
+                        <% categories.forEach(function(cat) { %>
+                            <% if (cat.isListed) { %>
+                                <option value="<%= cat._id %>"><%= cat.name %></option>
+                            <% } %>
+                        <% }); %>
+                    <% } %>
                 </select>
-                <small class="text-danger error-message" id="category-error"></small>
+                <span class="error-message" id="categoryError"></span>
             </div>
 
             <!-- Highlights -->
-            <div class="form-group mb-4">
-                <label class="form-label">Highlights</label>
+            <div class="form-group">
+                <label>Highlights</label>
                 <div id="highlightsContainer">
-                    <div class="highlight-item mb-2">
-                        <input type="text" class="form-control highlight-input" name="highlights[]" placeholder="e.g. Premium Quality">
+                    <div class="highlight-wrapper">
+                        <input type="text" class="highlight-input" name="highlights" placeholder="Add highlight">
                     </div>
-                    <div class="highlight-item mb-2">
-                        <input type="text" class="form-control highlight-input" name="highlights[]" placeholder="e.g. Limited Edition">
+                    <div class="highlight-wrapper">
+                        <input type="text" class="highlight-input" name="highlights" placeholder="Add highlight">
                     </div>
                 </div>
-                <button type="button" id="addHighlightBtn" class="btn btn-outline-secondary btn-sm mt-2">+ Add Highlight</button>
+                <button type="button" id="addHighlightBtn">Add Highlight</button>
             </div>
 
             <!-- Description -->
-            <div class="form-group mb-5">
-                <label class="form-label">Description <span class="text-danger">*</span></label>
-                <textarea id="description" name="description" class="form-control" rows="6" placeholder="Write a detailed description..."></textarea>
-                <small class="text-danger error-message" id="description-error"></small>
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" rows="4" placeholder="Write your description..."></textarea>
+                <span class="error-message" id="descriptionError"></span>
             </div>
 
-            <!-- Variants Section -->
-            <div class="variants-section mb-5">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h3>Product Variants</h3>
-                    <button type="button" id="addVariantBtn" class="btn btn-add">
-                        Add Variant
-                    </button>
-                </div>
-
-                <div id="variantsContainer">
-                    <!-- Dynamic variant cards will be inserted here -->
-                </div>
-                <small class="text-danger error-message" id="variants-error"></small>
+            <!-- Add Variant Button -->
+            <div class="form-group">
+                <button type="button" id="addVariantBtn" class="btn-primary">Add Variant</button>
             </div>
 
-            <!-- Submit -->
-            <div class="form-actions text-center">
-                <button type="button" class="btn btn-cancel me-3" onclick="window.history.back()">Cancel</button>
-                <button type="submit" id="saveProductBtn" class="btn btn-add">
-                    <span class="btn-text">Save Product</span>
-                    <span class="btn-spinner hidden">
-                        <i class="fas fa-spinner fa-spin"></i> Saving...
-                    </span>
-                </button>
+            <!-- Variants List -->
+            <div id="variantsContainer">
+                <!-- Dynamically added variants will appear here -->
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="cancel-btn btn-secondary">Cancel</button>
+                <button type="submit" class="save-btn btn-primary">Save Product</button>
             </div>
         </form>
     </div>
 </main>
 
 <!-- Variant Modal -->
-<div id="variantModal" class="modal">
+<div class="modal" id="variantModal">
     <div class="modal-content">
         <div class="modal-header">
             <h3>Add Variant</h3>
-            <span class="close">×</span>
+            <span class="close">&times;</span>
         </div>
         <div class="modal-body">
-            <div class="row g-3">
-                <div class="col-md-6">
-                    <label class="form-label">Color <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" id="variantColor">
-                    <small class="text-danger error-message" id="variantColor-error"></small>
+            <form id="variantForm">
+                <div class="form-group">
+                    <label for="color">Color *</label>
+                    <input type="text" id="color" name="color">
+                    <span class="error-message" id="colorError"></span>
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label">Price (₹) <span class="text-danger">*</span></label>
-                    <input type="number" class="form-control" id="variantPrice" step="0.01" min="0">
-                    <small class="text-danger error-message" id="variantPrice-error"></small>
+                <div class="form-group">
+                    <label for="price">Price *</label>
+                    <input type="number" id="price" name="price" step="0.01" min="0">
+                    <span class="error-message" id="priceError"></span>
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label">Discount Price (₹)</label>
-                    <input type="number" class="form-control" id="variantDiscountedPrice" step="0.01" min="0">
-                    <small class="text-danger error-message" id="variantDiscountedPrice-error"></small>
+                <div class="form-group">
+                    <label for="discountedPrice">Discount Price</label>
+                    <input type="number" id="discountedPrice" name="discountedPrice" step="0.01" min="0">
+                    <span class="error-message" id="discountedPriceError"></span>
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label">Stock <span class="text-danger">*</span></label>
-                    <input type="number" class="form-control" id="variantStock" min="0">
-                    <small class="text-danger error-message" id="variantStock-error"></small>
+                <div class="form-group">
+                    <label for="stockLimit">Stock Limit</label>
+                    <input type="number" id="stockLimit" name="stockLimit" min="0">
+                    <span class="error-message" id="stockLimitError"></span>
                 </div>
-            </div>
-
-            <div class="mt-4">
-                <label class="form-label">Variant Images <span class="text-danger">(Exactly 3 required)</span></label>
-                <div class="variant-images" id="modalVariantImages">
-                    <% for (let i = 0; i < 3; i++) { %>
-                    <div class="image-upload" data-index="<%= i %>">
-                        <div class="upload-placeholder">
-                            <div class="upload-icon"><i class="fas fa-image"></i></div>
-                            <p class="upload-text">Image <%= i + 1 %></p>
-                            <button type="button" class="upload-btn">BROWSE IMAGE</button>
+                <div class="form-group">
+                    <label>Images (Upload exactly 3 images) </label>
+                    <div class="image-uploads">
+                        <div class="file-upload-group">
+                            <label for="image1" class="file-label">Image 1</label>
+                            <input type="file" id="image1" name="image1" accept="image/*">
+                            <div class="preview-container"></div>
                         </div>
-                        <div class="image-preview-container hidden">
-                            <img class="image-preview" src="#" alt="Preview">
-                            <button type="button" class="delete-image-btn">×</button>
+                        <div class="file-upload-group">
+                            <label for="image2" class="file-label">Image 2</label>
+                            <input type="file" id="image2" name="image2" accept="image/*">
+                            <div class="preview-container"></div>
                         </div>
-                        <input type="file" name="variantImages" accept="image/*" class="file-input">
+                        <div class="file-upload-group">
+                            <label for="image3" class="file-label">Image 3</label>
+                            <input type="file" id="image3" name="image3" accept="image/*">
+                            <div class="preview-container"></div>
+                        </div>
                     </div>
-                    <% } %>
+                    <span class="error-message" id="imagesError"></span>
                 </div>
-            </div>
+            </form>
         </div>
         <div class="modal-footer">
-            <button type="button" class="btn btn-cancel" id="closeVariantModal">Cancel</button>
-            <button type="button" class="btn btn-add" id="saveVariantToList">Add to List</button>
+            <button type="button" class="cancel-btn btn-secondary" id="closeModalBtn">Close</button>
+            <button type="button" class="save-btn btn-primary" id="saveVariantBtn">Save Variant</button>
         </div>
     </div>
 </div>
 
-<!-- Crop Modal -->
-<div id="cropModal" class="modal">
-    <div class="modal-content crop-modal">
+<!-- Image Crop Modal -->
+<div class="modal" id="cropModal">
+    <div class="modal-content" style="max-width:600px;">
         <div class="modal-header">
             <h3>Crop Image</h3>
-            <span class="close">×</span>
+            <span class="close" id="closeCropModal">&times;</span>
         </div>
         <div class="modal-body">
-            <div class="crop-container">
-                <img id="cropImage" src="#" alt="Image to crop">
+            <div style="max-height:400px;">
+                <img id="cropImage" style="max-width:100%; display:block;" />
             </div>
         </div>
-        <div class="modal-footer crop-actions">
-            <button type="button" id="cancelCrop" class="btn btn-cancel">Cancel</button>
-            <button type="button" id="applyCrop" class="btn btn-add">Apply Crop</button>
+        <div class="modal-footer">
+            <button type="button" class="btn-secondary" id="cancelCropBtn">Cancel</button>
+            <button type="button" class="btn-primary" id="applyCropBtn">Crop & Replace</button>
         </div>
     </div>
 </div>

@@ -5,12 +5,15 @@ const upload = require("../../middlewares/upload");
 const { checkSession } = require("../../middlewares/adminAuth");
 const nocache = require("../../middlewares/nocache");
 const setPagetitle = require("../../middlewares/setpagetitle");
+const {addProductValidation,updateProductValidation}=require("../../validations/productValidation")
+const validate=require("../../middlewares/validate")
 
 
 // product management
 router.get("/products",nocache,checkSession,setPagetitle("products","products.css"),productController.loadProduct)
 router.get("/products/add",nocache,checkSession,setPagetitle("Add Product", "addProducts.css"),productController.loadAddProduct)
-router.post("/products/add",nocache,checkSession,productController.addProduct)
+router.post("/products/add",nocache,checkSession,validate(addProductValidation),upload.array('variantImages', 50),productController.addProduct)
+
 router.get("/products/edit/:id", nocache, checkSession, setPagetitle("products", "editProduct.css"), productController.loadEditProduct)
 router.post("/products/edit/:id", nocache, checkSession, productController.updateProduct)
 router.patch("/products/toggle/:id",nocache, checkSession, setPagetitle("products", "productvariants.css"), productController.toggleProductStatus)
