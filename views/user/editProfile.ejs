@@ -3,75 +3,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Profile</title>
+    <title>Edit Profile - Roohiya</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <!-- Cropper.js CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">    
+    <!-- CSS Files -->
     <link rel="stylesheet" href="/styles/user/common.css">
+    <link rel="stylesheet" href="/styles/user/sidebar.css">
   <link rel="stylesheet" href="/styles/user/<%= pagecss %>">
-
 </head>
 <body>
+    <%- include('../partials/user/navbar') %>
     
-  <%- include('../partials/user/navbar') %>
-    <div class="edit-profile-container">
-        <div class="edit-profile-header">
-            <h1>Edit Profile</h1>
-            <a href="/user/profile" class="back-btn">Back to Profile</a>
-        </div>
+    <div class="profile-container">
+        <div class="profile-wrapper">
+            <!-- Sidebar -->
+            <%- include('../partials/user/sidebar', { 
+                user, 
+                activePage: 'profile',
+            }) %>
+            
+            <!-- Main Content -->
+            <div class="profile-main-content">
+                <div class="edit-profile-container">
+                    <div class="edit-profile-header">
+                        <h1>Edit Profile</h1>
+                        <a href="/user/profile" class="back-btn">Back to Profile</a>
+                    </div>
 
-        <div class="edit-profile-content">
-            <form id="editProfileForm" class="edit-profile-form" action="/user/editProfile" method="POST" enctype="multipart/form-data">
-                <div class="form-section">
-                    <h2>Profile Image</h2>
-                    <div class="profile-image-edit">
-                        <div class="current-image">
-                                            <img 
+                    <div class="edit-profile-content">
+                        <form id="editProfileForm" class="edit-profile-form" action="/user/editProfile" method="POST" enctype="multipart/form-data">
+                            <div class="form-section">
+                                <h2>Profile Image</h2>
+                                <div class="profile-image-edit">
+                                    <div class="current-image">
+                                        <img 
                                             src="<%= user.profileImage ? user.profileImage : 'https://res.cloudinary.com/dqcd6e4ux/image/upload/v1761935135/free-user-icon-3296-thumb_rsdnow.png' %>" 
                                             alt="Current Profile Image" 
                                             id="currentProfileImg"
                                             onerror="this.onerror=null; this.src='https://res.cloudinary.com/dqcd6e4ux/image/upload/v1761935135/free-user-icon-3296-thumb_rsdnow.png';"
-                                            />
-                        </div>
-                        <div class="image-upload">
-                            <label for="profileImage">Upload New Image</label>
-                            <input type="file" id="profileImage" name="profileImage" accept="image/*">
-                            <p class="file-info">Supported formats: JPG, PNG, GIF. Max size: 2MB</p>
-                        </div>
+                                        />
+                                    </div>
+                                   <!-- Inside the image-upload div -->
+<div class="image-upload">
+  <label for="profileImage" class="upload-label">
+    <i class="fas fa-camera"></i>
+    Upload New Image
+  </label>
+  <input type="file" id="profileImage" name="profileImage" accept="image/*" style="display: none;">
+  <!-- Remove the hidden croppedImage input – we don't need it anymore -->
+  <p class="file-info">Supported formats: JPG, PNG. Max size: 2MB</p>
+</div>
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <h2>Personal Information</h2>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="name">Full Name *</label>
+                                        <input type="text" id="name" name="name" value="<%= user.name %>" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="email">Email Address *</label>
+                                        <input type="email" id="email" name="email" value="<%= user.email %>" 
+                                            <%= isGoogleUser ? 'readonly' : '' %> 
+                                            <%= isGoogleUser ? 'class="disabled-input"' : '' %>
+                                            required>
+                                        <% if (isGoogleUser) { %>
+                                            <small class="google-note">Email cannot be changed for Google users.</small>
+                                        <% } %>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="phone">Phone Number</label>
+                                        <input type="tel" id="phone" name="phone" value="<%= user.phone || '' %>">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="button" class="btn-secondary" id="cancelBtn">Cancel</button>
+                                <button type="submit" class="btn-primary" id="saveBtn">
+                                    <i class="fas fa-save"></i>
+                                    Save Changes
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
-
-                <div class="form-section">
-                    <h2>Personal Information</h2>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="name">Full Name *</label>
-                            <input type="text" id="name" name="name" value="<%= user.name %>">
-                        </div>
-                        <div class="form-group">
-                            <label for="email">Email Address *</label>
-                           <input type="email" id="email" name="email" value="<%= user.email %>" <%= isGoogleUser ? 'readonly' : '' %>  <%= isGoogleUser ? 'class="disabled-input"' : '' %>>
-                                <% if (isGoogleUser) { %>
-                                <small style="color: gray;">Email cannot be changed for Google users.</small>
-                                <% } %>
-                        </div>
-                        <div class="form-group">
-                            <label for="phone">Phone Number</label>
-                            <input type="tel" id="phone" name="phone" value="<%= user.phone || '' %>">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-actions">
-                    <button type="button" class="btn-secondary" id="cancelBtn">Cancel</button>
-                    <button type="submit" class="btn-primary">Save Changes</button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 
-<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- Image Cropper Modal -->
+    <div id="cropperModal" class="modal">
+        <div class="modal-content cropper-modal">
+            <div class="modal-header">
+                <h2><i class="fas fa-crop-alt"></i> Crop Profile Picture</h2>
+                <button class="close-btn" id="closeCropper">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="crop-container">
+                    <img id="imageToCrop" src="" alt="Image to crop">
+                </div>
+                <div class="crop-controls">
+                    <div class="zoom-controls">
+                        <button type="button" class="crop-btn zoom-out">
+                            <i class="fas fa-search-minus"></i>
+                        </button>
+                        <input type="range" id="zoomSlider" min="0.1" max="3" step="0.1" value="1">
+                        <button type="button" class="crop-btn zoom-in">
+                            <i class="fas fa-search-plus"></i>
+                        </button>
+                    </div>
+                    <div class="rotate-controls">
+                        <button type="button" class="crop-btn rotate-left">
+                            <i class="fas fa-undo"></i>
+                            Rotate Left
+                        </button>
+                        <button type="button" class="crop-btn rotate-right">
+                            <i class="fas fa-redo"></i>
+                            Rotate Right
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" id="cancelCrop">
+                    <i class="fas fa-times"></i>
+                    Cancel
+                </button>
+                <button type="button" class="btn-primary" id="applyCrop">
+                    <i class="fas fa-check"></i>
+                    Apply Crop
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <%- include('../partials/user/footer') %>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- Cropper.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
     <script src="/js/editProfile.js"></script>
-     <%- include('../partials/user/footer') %>
 </body>
 </html>

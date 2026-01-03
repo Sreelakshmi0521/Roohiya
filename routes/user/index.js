@@ -15,6 +15,7 @@ const checkoutRoutes=require("./checkoutRoutes")
 const orderRoutes=require("./orderRoutes")
 
 
+
 router.use("/",authRoutes)
 router.use("/",productRoutes)
 router.use("/",reviewRoutes)

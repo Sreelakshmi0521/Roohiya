@@ -238,6 +238,7 @@ exports.getOrderList = async (req, res) => {
             search: search || "",
             currentPage: page,
             totalPages: Math.ceil(total / limit),
+            getColorCode
         });
 
     } catch (error) {

@@ -1,36 +1,71 @@
+<!-- Sidebar - Integrated Layout -->
 <div class="profile-sidebar">
-  <div class="profile-image-section">
-    <div class="profile-image">
-         <img 
-      src="<%= user.profileImage %>"
-      alt="Profile Image"
-      onerror="this.onerror=null; this.src='https://res.cloudinary.com/dqcd6e4ux/image/upload/v1761935135/free-user-icon-3296-thumb_rsdnow.png';"
-    />
+  <!-- User Info -->
+  <div class="user-info-header">
+    <div class="user-avatar">
+      <img 
+        src="<%= user.profileImage || 'https://res.cloudinary.com/dqcd6e4ux/image/upload/v1761935135/free-user-icon-3296-thumb_rsdnow.png' %>"
+        alt="<%= user.name %>"
+        class="user-avatar-img"
+        onerror="this.onerror=null; this.src='https://res.cloudinary.com/dqcd6e4ux/image/upload/v1761935135/free-user-icon-3296-thumb_rsdnow.png';"
+      />
     </div>
-    <h2><%= user.name %></h2>
+    <h3 class="user-name"><%= user.name %></h3>
+    <p class="user-welcome">Welcome back!</p>
   </div>
 
-  <nav class="profile-nav">
-    <ul>
-      <li>
-        <a href="/user/profile" class="nav-link <%= activePage === 'profile' ? 'active' : '' %>">Personal Details</a>
-      </li>
-      <li>
-        <a href="/user/addresses" class="nav-link <%= activePage === 'addresses' ? 'active' : '' %>">Address</a>
-      </li>
-      <li>
-        <a href="/user/orders" class="nav-link <%= activePage === 'orders' ? 'active' : '' %>">My Orders</a>
-      </li>
-      <% if (!user.isGoogleUser) { %>
-      <li>
-        <a href="/user/changePassword" class="nav-link <%= activePage === 'changePassword' ? 'active' : '' %>">Change Password</a>
-      </li>
-      <% } %>
-       <li class="logout-item">
-                <a href="/logout" class="nav-link logout-btn">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </a>
-            </li>
-    </ul>
-  </nav>
+  <!-- Menu -->
+  <ul class="sidebar-menu">
+    <li class="menu-item">
+      <a href="/user/profile" class="menu-link <%= activePage === 'profile' ? 'active' : '' %>">
+        <i class="menu-icon fas fa-user"></i>
+        <span class="menu-text">Personal Details</span>
+      </a>
+    </li>
+
+    <li class="menu-item">
+      <a href="/user/addresses" class="menu-link <%= activePage === 'addresses' ? 'active' : '' %>">
+        <i class="menu-icon fas fa-map-marker-alt"></i>
+        <span class="menu-text">My Addresses</span>
+      </a>
+    </li>
+
+    <li class="menu-item">
+      <a href="/user/orders" class="menu-link <%= activePage === 'orders' ? 'active' : '' %>">
+        <i class="menu-icon fas fa-shopping-bag"></i>
+        <span class="menu-text">My Orders</span>
+      </a>
+    </li>
+
+
+    <li class="menu-item">
+      <a href="/user/wallet" class="menu-link <%= activePage === 'wallet' ? 'active' : '' %>">
+        <i class="menu-icon fas fa-wallet"></i>
+        <span class="menu-text">My Wallet</span>
+      </a>
+    </li>
+
+    <li class="menu-item">
+      <a href="/user/referral" class="menu-link <%= activePage === 'referral' ? 'active' : '' %>">
+        <i class="menu-icon fas fa-gift"></i>
+        <span class="menu-text">Referral Code</span>
+      </a>
+    </li>
+
+    <% if (!user.isGoogleUser) { %>
+    <li class="menu-item">
+      <a href="/user/changePassword" class="menu-link <%= activePage === 'changePassword' ? 'active' : '' %>">
+        <i class="menu-icon fas fa-key"></i>
+        <span class="menu-text">Change Password</span>
+      </a>
+    </li>
+    <% } %>
+
+    <li class="menu-item">
+      <a href="/logout" class="menu-link logout-link">
+        <i class="menu-icon fas fa-sign-out-alt"></i>
+        <span class="menu-text">Log Out</span>
+      </a>
+    </li>
+  </ul>
 </div>

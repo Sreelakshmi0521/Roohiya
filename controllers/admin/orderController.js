@@ -279,8 +279,3 @@ exports.updateProductStatus=async(req,res)=>{
         });
     }
 }
-
-
-
-
-

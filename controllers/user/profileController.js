@@ -17,6 +17,7 @@ const loadProfile=async(req,res,next)=>{
    if(!user) throw new Error("User not found")
     res.render("user/profile",{
       user,
+      activePage: 'profile'
 
    })
    

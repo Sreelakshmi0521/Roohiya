@@ -3,99 +3,112 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= pageTitle %></title>
+  <title>My Addresses - Roohiya</title>
 
+  <!-- Fonts & Icons -->
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 
+  <!-- CSS Files -->
   <link rel="stylesheet" href="/styles/user/common.css">
   <link rel="stylesheet" href="/styles/user/sidebar.css">
   <link rel="stylesheet" href="/styles/user/<%= pagecss %>">
 </head>
-
 <body>
   <%- include('../partials/user/navbar') %>
 
-  <div class="profile-wrapper">
-    <%- include('../partials/user/sidebar', { user, activePage: 'addresses' }) %>
+  <div class="profile-container">
+    <div class="profile-wrapper">
+      <!-- Sidebar -->
+      <%- include('../partials/user/sidebar', { 
+        user, 
+        activePage: 'addresses',
+      }) %>
 
-    <div class="address-container">
-      <h1>My Addresses</h1>
+      <!-- Main Content -->
+      <div class="profile-main-content">
+        <!-- Header -->
+        <div class="address-page-header">
+          <h1>My Addresses</h1>
+          <button class="add-address-btn" onclick="openAddModal()">
+            <i class="fas fa-plus"></i>
+            Add New Address
+          </button>
+        </div>
 
-      <!-- Add Address Button -->
-      <div class="add-address-header">
-        <button class="add-address-btn" onclick="openAddModal()">
-          <i class="fas fa-plus"></i>
-          Add New Address
-        </button>
-      </div>
-
-      <!-- Saved Addresses -->
-      <div class="section-header">
-        <h2>Saved Addresses</h2>
-        <span class="address-count"><%= addresses.length %> address<%= addresses.length !== 1 ? 'es' : '' %></span>
-      </div>
-      
-      <div class="address-list">
-        <% if (!addresses || addresses.length === 0) { %>
-          <div class="empty-state">
-            <i class="fas fa-map-marker-alt"></i>
-            <p>No addresses saved yet.</p>
-            <p class="empty-subtext">Add your first address to get started</p>
-          </div>
-        <% } else { %>
-          <% addresses.forEach(addr => { %>
-            <div class="address-card <%= addr.isDefault ? 'default-address' : '' %>">
-              <div class="address-header">
-                <div class="address-type-badge"><%= addr.addressType %></div>
-                <% if (addr.isDefault) { %>
-                  <div class="default-indicator">
-                    <i class="fas fa-star"></i>
-                    Default Address
-                  </div>
-                <% } %>
+        <!-- Address Count -->
+        <div class="section-header">
+          <h2>Saved Addresses</h2>
+          <span class="address-count"><%= addresses.length %> address<%= addresses.length !== 1 ? 'es' : '' %></span>
+        </div>
+        
+        <!-- Address List -->
+        <div class="address-list">
+          <% if (!addresses || addresses.length === 0) { %>
+            <div class="empty-address-state">
+              <div class="empty-icon">
+                <i class="fas fa-map-marker-alt"></i>
               </div>
-              
-              <div class="address-content">
-                <p class="address-name-phone">
-                  <strong><%= addr.name %></strong> • <%= addr.phone %>
-                </p>
-                <p class="address-line"><%= addr.houseName %>, <%= addr.locality %></p>
-                <p class="address-line"><%= addr.city %>, <%= addr.state %> - <%= addr.pincode %></p>
-                <p class="address-line"><%= addr.country %></p>
-                <% if (addr.landmark) { %>
-                  <p class="address-landmark">
-                    <i class="fas fa-map-marker-alt"></i>
-                    Landmark: <%= addr.landmark %>
-                  </p>
-                <% } %>
-              </div>
-              
-              <div class="address-footer">
-                <div class="address-actions">
-                  <% if (!addr.isDefault) { %>
-                    <button class="set-default-btn" onclick="setAsDefault('<%= addr._id %>')">
+              <h3>No addresses saved yet</h3>
+              <p>Add your first address to get started with faster checkout</p>
+              <button class="add-first-btn" onclick="openAddModal()">
+                <i class="fas fa-plus"></i>
+                Add Your First Address
+              </button>
+            </div>
+          <% } else { %>
+            <% addresses.forEach(addr => { %>
+              <div class="address-card <%= addr.isDefault ? 'default-address' : '' %>">
+                <div class="address-card-header">
+                  <div class="address-type-badge"><%= addr.addressType %></div>
+                  <% if (addr.isDefault) { %>
+                    <div class="default-indicator">
                       <i class="fas fa-star"></i>
-                      Set as Default
-                    </button>
+                      Default Address
+                    </div>
                   <% } %>
-                  
-                  <button class="edit-btn" onclick="openEditModal('<%= addr._id %>')">
-                    <i class="fas fa-edit"></i>
-                    Edit
-                  </button>
-                  
-                 <button class="delete-btn" onclick="openDeleteModal('<%= addr._id %>')">
-                  <i class="fas fa-trash"></i>
-                  Delete
-                </button>
-
+                </div>
+                
+                <div class="address-card-content">
+                  <p class="address-name-phone">
+                    <strong><%= addr.name %></strong> • <%= addr.phone %>
+                  </p>
+                  <p class="address-line"><%= addr.houseName %>, <%= addr.locality %></p>
+                  <p class="address-line"><%= addr.city %>, <%= addr.state %> - <%= addr.pincode %></p>
+                  <p class="address-line"><%= addr.country %></p>
+                  <% if (addr.landmark) { %>
+                    <p class="address-landmark">
+                      <i class="fas fa-map-marker-alt"></i>
+                      Landmark: <%= addr.landmark %>
+                    </p>
+                  <% } %>
+                </div>
+                
+                <div class="address-card-footer">
+                  <div class="address-actions">
+                    <% if (!addr.isDefault) { %>
+                      <button class="action-btn set-default-btn" onclick="setAsDefault('<%= addr._id %>')">
+                        <i class="fas fa-star"></i>
+                        Set as Default
+                      </button>
+                    <% } %>
+                    
+                    <button class="action-btn edit-btn" onclick="openEditModal('<%= addr._id %>')">
+                      <i class="fas fa-edit"></i>
+                      Edit
+                    </button>
+                    
+                    <button class="action-btn delete-btn" onclick="openDeleteModal('<%= addr._id %>')">
+                      <i class="fas fa-trash"></i>
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          <% }) %>
-        <% } %>
+            <% }) %>
+          <% } %>
+        </div>
       </div>
     </div>
   </div>
@@ -390,12 +403,11 @@
     </div>
   </div>
 
-  <%- include('../partials/user/alert', { message, messageType }) %>
   <%- include('../partials/user/footer') %>
 
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-   <script src="/js/pincodeAutofill.js"></script>
+  <script src="/js/pincodeAutofill.js"></script>
   <script src="/js/address.js"></script>
 </body>
 </html>
