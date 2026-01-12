@@ -41,6 +41,35 @@ const cartSchema = new mongoose.Schema({
         },
       },
     ],
+    coupon: {  // New field for storing applied coupon details (temporary until order placement)
+      code: {
+        type: String,
+      },
+      couponId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Coupon',
+      },
+      discountType: {
+        type: String,
+        enum: ['percentage', 'fixed'],
+      },
+      discountValue: {
+        type: Number,
+      },
+      discountAmount: {
+        type: Number,
+      },
+    },
+    discount: {  // Total discount from coupon
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    totalAmount: {  // Computed total after discounts (update on apply/remove)
+      type: Number,
+      default: 0,
+      min: 0,
+    },
 
   },{ timestamps: true })
 

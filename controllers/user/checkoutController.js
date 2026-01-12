@@ -35,11 +35,24 @@ exports.loadCheckoutPage=async(req,res)=>{
 
   })
 
+    let couponDiscount = 0
+    let appliedCoupon = null
+
+          if (cart.coupon && cart.coupon.code) {
+            couponDiscount = cart.coupon.discountAmount || 0
+            appliedCoupon = {
+                code: cart.coupon.code,
+                discountAmount: cart.coupon.discountAmount,
+                discountType: cart.coupon.discountType,
+                discountValue: cart.coupon.discountValue
+            }
+        }
+
   const tax=+(subtotal*0.05).toFixed(2)
 
   const shipping=subtotal>599?0:50
 
-  const total=subtotal+tax+shipping
+        const total = subtotal - couponDiscount + tax + shipping
 
   res.render("user/checkout",{
     addresses,
@@ -48,14 +61,18 @@ exports.loadCheckoutPage=async(req,res)=>{
         image: item.productVariantId?.images?.[0] ,
         quantity:item.quantity,
         price:item.discountedPriceAtTime||item.priceAtTime,
-        originalPrice:item.priceAtTime
+        originalPrice:item.priceAtTime,
+         discount: item.priceAtTime - (item.discountedPriceAtTime || item.priceAtTime)
+
     })),
     summary:{
         subtotal,
         tax,
         shipping,
         total,
-        youSave
+        youSave,
+          couponDiscount,  
+                appliedCoupon 
     },
     user: req.session.user,
 

@@ -118,35 +118,89 @@
                     </div>
 
                     <div class="price-breakdown">
-                        <div class="price-row">
-                            <span>Subtotal:</span>
-                            <span>₹<%= (summary.subtotal || 0).toFixed(2) %></span>
-                        </div>
-                        <div class="price-row">
-                            <span>Shipping:</span>
-                            <span>₹<%= (summary.shipping || 0).toFixed(2) %></span>
-                        </div>
-                        <div class="price-row">
-                            <span>Tax:</span>
-                            <span>₹<%= (summary.tax || 0).toFixed(2) %></span>
-                        </div>
-                        <% if (summary.youSave > 0) { %>
-<div class="price-row you-save">
-    <span class="text-success">You Save:</span>
-    <span class="text-success">₹<%= (summary.youSave || 0).toFixed(2) %></span>
+    <div class="price-row">
+        <span>Subtotal:</span>
+        <span>₹<%= (summary.subtotal || 0).toFixed(2) %></span>
+    </div>
+    
+    <!-- Product Discounts (You Save) -->
+    <% if (summary.youSave > 0) { %>
+        <div class="price-row you-save">
+            <span class="text-success">You Save:</span>
+            <span class="text-success">₹<%= (summary.youSave || 0).toFixed(2) %></span>
+        </div>
+    <% } %>
+    
+  
+    <div class="price-row">  <!-- Coupon Discount -->
+    <% if (summary.couponDiscount > 0) { %>
+        <div class="price-row discount">
+            <span>Coupon Discount (<%= summary.appliedCoupon?.code %>):</span>
+            <span>-₹<%= (summary.couponDiscount || 0).toFixed(2) %></span>
+        </div>
+    <% } %>
+    
+        <span>Shipping:</span>
+        <span>₹<%= (summary.shipping || 0).toFixed(2) %></span>
+    </div>
+    
+    <div class="price-row">
+        <span>Tax:</span>
+        <span>₹<%= (summary.tax || 0).toFixed(2) %></span>
+    </div>
+    
+    <div class="price-row total">
+        <span>Grand Total:</span>
+        <span>₹<%= (summary.total || 0).toFixed(2) %></span>
+    </div>
 </div>
-<% } %>
-
-                        <div class="price-row total">
-                            <span>Total:</span>
-                            <span>₹<%= (summary.total || 0).toFixed(2) %></span>
-                        </div>
-                    </div>
 
                     <button type="button" class="btn-place-order" onclick="placeOrder()">
                         <i class="fas fa-shopping-bag"></i> Place Order
                     </button>
                 </section>
+                
+                    <!-- Simple Coupon Box Below Order Summary -->
+<section class="simple-coupon-box">
+    <h3>Apply Coupon</h3>
+    <div class="coupon-input-group">
+        <% if (summary.appliedCoupon && summary.appliedCoupon.code) { %>
+            <input 
+                type="text" 
+                id="couponCode" 
+                placeholder="Enter coupon code" 
+                value="<%= summary.appliedCoupon.code %>" 
+                readonly
+            >
+            <button type="button" class="btn-remove" onclick="removeCoupon()" id="removeCouponBtn">
+                REMOVE
+            </button>
+        <% } else { %>
+            <input 
+                type="text" 
+                id="couponCode" 
+                placeholder="Enter coupon code"
+            >
+            <button type="button" class="btn-apply" onclick="applyCoupon()" id="applyCouponBtn">
+                APPLY
+            </button>
+        <% } %>
+    </div>
+
+    <% if (summary.appliedCoupon && summary.appliedCoupon.code) { %>
+        <div class="applied-success">
+            <i class="fas fa-check-circle"></i>
+            Coupon <strong><%= summary.appliedCoupon.code %></strong> applied! 
+            You saved ₹<%= summary.couponDiscount.toFixed(2) %>
+        </div>
+    <% } %>
+
+    <div class="view-coupons-link">
+        <button type="button" class="link-btn" onclick="openAvailableCouponsModal()" id="viewCouponsBtn">
+            <i class="fas fa-ticket-alt"></i> View Available Coupons
+        </button>
+    </div>
+</section>
             </div>
         </div>
     </div>
@@ -311,10 +365,13 @@
     </div>
 
     <%- include('../partials/user/footer') %>
+    
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="/js/checkout.js"></script>
        <script src="/js/pincodeAutofill.js"></script>
+           <script src="/js/coupon.js"></script>
+
 
     
   

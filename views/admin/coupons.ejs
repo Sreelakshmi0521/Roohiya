@@ -1,0 +1,376 @@
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="mb-1">COUPONS</h2>
+      <p class="text-muted mb-0">Create and manage discount coupons for your store</p>
+    </div>
+    <button class="btn btn-primary px-4" id="btnAddCoupon">
+      <i class="bi bi-plus-lg me-2"></i> ADD COUPON
+    </button>
+  </div>
+
+ <!-- Updated Search & Filter Section -->
+<div class="card shadow-sm border-0 mb-4">
+  <div class="card-body p-3">
+    <div class="row g-3 align-items-center">
+      <!-- Search Column -->
+      <div class="col-md-8 col-lg-9">
+        <div class="input-group">
+          <span class="input-group-text bg-white border-end-0">
+            <i class="bi bi-search text-muted"></i>
+          </span>
+          <input type="text" class="form-control border-start-0" id="searchCoupon" placeholder="Search coupon code..." value="<%= search || '' %>">
+        </div>
+      </div>
+      
+      <!-- Status Filter Column -->
+      <div class="col-md-4 col-lg-3">
+        <div class="status-filter-container">
+          <div class="dropdown">
+            <button class="btn btn-outline-secondary w-100 dropdown-toggle d-flex justify-content-between align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <span class="filter-label">
+                <% if(status === 'active') { %>Active<% } else if(status === 'inactive') { %>Inactive<% } else if(status === 'expired') { %>Expired<% } else { %>All Status<% } %>
+              </span>
+              <i class="bi bi-chevron-down"></i>
+            </button>
+            <ul class="dropdown-menu w-100">
+              <li><a class="dropdown-item <%= !status || status === 'all' ? 'active' : '' %>" href="?page=1<%= search ? '&search=' + encodeURIComponent(search) : '' %>">All Status</a></li>
+              <li><a class="dropdown-item <%= status === 'active' ? 'active' : '' %>" href="?page=1&status=active<%= search ? '&search=' + encodeURIComponent(search) : '' %>">Active</a></li>
+              <li><a class="dropdown-item <%= status === 'inactive' ? 'active' : '' %>" href="?page=1&status=inactive<%= search ? '&search=' + encodeURIComponent(search) : '' %>">Inactive</a></li>
+              <li><a class="dropdown-item <%= status === 'expired' ? 'active' : '' %>" href="?page=1&status=expired<%= search ? '&search=' + encodeURIComponent(search) : '' %>">Expired</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <!-- Coupon Table -->
+  <div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0 align-middle">
+          <thead class="bg-light">
+            <tr>
+              <th>COUPON CODE</th>
+              <th>DESCRIPTION</th>
+              <th>MIN PURCHASE</th>
+              <th>DISCOUNT</th>
+              <th>START DATE</th>
+              <th>END DATE</th>
+              <th>USAGE</th>
+              <th>STATUS</th>
+              <th>ACTION</th>
+            </tr>
+          </thead>
+          <tbody id="couponTableBody">
+            <% if(coupons.length === 0) { %>
+              <tr>
+                <td colspan="9" class="text-center py-5">
+                  <div class="text-muted">
+                    <i class="bi bi-tag fs-4 d-block mb-2"></i>
+                    No coupons found
+                  </div>
+                </td>
+              </tr>
+            <% } %>
+            <% coupons.forEach(coupon => { %>
+            <tr data-coupon-id="<%= coupon._id %>">
+    <td class="fw-bold"><%= coupon.code %></td>
+    <td><%= coupon.description %></td>
+    <td>
+        <% if(coupon.minPurchaseAmount > 0) { %>
+            ₹<%= coupon.minPurchaseAmount.toLocaleString('en-IN') %>
+        <% } else { %>
+            —
+        <% } %>
+    </td>
+    <td>
+        <%= coupon.discountType === 'percentage' ? coupon.discountValue + '%' : '₹' + coupon.discountValue.toLocaleString('en-IN') %>
+        <% if(coupon.maxDiscountAmount && coupon.discountType === 'percentage') { %>
+            <small class="d-block text-muted">Max: ₹<%= coupon.maxDiscountAmount.toLocaleString('en-IN') %></small>
+        <% } %>
+    </td>
+    <td>
+        <%= new Date(coupon.startDate).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }) %>
+    </td>
+    <td>
+        <%= new Date(coupon.endDate).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }) %>
+    </td>
+    <td>
+        <%= coupon.usageCount %> / <%= coupon.usageLimit === 0 ? '∞' : coupon.usageLimit %>
+        <small class="d-block text-muted">Per user: <%= coupon.perUserLimit %></small>
+    </td>
+    <!-- ADD THIS STATUS COLUMN -->
+<!-- UPDATE THE STATUS COLUMN IN YOUR TABLE -->
+<td>
+    <div class="d-flex align-items-center justify-content-between">
+        <div class="form-check form-switch m-0">
+            <input class="form-check-input toggle-status" type="checkbox" 
+                   role="switch" <%= coupon.isActive ? 'checked' : '' %> 
+                   data-id="<%= coupon._id %>"
+                   style="margin-left: 0;">
+        </div>
+        <span class="status-label ms-2 <%= coupon.isActive ? 'status-active' : 'status-inactive' %>">
+            <%= coupon.isActive ? 'Active' : 'Inactive' %>
+        </span>
+    </div>
+</td>
+    <!-- END STATUS COLUMN -->
+    <td>
+        <button class="btn btn-sm btn-outline-primary btn-edit me-2" 
+                data-id="<%= coupon._id %>">
+            <i class="bi bi-pencil"></i>
+        </button>
+        <button class="btn btn-sm btn-outline-danger btn-delete" 
+                data-id="<%= coupon._id %>">
+            <i class="bi bi-trash"></i>
+        </button>
+    </td>
+</tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="card-footer bg-white border-0">
+      <% if (totalPages > 1) { %>
+        <nav aria-label="Coupon pagination">
+          <ul class="pagination justify-content-center mb-0">
+            <!-- Previous -->
+            <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+              <a class="page-link" 
+                 href="?page=<%= currentPage - 1 %><%= search ? '&search=' + encodeURIComponent(search) : '' %><%= status && status !== 'all' ? '&status=' + status : '' %>"
+                 aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+
+            <!-- Page numbers -->
+            <% for(let i = 1; i <= totalPages; i++) { %>
+              <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                <a class="page-link" 
+                   href="?page=<%= i %><%= search ? '&search=' + encodeURIComponent(search) : '' %><%= status && status !== 'all' ? '&status=' + status : '' %>">
+                  <%= i %>
+                </a>
+              </li>
+            <% } %>
+
+            <!-- Next -->
+            <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+              <a class="page-link" 
+                 href="?page=<%= currentPage + 1 %><%= search ? '&search=' + encodeURIComponent(search) : '' %><%= status && status !== 'all' ? '&status=' + status : '' %>"
+                 aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      <% } else if(coupons.length > 0) { %>
+        <div class="text-center text-muted py-3">
+          <small>Showing all coupons (<%= coupons.length %>)</small>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Add Coupon Modal -->
+  <div class="modal fade" id="addCouponModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title">Add New Coupon</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="addCouponForm">
+            <div class="mb-3">
+              <label class="form-label">Coupon Code *</label>
+              <input type="text" class="form-control" name="code" placeholder="e.g. SAVE20" >
+              <small class="text-muted">4-20 characters, uppercase letters, numbers, dash or underscore only</small>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Description *</label>
+              <textarea class="form-control" name="description" rows="2" placeholder="Brief description of the coupon offer" ></textarea>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Minimum Purchase Amount (₹)</label>
+                <input type="number" class="form-control" name="minPurchaseAmount" value="0" min="0" step="0.01">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Discount Type *</label>
+                <select class="form-select" name="discountType" >
+                  <option value="percentage">Percentage (%)</option>
+                  <option value="fixed">Fixed Amount (₹)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Discount Value *</label>
+                <input type="number" class="form-control" name="discountValue" min="0.01" step="0.01" >
+              </div>
+              <div class="col-md-6" id="maxDiscountAmountContainer" style="display: none;">
+                <label class="form-label">Max Discount Amount (₹)</label>
+                <input type="number" class="form-control" name="maxDiscountAmount" min="1" step="0.01">
+              </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Start Date *</label>
+                <input type="date" class="form-control" name="startDate" >
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">End Date *</label>
+                <input type="date" class="form-control" name="endDate" >
+              </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Usage Limit *</label>
+                <input type="number" class="form-control" name="usageLimit" value="1" min="1" >
+                <small class="text-muted">Total times coupon can be used</small>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Per User Limit *</label>
+                <input type="number" class="form-control" name="perUserLimit" value="1" min="1" >
+                <small class="text-muted">Times a single user can use this</small>
+              </div>
+            </div>
+
+            <div class="form-check mb-3">
+              <input class="form-check-input" type="checkbox" name="isActive" id="addIsActive" checked>
+              <label class="form-check-label" for="addIsActive">
+                Active Coupon
+              </label>
+            </div>
+
+            <div class="d-grid mt-4">
+              <button type="submit" class="btn btn-primary btn-lg" id="addCouponSubmit">
+                ADD COUPON
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Coupon Modal -->
+  <div class="modal fade" id="editCouponModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title">Edit Coupon</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editCouponForm">
+            <input type="hidden" name="couponId" id="edit_couponId">
+
+            <div class="mb-3">
+              <label class="form-label">Coupon Code *</label>
+              <input type="text" class="form-control" name="code" id="edit_code" required>
+              <small class="text-muted">4-20 characters, uppercase letters, numbers, dash or underscore only</small>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Description *</label>
+              <textarea class="form-control" name="description" id="edit_description" rows="2" required></textarea>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Minimum Purchase Amount (₹)</label>
+                <input type="number" class="form-control" name="minPurchaseAmount" id="edit_minPurchaseAmount" min="0" step="0.01">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Discount Type *</label>
+                <select class="form-select" name="discountType" id="edit_discountType" required>
+                  <option value="percentage">Percentage (%)</option>
+                  <option value="fixed">Fixed Amount (₹)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Discount Value *</label>
+                <input type="number" class="form-control" name="discountValue" id="edit_discountValue" min="0.01" step="0.01" >
+              </div>
+              <div class="col-md-6" id="edit_maxDiscountAmountContainer">
+                <label class="form-label">Max Discount Amount (₹)</label>
+                <input type="number" class="form-control" name="maxDiscountAmount" id="edit_maxDiscountAmount" min="1" step="0.01">
+              </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Start Date *</label>
+                <input type="date" class="form-control" name="startDate" id="edit_startDate" >
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">End Date *</label>
+                <input type="date" class="form-control" name="endDate" id="edit_endDate" >
+              </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Usage Limit *</label>
+                <input type="number" class="form-control" name="usageLimit" id="edit_usageLimit" min="1" >
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Per User Limit *</label>
+                <input type="number" class="form-control" name="perUserLimit" id="edit_perUserLimit" min="1" >
+              </div>
+            </div>
+
+            <div class="form-check mb-3">
+              <input class="form-check-input" type="checkbox" name="isActive" id="edit_isActive">
+              <label class="form-check-label" for="edit_isActive">
+                Active Coupon
+              </label>
+            </div>
+
+            <div class="d-grid mt-4">
+              <button type="submit" class="btn btn-primary btn-lg" id="editCouponSubmit">
+                UPDATE COUPON
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal fade" id="deleteCouponModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title text-danger">Delete Coupon</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to delete coupon "<span id="deleteCouponCode"></span>"?</p>
+          <p class="text-muted small">This action cannot be undone. If the coupon has been used, it cannot be deleted.</p>
+        </div>
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" id="confirmDelete">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
