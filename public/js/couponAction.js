@@ -28,8 +28,9 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Coupon Action JS initialized');
         
         // Event Listeners
-        btnAddCoupon.addEventListener('click', openAddCouponModal);
-        addCouponForm.addEventListener('submit', handleAddCoupon);
+if (btnAddCoupon) {
+    btnAddCoupon.addEventListener('click', openAddCouponModal);
+}        addCouponForm.addEventListener('submit', handleAddCoupon);
         editCouponForm.addEventListener('submit', handleUpdateCoupon);
         searchCoupon.addEventListener('input', handleSearch);
         confirmDeleteBtn.addEventListener('click', handleDeleteCoupon);
@@ -192,18 +193,21 @@ document.addEventListener('DOMContentLoaded', function() {
             case 'startDate':
             case 'endDate':
                 isValid = validateDates(form);
-                if (!isValid) {
-                    if (fieldName === 'startDate') {
+               if (!isValid) {
+                const todayStr = new Date().toISOString().split('T')[0];
+
+                if (fieldName === 'startDate') {
+                    if (field.value < todayStr) {
                         errorMessage = 'Start date cannot be in the past';
-                    } else {
-                        const startDate = new Date(form.querySelector('input[name="startDate"]').value);
-                        const endDate = new Date(field.value);
-                        if (endDate <= startDate) {
-                            errorMessage = 'End date must be after start date';
-                        }
+                    }
+                } else {
+                    const startDate = form.querySelector('input[name="startDate"]').value;
+                    if (field.value <= startDate) {
+                        errorMessage = 'End date must be after start date';
                     }
                 }
-                break;
+            }
+             break;
                 
             case 'usageLimit':
             case 'perUserLimit':
@@ -325,30 +329,26 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         return true;
     }
+function validateDates(form) {
+    const startDateInput = form.querySelector('input[name="startDate"]');
+    const endDateInput = form.querySelector('input[name="endDate"]');
 
-    function validateDates(form) {
-        const startDateInput = form.querySelector('input[name="startDate"]');
-        const endDateInput = form.querySelector('input[name="endDate"]');
-        
-        if (!startDateInput.value || !endDateInput.value) return true;
-        
-        const startDate = new Date(startDateInput.value);
-        const endDate = new Date(endDateInput.value);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        
-        // Check if start date is valid
-        if (startDateInput === document.activeElement || startDateInput.value) {
-            if (startDate < today) return false;
-        }
-        
-        // Check if end date is valid
-        if (endDateInput === document.activeElement || endDateInput.value) {
-            if (endDate <= startDate) return false;
-        }
-        
-        return true;
-    }
+    if (!startDateInput.value || !endDateInput.value) return true;
+
+    // ✅ FIX: Compare as STRING instead of Date (avoids timezone issue)
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    const startDate = startDateInput.value;
+    const endDate = endDateInput.value;
+
+    // Start date cannot be past
+    if (startDate < todayStr) return false;
+
+    // End date must be after start date
+    if (endDate <= startDate) return false;
+
+    return true;
+}
 
     function validateLimit(value, fieldName, form) {
         const numValue = parseInt(value);

@@ -2,16 +2,20 @@ const validate = (schema) => {
     
   return (req, res, next) => {
 
-    const { error } = schema.validate(req.body, { abortEarly: false });
+const { value, error } = schema.validate(req.body, {
+  abortEarly: false,
+  stripUnknown: true
+});
+
 
     if (error) {
       const errors = {};
       error.details.forEach((err) => {
-        const key = err.path[0];
+        const key = err.path.join('.');
         errors[key] = err.message.replace(/["]/g, '');
       });
 
-      if (req.xhr || req.headers.accept.includes("json")) {
+      if (req.xhr ||  req.headers.accept?.includes("json")) {
         return res.status(400).json({ errors });
       }
 
@@ -23,7 +27,9 @@ const validate = (schema) => {
       });
     }
 
-  return  next();
+req.body = value;
+
+  next();
   };
 };
 

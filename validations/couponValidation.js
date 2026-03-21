@@ -3,7 +3,7 @@ const Joi = require('joi');
 const couponValidationSchema = Joi.object({
     code: Joi.string()
         .trim()
-        .uppercase({ force: true })
+        .uppercase()
         .min(4)
         .max(20)
         .pattern(/^[A-Z][A-Z0-9_-]{3,19}$/)
@@ -12,7 +12,8 @@ const couponValidationSchema = Joi.object({
             'string.empty': 'Coupon code is required',
             'string.min': 'Coupon code must be at least 4 characters',
             'string.max': 'Coupon code cannot exceed 20 characters',
-'string.pattern.base': 'Coupon code must start with a letter (A-Z) and can contain letters, numbers, underscore (_), or hyphen (-)'        }),
+            'string.pattern.base': 'Coupon code must start with a letter (A-Z) and can contain letters, numbers, underscore (_), or hyphen (-)'
+        }),
 
     description: Joi.string()
         .trim()
@@ -49,7 +50,7 @@ const couponValidationSchema = Joi.object({
 
     maxDiscountAmount: Joi.number()
         .min(0)
-        .allow(null, '')
+        .allow(null)
         .optional()
         .when('discountType', {
             is: 'percentage',
@@ -92,10 +93,8 @@ const couponValidationSchema = Joi.object({
     startDate: Joi.date()
         .iso()
         .required()
-        .min('now')
         .messages({
             'date.base': 'Start date is required',
-            'date.min': 'Start date cannot be in the past',
             'date.format': 'Start date must be a valid date'
         }),
 
@@ -113,11 +112,12 @@ const couponValidationSchema = Joi.object({
         .default(true)
 });
 
-// Schema for updates (code is optional)
+
+// ✅ UPDATE SCHEMA (safe version – only code optional)
 const couponUpdateValidationSchema = couponValidationSchema.keys({
     code: Joi.string()
         .trim()
-        .uppercase({ force: true })
+        .uppercase()
         .min(4)
         .max(20)
         .pattern(/^[A-Z0-9_-]{4,20}$/)
@@ -129,11 +129,12 @@ const couponUpdateValidationSchema = couponValidationSchema.keys({
         })
 });
 
-// For applying coupons (user side) - No changes needed
+
+// ✅ APPLY COUPON (no change)
 const couponApplyValidationSchema = Joi.object({
     couponCode: Joi.string()
         .trim()
-        .min(1, 'utf8')
+        .min(1)
         .max(20)
         .required()
         .messages({
@@ -143,8 +144,8 @@ const couponApplyValidationSchema = Joi.object({
         })
 });
 
-module.exports = { 
-    couponValidationSchema, 
+module.exports = {
+    couponValidationSchema,
     couponUpdateValidationSchema,
-    couponApplyValidationSchema 
+    couponApplyValidationSchema
 };

@@ -41,12 +41,11 @@
                             <span><%= new Date(order.createdAt).toLocaleDateString() %></span>
                         </div>
                         <div class="detail-row">
-                            <span>Payment Method:</span>
-                            <span class="payment-method">
-                                <i class="fas fa-money-bill-wave"></i>
-                                Cash on Delivery
-                            </span>
-                        </div>
+ <span class="payment-method">
+    <i class="fas fa-credit-card"></i>
+    <%= order.paymentMethod && order.paymentMethod.toLowerCase() === 'cod' ? 'Cash on Delivery' : 'Razorpay' %>
+</span>
+</div>
                         <div class="detail-row">
                             <span>Total Amount:</span>
                             <span class="total-amount">₹<%= order.totalAmount.toFixed(2) %></span>

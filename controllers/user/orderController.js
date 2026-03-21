@@ -170,23 +170,23 @@ exports.getOrderDetails = async (req, res) => {
             return res.status(404).send("Order not found");
         }
          if (!order.confirmedAt && order.status !== 'pending') {
-      order.confirmedAt = new Date(order.createdAt.getTime() + 2*60*60*1000); // 2 hours after order
+      order.confirmedAt = new Date(order.createdAt.getTime() + 2*60*60*1000);
     }
     
     if (!order.shippedAt && ['shipped', 'out for delivery', 'delivered'].includes(order.status)) {
-      order.shippedAt = new Date(order.createdAt.getTime() + 24*60*60*1000); // 1 day after order
+      order.shippedAt = new Date(order.createdAt.getTime() + 24*60*60*1000); 
     }
     
     if (!order.outForDeliveryAt && ['out for delivery', 'delivered'].includes(order.status)) {
-      order.outForDeliveryAt = new Date(order.createdAt.getTime() + 48*60*60*1000); // 2 days after order
+      order.outForDeliveryAt = new Date(order.createdAt.getTime() + 48*60*60*1000);
     }
     
     if (!order.deliveredAt && order.status === 'delivered') {
-      order.deliveredAt = new Date(order.createdAt.getTime() + 72*60*60*1000); // 3 days after order
+      order.deliveredAt = new Date(order.createdAt.getTime() + 72*60*60*1000);
     }
     
     if (!order.cancelledAt && order.status === 'cancelled') {
-      order.cancelledAt = new Date(); // Current time for cancelled
+      order.cancelledAt = new Date(); 
     }
 
 

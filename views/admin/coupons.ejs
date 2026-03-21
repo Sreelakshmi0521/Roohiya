@@ -105,17 +105,41 @@
     <!-- ADD THIS STATUS COLUMN -->
 <!-- UPDATE THE STATUS COLUMN IN YOUR TABLE -->
 <td>
-    <div class="d-flex align-items-center justify-content-between">
-        <div class="form-check form-switch m-0">
-            <input class="form-check-input toggle-status" type="checkbox" 
-                   role="switch" <%= coupon.isActive ? 'checked' : '' %> 
-                   data-id="<%= coupon._id %>"
-                   style="margin-left: 0;">
-        </div>
-        <span class="status-label ms-2 <%= coupon.isActive ? 'status-active' : 'status-inactive' %>">
-            <%= coupon.isActive ? 'Active' : 'Inactive' %>
-        </span>
+<%
+   const now = new Date();
+   let displayStatus = '';
+   let statusClass = '';
+   const isExpired = now > new Date(coupon.endDate);
+
+   if (!coupon.isActive) {
+       displayStatus = 'Inactive';
+       statusClass = 'status-inactive';
+   } else if (isExpired) {
+       displayStatus = 'Expired';
+       statusClass = 'status-expired';
+   } else if (now < new Date(coupon.startDate)) {
+       displayStatus = 'Scheduled';
+       statusClass = 'status-scheduled';
+   } else {
+       displayStatus = 'Active';
+       statusClass = 'status-active';
+   }
+%>
+
+<div class="d-flex align-items-center justify-content-between">
+    <div class="form-check form-switch m-0">
+        <input class="form-check-input toggle-status"
+               type="checkbox"
+               role="switch"
+               <%= coupon.isActive && !isExpired ? 'checked' : '' %>
+               <%= isExpired ? 'disabled' : '' %>
+               data-id="<%= coupon._id %>">
     </div>
+
+    <span class="ms-2 <%= statusClass %>">
+        <%= displayStatus %>
+    </span>
+</div>
 </td>
     <!-- END STATUS COLUMN -->
     <td>

@@ -59,7 +59,7 @@ body, html {
     box-shadow: 0 0 0 0.2rem rgba(247, 147, 30, 0.25);
 }
 .create-btn {
-    background: rgb(246, 194, 194);;
+    background: #638C62;
     border: none;
     color: #000000;
     padding: 12px 20px;
@@ -69,7 +69,7 @@ body, html {
     margin-bottom: 1.5rem;
 }
 .create-btn:hover {
-    background: rgb(244, 200, 200);;
+    background: #668865;
 }
 .login-link a, .forgot-password a {
     color: #f7931e;

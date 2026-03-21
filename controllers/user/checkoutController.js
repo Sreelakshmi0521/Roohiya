@@ -2,7 +2,6 @@ const Address= require("../../models/addressModel")
 const Cart=require("../../models/cartModel")
 const getUserId=(req)=>req.session.user?._id||req.session.user?.id
 
-
 exports.loadCheckoutPage=async(req,res)=>{
     try {
         const userId=getUserId(req)
@@ -84,6 +83,8 @@ exports.loadCheckoutPage=async(req,res)=>{
 
     }
 }
+
+
 
 exports.getAddressById=async(req,res)=>{
     try {

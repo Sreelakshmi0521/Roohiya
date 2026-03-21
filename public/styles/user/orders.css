@@ -82,7 +82,7 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-heading);
+    font-family: 'Oliver Font Family';
     font-weight: 600;
     color: var(--text-primary);
     line-height: 1.25;
@@ -92,7 +92,7 @@ h1, h2, h3, h4, h5, h6 {
 .profile-main-container {
     min-height: calc(100vh - 200px);
     padding: var(--space-2xl) 0;
-    background-color: var(--bg-light);
+    background-color:#F8F5F0;
 }
 
 .profile-wrapper {

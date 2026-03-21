@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     <title><%= pageTitle %></title>
+    <title><%= pageTitle %></title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
@@ -33,7 +33,7 @@
                                         value="<%= address._id %>" 
                                         id="address-<%= address._id %>"
                                         <%= address.isDefault ? 'checked' : '' %>
-                                        
+                                        required
                                     >
                                     <label for="address-<%= address._id %>" class="address-label">
                                         <div class="address-content">
@@ -81,11 +81,20 @@
                 <!-- Payment Method -->
                 <section class="payment-section">
                     <h2>Payment Method</h2>
-                    <div class="payment-option">
-                        <input type="radio" name="paymentMethod" id="cod" value="cod" checked >
-                        <label for="cod">
-                            <i class="fas fa-money-bill-wave"></i> Cash on Delivery
-                        </label>
+                    <div class="payment-options">
+                        <div class="payment-option">
+                            <input type="radio" name="paymentMethod" id="cod" value="cod" checked required>
+                            <label for="cod">
+                                <i class="fas fa-money-bill-wave"></i> Cash on Delivery
+                            </label>
+                        </div>
+                        <!-- Add other payment methods here -->
+                         <div class="payment-option">
+  <input type="radio" name="paymentMethod" id="razorpay" value="razorpay" required>
+  <label for="razorpay">
+    <i class="fas fa-credit-card"></i> Pay Online (Razorpay)
+  </label>
+</div>
                     </div>
                 </section>
             </div>
@@ -105,10 +114,12 @@
                                     <div class="item-details">
                                         <h4><%= item.name %></h4>
                                         <p class="item-quantity">Quantity: <%= item.quantity %></p>
-                                        <p class="item-price">₹<%= (item.price * item.quantity).toFixed(2) %></p>
                                         <% if (item.discount > 0) { %>
-                                            <p class="item-discount">Discount: -₹<%= item.discount.toFixed(2) %></p>
+                                            <p class="item-original-price">
+                                                <del>₹<%= (item.originalPrice * item.quantity).toFixed(2) %></del>
+                                            </p>
                                         <% } %>
+                                        <p class="item-price">₹<%= (item.price * item.quantity).toFixed(2) %></p>
                                     </div>
                                 </div>
                             <% }); %>
@@ -117,90 +128,110 @@
                         <% } %>
                     </div>
 
-                    <div class="price-breakdown">
+                   <div class="price-breakdown">
+    <!-- Original Price (optional) -->
+    <% if (summary.youSave > 0) { %>
+        <div class="price-row original-price">
+            <span>Original Price:</span>
+            <span><del>₹<%= (summary.subtotal + summary.youSave).toFixed(2) %></del></span>
+        </div>
+    <% } %>
+    
     <div class="price-row">
         <span>Subtotal:</span>
-        <span>₹<%= (summary.subtotal || 0).toFixed(2) %></span>
+        <span>₹<%= summary.subtotal || "0.00" %></span>
     </div>
     
-    <!-- Product Discounts (You Save) -->
     <% if (summary.youSave > 0) { %>
         <div class="price-row you-save">
             <span class="text-success">You Save:</span>
-            <span class="text-success">₹<%= (summary.youSave || 0).toFixed(2) %></span>
+            <span class="text-success">-₹<%= summary.youSave || "0.00" %></span>
         </div>
     <% } %>
     
-  
-    <div class="price-row">  <!-- Coupon Discount -->
     <% if (summary.couponDiscount > 0) { %>
         <div class="price-row discount">
             <span>Coupon Discount (<%= summary.appliedCoupon?.code %>):</span>
-            <span>-₹<%= (summary.couponDiscount || 0).toFixed(2) %></span>
+            <span>-₹<%= summary.couponDiscount || "0.00" %></span>
         </div>
     <% } %>
     
+    <div class="price-row">
         <span>Shipping:</span>
-        <span>₹<%= (summary.shipping || 0).toFixed(2) %></span>
+        <span>
+            <% if (summary.shipping > 0) { %>
+                ₹<%= summary.shipping || "0.00" %>
+            <% } else { %>
+                FREE
+            <% } %>
+        </span>
     </div>
     
     <div class="price-row">
-        <span>Tax:</span>
-        <span>₹<%= (summary.tax || 0).toFixed(2) %></span>
+        <span>Tax (5%):</span>
+        <span>₹<%= summary.tax || "0.00" %></span>
     </div>
     
+    <hr class="divider">
+    
     <div class="price-row total">
-        <span>Grand Total:</span>
-        <span>₹<%= (summary.total || 0).toFixed(2) %></span>
+        <strong>Grand Total:</strong>
+        <strong>₹<%= summary.total || "0.00" %></strong>
     </div>
 </div>
 
-                    <button type="button" class="btn-place-order" onclick="placeOrder()">
+                    <button type="button" class="btn-place-order" onclick="placeOrder()" id="placeOrderBtn">
                         <i class="fas fa-shopping-bag"></i> Place Order
                     </button>
                 </section>
                 
-                    <!-- Simple Coupon Box Below Order Summary -->
-<section class="simple-coupon-box">
-    <h3>Apply Coupon</h3>
-    <div class="coupon-input-group">
-        <% if (summary.appliedCoupon && summary.appliedCoupon.code) { %>
-            <input 
-                type="text" 
-                id="couponCode" 
-                placeholder="Enter coupon code" 
-                value="<%= summary.appliedCoupon.code %>" 
-                readonly
-            >
-            <button type="button" class="btn-remove" onclick="removeCoupon()" id="removeCouponBtn">
-                REMOVE
-            </button>
-        <% } else { %>
-            <input 
-                type="text" 
-                id="couponCode" 
-                placeholder="Enter coupon code"
-            >
-            <button type="button" class="btn-apply" onclick="applyCoupon()" id="applyCouponBtn">
-                APPLY
-            </button>
-        <% } %>
-    </div>
+                <!-- Coupon Section -->
+<!-- Coupon Section -->
+<section class="checkout-coupon">
+  <h3 class="checkout-coupon__title">
+    <i class="fas fa-tag"></i> Apply Coupon
+  </h3>
 
-    <% if (summary.appliedCoupon && summary.appliedCoupon.code) { %>
-        <div class="applied-success">
-            <i class="fas fa-check-circle"></i>
-            Coupon <strong><%= summary.appliedCoupon.code %></strong> applied! 
-            You saved ₹<%= summary.couponDiscount.toFixed(2) %>
+  <% if (summary.appliedCoupon && summary.appliedCoupon.code) { %>
+    <div class="checkout-coupon__applied">
+      <div class="checkout-coupon__info">
+        <i class="fas fa-check-circle"></i>
+        <div>
+          <strong><%= summary.appliedCoupon.code %></strong>
+          <span>
+            <% if (summary.appliedCoupon.discountType === 'percentage') { %>
+              <%= summary.appliedCoupon.discountValue %>% OFF
+            <% } else { %>
+              ₹<%= summary.appliedCoupon.discountValue %> OFF
+            <% } %>
+          </span>
         </div>
-    <% } %>
+      </div>
 
-    <div class="view-coupons-link">
-        <button type="button" class="link-btn" onclick="openAvailableCouponsModal()" id="viewCouponsBtn">
-            <i class="fas fa-ticket-alt"></i> View Available Coupons
-        </button>
+      <button class="checkout-coupon__remove" onclick="removeCoupon()">
+        Remove
+      </button>
     </div>
+  <% } else { %>
+    <div class="checkout-coupon__input">
+      <input
+        type="text"
+        id="couponCode"
+        placeholder="Enter coupon code"
+        maxlength="20"
+      />
+      <button onclick="applyCoupon()">Apply</button>
+    </div>
+
+    <p id="couponError" class="checkout-coupon__error"></p>
+    <p id="couponSuccess" class="checkout-coupon__success"></p>
+  <% } %>
+
+  <button class="checkout-coupon__view" onclick="showAvailableCoupons()">
+    <i class="fas fa-ticket-alt"></i> View Available Coupons
+  </button>
 </section>
+
             </div>
         </div>
     </div>
@@ -228,7 +259,7 @@
                             <i class="fas fa-user"></i> Full Name
                         </label>
                         <input type="text" id="name" name="name"  
-                               placeholder="Enter your full name">
+                               placeholder="Enter your full name" >
                         <span class="error-message" id="nameError"></span>
                     </div>
 
@@ -238,7 +269,7 @@
                             <i class="fas fa-phone"></i> Phone Number
                         </label>
                         <input type="tel" id="phone" name="phone"  
-                               placeholder="10-digit mobile number">
+                               placeholder="10-digit mobile number" >
                         <span class="error-message" id="phoneError"></span>
                     </div>
 
@@ -248,7 +279,7 @@
                             <i class="fas fa-home"></i> House/Building Name
                         </label>
                         <input type="text" id="houseName" name="houseName"  
-                               placeholder="House no. and building name">
+                               placeholder="House no. and building name" >
                         <span class="error-message" id="houseNameError"></span>
                     </div>
 
@@ -258,7 +289,7 @@
                             <i class="fas fa-road"></i> Locality/Area
                         </label>
                         <input type="text" id="locality" name="locality"  
-                               placeholder="Locality or area name">
+                               placeholder="Locality or area name" >
                         <span class="error-message" id="localityError"></span>
                     </div>
 
@@ -268,7 +299,7 @@
                             <i class="fas fa-city"></i> City
                         </label>
                         <input type="text" id="city" name="city"  
-                               placeholder="Enter your city">
+                               placeholder="Enter your city" >
                         <span class="error-message" id="cityError"></span>
                     </div>
 
@@ -278,7 +309,7 @@
                             <i class="fas fa-map"></i> State
                         </label>
                         <input type="text" id="state" name="state"  
-                               placeholder="Enter your state">
+                               placeholder="Enter your state" >
                         <span class="error-message" id="stateError"></span>
                     </div>
 
@@ -287,13 +318,12 @@
                         <label for="pincode" class="form-label">
                             <i class="fas fa-map-pin"></i> Pincode
                         </label>
-                                    <div class="pincode-wrapper">
-                                    <input type="text" id="pincode" name="pincode" placeholder="6-digit pincode">
-                                    <span id="spinner" style="display:none;">
-                                        <i class="fas fa-spinner fa-spin"></i>
-                                    </span>
-                                    </div>
-
+                        <div class="pincode-wrapper">
+                            <input type="text" id="pincode" name="pincode" placeholder="6-digit pincode" >
+                            <span id="spinner" style="display:none;">
+                                <i class="fas fa-spinner fa-spin"></i>
+                            </span>
+                        </div>
                         <span class="error-message" id="pincodeError"></span>
                     </div>
 
@@ -325,7 +355,7 @@
                         </label>
                         <div class="address-type-options">
                             <label class="radio-label">
-                                <input type="radio" name="addressType" value="Home" checked>
+                                <input type="radio" name="addressType" value="Home" checked >
                                 <span class="radio-custom"></span>
                                 <i class="fas fa-home"></i> Home
                             </label>
@@ -364,16 +394,39 @@
         </div>
     </div>
 
+    <!-- Available Coupons Modal -->
+    <div id="couponsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-ticket-alt"></i> Available Coupons</h2>
+                <button type="button" class="close-btn" onclick="closeCouponsModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <div id="couponsList" class="coupons-list">
+                    <!-- Coupons will be loaded here -->
+                    <div class="loading">
+                        <i class="fas fa-spinner fa-spin"></i> Loading coupons...
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeCouponsModal()">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
     <%- include('../partials/user/footer') %>
     
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="/js/checkout.js"></script>
-       <script src="/js/pincodeAutofill.js"></script>
-           <script src="/js/coupon.js"></script>
-
-
-    
-  
+    <script src="/js/pincodeAutofill.js"></script>
+    <!-- <script src="/js/coupon.js"></script> -->
 </body>
 </html>
